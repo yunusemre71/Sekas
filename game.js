@@ -25727,8 +25727,8 @@ void main() {
           name: "Düşük",
           viewRadius: 3,
           nearRadius: 1,
-          grassRadius: 18,
-          grassDensity: 0.45,
+          grassRadius: 15,
+          grassDensity: 0.4,
           shadow: 1024,
           shadowRange: 40,
           pixelRatio: 0.75,
@@ -25740,8 +25740,8 @@ void main() {
           name: "Orta",
           viewRadius: 4,
           nearRadius: 2,
-          grassRadius: 30,
-          grassDensity: 0.7,
+          grassRadius: 25,
+          grassDensity: 0.6,
           shadow: 2048,
           shadowRange: 55,
           pixelRatio: 1,
@@ -25753,8 +25753,8 @@ void main() {
           name: "Yüksek",
           viewRadius: 5,
           nearRadius: 2,
-          grassRadius: 40,
-          grassDensity: 1,
+          grassRadius: 33,
+          grassDensity: 0.85,
           shadow: 2048,
           shadowRange: 70,
           pixelRatio: 1.25,
@@ -25766,8 +25766,8 @@ void main() {
           name: "Ultra",
           viewRadius: 6,
           nearRadius: 3,
-          grassRadius: 52,
-          grassDensity: 1.25,
+          grassRadius: 42,
+          grassDensity: 1.05,
           shadow: 4096,
           shadowRange: 90,
           pixelRatio: 1.5,
@@ -46131,7 +46131,7 @@ ${fi}
         w = Math.sin(d),
         v = -w,
         M = x,
-        T = 3;
+        T = 2;
       for (let b = 0; b <= T; b++) {
         let _ = b / T,
           E = g * (1 - _ * 0.92),
@@ -46318,6 +46318,35 @@ uniform float uWet; uniform float uNight;`,
       a
     );
   }
+  function sgCompact(r, t) {
+    let e = r.instanceMatrix.array,
+      n = r.instanceColor.array,
+      i = t.instanceMatrix.array,
+      s = t.instanceColor.array,
+      o = 0;
+    for (let a = 0, l = r.count; a < l; a++) {
+      let c = a * 16;
+      if (e[c] === 0 && e[c + 1] === 0 && e[c + 2] === 0) continue;
+      for (let h = 0; h < 16; h++) i[o * 16 + h] = e[c + h];
+      let h = a * 3,
+        d = o * 3;
+      ((s[d] = n[h]), (s[d + 1] = n[h + 1]), (s[d + 2] = n[h + 2]), o++);
+    }
+    ((t.count = o), (t.instanceMatrix.needsUpdate = !0), (t.instanceColor.needsUpdate = !0));
+  }
+  function sgDrawMesh(r) {
+    let t = new Ni(r.geometry, r.material, r.count);
+    return (
+      (t.frustumCulled = !1),
+      (t.receiveShadow = !0),
+      (t.castShadow = !1),
+      t.setColorAt(0, new vt(1, 1, 1)),
+      t.instanceMatrix.setUsage(Ei),
+      t.instanceColor.setUsage(Ei),
+      (t.count = 0),
+      t
+    );
+  }
   var SgMicroGrass = class {
     constructor(t, e) {
       ((this.G = t),
@@ -46325,6 +46354,7 @@ uniform float uWet; uniform float uNight;`,
         (this.geo = sgMicroGeo(80)),
         (this.mat = Vx(this.u)),
         (this.mat.defines.GRASS_H = "0.16"),
+        (this.mat.side = an),
         (this.mat.customProgramCacheKey = () => "grass-micro-v1"),
         (this.cells = new Map()),
         (this.free = []),
@@ -46337,7 +46367,8 @@ uniform float uWet; uniform float uNight;`,
     }
     configure(t) {
       if (
-        (this.mesh && (this.G.scene.remove(this.mesh), this.mesh.dispose(), (this.mesh = null)),
+        (this.mesh &&
+          (this.G.scene.remove(this.draw), this.mesh.dispose(), this.draw.dispose(), (this.mesh = this.draw = null)),
         this.cells.clear(),
         (this.pending.length = 0),
         (this.lastCx = null),
@@ -46355,9 +46386,8 @@ uniform float uWet; uniform float uNight;`,
       ((this.mesh.frustumCulled = !1),
         (this.mesh.receiveShadow = !0),
         (this.mesh.castShadow = !1),
-        this.mesh.instanceMatrix.setUsage(Ei),
-        this.mesh.instanceColor.setUsage(Ei),
-        this.G.scene.add(this.mesh),
+        (this.draw = sgDrawMesh(this.mesh)),
+        this.G.scene.add(this.draw),
         (this.u.uRadius.value = t));
     }
     blocked(t, e, n) {
@@ -46490,8 +46520,7 @@ uniform float uWet; uniform float uNight;`,
         }
         (this.fill(s, o, a.block), (this.dirty = !0), i--);
       }
-      this.dirty &&
-        ((this.mesh.instanceMatrix.needsUpdate = !0), (this.mesh.instanceColor.needsUpdate = !0), (this.dirty = !1));
+      this.dirty && (sgCompact(this.mesh, this.draw), (this.dirty = !1));
     }
   };
   var qh = class {
@@ -46527,7 +46556,11 @@ uniform float uWet; uniform float uNight;`,
         (this.K = Math.round(36 * e)),
         (this.KF = Math.max(1, Math.round(3 * e))),
         this.mesh &&
-          (this.G.scene.remove(this.mesh, this.flowers), this.mesh.dispose(), this.flowers.dispose()),
+          (this.G.scene.remove(this.dmesh, this.dflowers),
+          this.mesh.dispose(),
+          this.flowers.dispose(),
+          this.dmesh.dispose(),
+          this.dflowers.dispose()),
         this.cells.clear(),
         (this.pending.length = 0),
         (this.lastCx = null),
@@ -46547,8 +46580,10 @@ uniform float uWet; uniform float uNight;`,
         for (let o = 0; o < i.count; o++) i.setMatrixAt(o, s);
         i.setColorAt(0, new vt(1, 1, 1));
         for (let o = 0; o < i.count; o++) i.setColorAt(o, new vt(1, 1, 1));
-        (i.instanceColor.setUsage(Ei), this.G.scene.add(i));
       }
+      ((this.dmesh = sgDrawMesh(this.mesh)),
+        (this.dflowers = sgDrawMesh(this.flowers)),
+        this.G.scene.add(this.dmesh, this.dflowers));
       this.uniforms.uRadius.value = t;
     }
     densityAt(t, e, n) {
@@ -46706,12 +46741,7 @@ uniform float uWet; uniform float uNight;`,
         }
         (this.fillCell(l, c, h.block), (this.dirty = !0), s--);
       }
-      this.dirty &&
-        ((this.mesh.instanceMatrix.needsUpdate = !0),
-        (this.mesh.instanceColor.needsUpdate = !0),
-        (this.flowers.instanceMatrix.needsUpdate = !0),
-        (this.flowers.instanceColor.needsUpdate = !0),
-        (this.dirty = !1));
+      this.dirty && (sgCompact(this.mesh, this.dmesh), sgCompact(this.flowers, this.dflowers), (this.dirty = !1));
       for (let l of this.trail) l.t += t;
       for (; this.trail.length && this.trail[0].t > 22; ) this.trail.shift();
       let o = this.uniforms.uTrample.value,
