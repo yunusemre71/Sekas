@@ -36298,9 +36298,10 @@ varying float vLeaf;
         K = c / 2 + pt - j;
       if (n === "inn" && Et && Et.side !== "back") {
         let ht, et;
+        let cw = Ae(Math.max(2, Et.w + 1.1), 0.05);
         Et.side === "left"
-          ? ([ht, et] = Y(1, lt, L, B, K, 1.4, "landing", "rooms"))
-          : ([et, ht] = Y(1, lt, L, B, K, B - lt - 1.4, "rooms", "landing"));
+          ? ([ht, et] = Y(1, lt, L, B, K, cw, "landing", "rooms"))
+          : ([et, ht] = Y(1, lt, L, B, K, B - lt - cw, "rooms", "landing"));
         let wt = H[H.length - 1];
         ((wt.gaps = []), (wt.corridor = !0), (W = ht), z.splice(z.indexOf(et), 1));
         let _t = et.z1 - et.z0 > 8.4 ? 4 : 3,
@@ -36570,6 +36571,22 @@ varying float vLeaf;
       d = Math.abs(a * e) / 2 + Math.abs(o * n) / 2;
     return { x0: l - h, x1: l + h, z0: c - d, z1: c + d };
   }
+  var sgClear = {
+    wardrobe: 0.8,
+    cupboard: 0.7,
+    shelf: 0.6,
+    shelf_jars: 0.6,
+    bookshelf: 0.7,
+    chest: 0.6,
+    desk: 0.7,
+    worktable: 0.7,
+    workbench: 0.7,
+    oven: 0.8,
+    toolrack: 0.6,
+    weaponrack: 0.6,
+    cauldron: 0.6,
+    nightstand: 0.35,
+  };
   function A3(r, t, e, n, i) {
     let s = [],
       o = [],
@@ -36597,10 +36614,14 @@ varying float vLeaf;
         );
       },
       d = (b, _, E, S, k, I = {}) => {
-        let C = I.sides || ["back", "left", "right", "front"].sort(() => a() - 0.5);
+        let C = I.sides || ["back", "left", "right", "front"].sort(() => a() - 0.5),
+          cl = sgClear[_] || 0;
         for (let z of C) {
-          let H = b.wallSpot(z, E, S, k > 1.2, a, I.pref);
-          if (H) return h(b, _, H, E, S, k, I.extra || {});
+          let H = b.wallSpot(z, E, S, k > 1.2, a, I.pref, cl);
+          if (H) {
+            let it = h(b, _, H, E, S, k, I.extra || {});
+            return (H.front && b.keepClear(H.front), it);
+          }
         }
         return null;
       },
@@ -36678,6 +36699,11 @@ varying float vLeaf;
             extra: { cover: p[s.length % 3], who: E },
           });
         if (!I) return null;
+        for (let sd of [-1, 1]) {
+          let px = Math.cos(I.yaw) * sd * (S / 2 + 0.35) + Math.sin(I.yaw) * 0.3,
+            pz = -Math.sin(I.yaw) * sd * (S / 2 + 0.35) + Math.cos(I.yaw) * 0.3;
+          b.keepClear(xr(I.x + px, I.z + pz, 0.7, k - 0.6, I.yaw));
+        }
         o.push({
           kind: "bed",
           floor: b.floor,
@@ -37428,7 +37454,7 @@ varying float vLeaf;
           keepClear(t) {
             this.soft.push(t);
           }
-          wallSpot(t, e, n, i, s, o = null) {
+          wallSpot(t, e, n, i, s, o = null, cl = 0) {
             let a = this.side(t);
             if (a.len < e + 0.1) return null;
             let l = [],
@@ -37460,8 +37486,23 @@ varying float vLeaf;
                   z1: Math.max(f[1], p[1]),
                 };
               if (!this.free(y)) continue;
+              let fr = null;
+              if (cl > 0) {
+                let q1 = a.p(d + 0.05, n),
+                  q2 = a.p(u - 0.05, n + cl);
+                if (
+                  ((fr = {
+                    x0: Math.min(q1[0], q2[0]),
+                    x1: Math.max(q1[0], q2[0]),
+                    z0: Math.min(q1[1], q2[1]),
+                    z1: Math.max(q1[1], q2[1]),
+                  }),
+                  !this.free(fr, !1))
+                )
+                  continue;
+              }
               let g = a.p(h + e / 2, n / 2);
-              return { x: g[0], z: g[1], yaw: a.yaw, rect: y, side: t, a: h };
+              return { x: g[0], z: g[1], yaw: a.yaw, rect: y, side: t, a: h, front: fr };
             }
             return null;
           }
@@ -39695,8 +39736,8 @@ varying float vLeaf;
     for (let _ of [-1, 1]) {
       let E = _ * (u / 2 + 0.03);
       l === "z"
-        ? r.box("woodD", d + E, p / 2, m, 0.05, 0.28, g, n.timber, { rx: c * y })
-        : r.box("woodD", m, p / 2, d + E, g, 0.28, 0.05, n.timber, { rz: -c * y });
+        ? r.box("woodD", d + E, p / 2, m, 0.05, 0.28, g, n.timber, { rx: -c * y })
+        : r.box("woodD", m, p / 2, d + E, g, 0.28, 0.05, n.timber, { rz: c * y });
     }
     let w = x * (u / 2 + 0.04);
     if (t.side !== "back") {
@@ -39708,8 +39749,8 @@ varying float vLeaf;
           : r.box("woodD", E, S + 0.45, d + w, 0.07, 0.95, 0.07, n.timber);
       }
       l === "z"
-        ? r.box("woodD", d + w, p / 2 + 0.92, m, 0.06, 0.06, g, n.timber, { rx: c * y })
-        : r.box("woodD", m, p / 2 + 0.92, d + w, g, 0.06, 0.06, n.timber, { rz: -c * y });
+        ? r.box("woodD", d + w, p / 2 + 0.92, m, 0.06, 0.06, g, n.timber, { rx: -c * y })
+        : r.box("woodD", m, p / 2 + 0.92, d + w, g, 0.06, 0.06, n.timber, { rz: c * y });
     }
     let v = j1(t),
       M = e.floors[1].y,
