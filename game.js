@@ -29916,7 +29916,7 @@ varying float vLeaf;
       let nk = [];
       for (let y = 1.5; y <= 1.66; y += 0.04) nk.push({ c: [0, y, -0.025 + (y - 1.5) * 0.12], ru: 0.058, rv: 0.058 });
       tube(nk, [0, 0, 1], (p) => (p[1] < 1.56 ? [["neck_01", 1]] : [["neck_01", 0.5], ["Head", 0.5]]), !1, !1);
-      // arms (upper)
+      part = "Nude_Arms";
       for (let sg of [1, -1]) {
         let f = sg > 0 ? "_l" : "_r",
           rg2 = [];
@@ -30004,7 +30004,7 @@ varying float vLeaf;
         cut = rg.findIndex((q) => q.c[1] <= 0.5);
       (tube(rg.slice(0, cut + 1), [0, 0, 1], lw, !0, !0), (part = "Nude_Feet"), tube(rg.slice(cut), [0, 0, 1], lw, !0, !0), (part = "Nude_Legs"));
     }
-    part = "Nude_Hands";
+    part = "Nude_Arms";
     for (let sg of [1, -1]) {
       let f = sg > 0 ? "_l" : "_r",
         P = (nm) => bp(nm + f),
@@ -30379,14 +30379,14 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
         for (let a of Object.keys(t.parts))
           (a === o || (a.startsWith(o + "_") && /_\d+$/.test(a.slice(o.length)))) && e.push(c + a);
       };
-    (n("HeadMesh"), n("Eyes"), n("Eyebrows"));
+    r.vm || (n("HeadMesh"), n("Eyes"), n("Eyebrows"));
     let i = r.outfit || {};
     for (let o of ["body", "arms", "legs", "feet", "head"]) n(i[o]);
     for (let o of i.acc || []) n(o);
     let s = i.head && /Hood|Armet|Horns/.test(i.head);
     return (
-      r.hair && !s && n(r.hair),
-      r.beard && r.body === "m" && !/Armet/.test(i.head || "") && n("Hair_Beard"),
+      !r.vm && r.hair && !s && n(r.hair),
+      !r.vm && r.beard && r.body === "m" && !/Armet/.test(i.head || "") && n("Hair_Beard"),
       [...new Set(e)]
     );
   }
@@ -30629,6 +30629,7 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
               n,
               i.map((a) => gA(a, t)),
             )),
+              (this.skel = o),
               this.mesh.bind(o, new Gt()),
               (this.mesh.castShadow = !0),
               (this.mesh.receiveShadow = !0),
@@ -30672,6 +30673,25 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
               (this.headVisible = !0),
               (this.lastSpeed = 0),
               (this.blinkT = 0));
+          }
+          setFp(t) {
+            this.fp && (this.model.remove(this.fp), (this.fp = null));
+            let { geometry: e, mats: n } = xA({
+                ...t,
+                vm: !0,
+                outfit: { body: null, arms: t.outfit?.arms || null, legs: null, feet: null, head: null, acc: [] },
+              }),
+              i = new ma(
+                e,
+                n.map((s) => gA(s, t)),
+              );
+            (i.bind(this.skel, new Gt()),
+              (i.castShadow = !0),
+              (i.receiveShadow = !0),
+              (i.frustumCulled = !1),
+              (i.visible = !1),
+              (this.fp = i),
+              this.model.add(i));
           }
           sampler(t) {
             if (!this.samplers[t]) {
@@ -49990,6 +50010,7 @@ uniform float uWet; uniform float uNight;`,
       constructor(t = HA) {
         if (!In.ready) return new sd();
         ((this.av = new Fo(t)),
+          this.av.setFp(t),
           (this.root = this.av.root),
           (this.root.name = "player"),
           (this.head = this.av.bones.Head),
@@ -50193,6 +50214,42 @@ uniform float uWet; uniform float uNight;`,
           p = rd.clone().addScaledVector(f, n ? 0.9 : -0.9);
         Gl(i["upperarm_" + c], i["lowerarm_" + c], i["hand_" + c], u, p, t);
       }
+      poseFp(t, e) {
+        let n = this.av,
+          i = this.bones,
+          s = !!e.fp;
+        this.fpK = Bt(this.fpK || 0, s ? 1 : 0, 12, t);
+        let o = 1 + 0.3 * this.fpK;
+        for (let h of ["l", "r"]) {
+          let d = i["upperarm_" + h];
+          Math.abs(d.scale.x - o) > 1e-4 && d.scale.setScalar(o);
+          let m = n.held[h];
+          m && ((m.userData.s0 ??= m.scale.x), m.scale.setScalar(m.userData.s0 / o));
+        }
+        if (!s) return;
+        let a = e.fp.q,
+          l = new R(1, 0, 0).applyQuaternion(a),
+          c = new R(0, 1, 0).applyQuaternion(a),
+          h = new R(0, 0, -1).applyQuaternion(a),
+          d = e.fp.p;
+        this.fpBusy = Bt(this.fpBusy || 0, e.action || e.aim || e.scr ? 1 : 0, 16, t);
+        let u = (1 - this.fpBusy) * this.fpK;
+        this.fpPh = (this.fpPh || 0) + (e.speed || 0) * t * 2.4;
+        let f = Math.min(1, (e.speed || 0) / 3),
+          p = Math.sin(this.fpPh) * 0.012 * f,
+          y = Math.abs(Math.cos(this.fpPh)) * 0.014 * f;
+        if (u > 0.01) {
+          n.root.updateMatrixWorld(!0);
+          let g = d.clone().addScaledVector(l, 0.25 + p).addScaledVector(c, -0.27 + y).addScaledVector(h, 0.5),
+            m = d.clone().addScaledVector(l, -0.27 - p).addScaledVector(c, -0.32 + y).addScaledVector(h, 0.46),
+            x = l.clone().multiplyScalar(0.8).addScaledVector(c, -0.9),
+            w = l.clone().multiplyScalar(-0.8).addScaledVector(c, -0.9);
+          (Gl(i.upperarm_r, i.lowerarm_r, i.hand_r, g, x, u),
+            Gl(i.upperarm_l, i.lowerarm_l, i.hand_l, m, w, u),
+            n.held.r && Yn(i.hand_r, l, -0.55 * u),
+            n.root.updateMatrixWorld(!0));
+        }
+      }
       poseSlope(t, e) {
         let n = this.av,
           i = this.bones;
@@ -50215,6 +50272,12 @@ uniform float uWet; uniform float uNight;`,
         }
       }
       poseExtra(t, e, n, i) {
+        e.fp &&
+          !e.vmMouth &&
+          (e.vmMouth = e.fp.p
+            .clone()
+            .addScaledVector(new R(0, 0, -1).applyQuaternion(e.fp.q), 0.3)
+            .addScaledVector(new R(0, 1, 0).applyQuaternion(e.fp.q), -0.2));
         this.poseSlope(t, e);
         let s = !!(n && n.type === "eat" && e.food && !e.dead);
         this.eatK = Bt(this.eatK || 0, s ? 1 : 0, 9, t);
@@ -50223,7 +50286,8 @@ uniform float uWet; uniform float uNight;`,
         (o && (this.atkSide = n.type === "punch" ? (this.atkN || 0) % 2 : 0),
           (this.atkP = o ? n.t / Math.max(0.1, n.dur) : 1),
           (this.swK = Bt(this.swK || 0, o ? 1 : 0, 14, t)),
-          this.swK > 0.01 && this.poseSwimAtk(this.swK, this.atkP, this.atkSide || 0));
+          this.swK > 0.01 && this.poseSwimAtk(this.swK, this.atkP, this.atkSide || 0),
+          this.poseFp(t, e));
       }
       updatePose(t, e) {
         let n = this.av;
@@ -53383,6 +53447,10 @@ uniform float uWet; uniform float uNight;`,
             vy: this.vel.y,
             crouch: this.crouching || this.scramble,
             ...this.slopePose(t, e),
+            fp:
+              this.G.cam.mode === "first" && !this.rest && !this.climb && !this.sleeping && !this.dead && !this.G.dialogue?.npc && this.G.cam.pitch > -0.62
+                ? { p: this.G.camera.position, q: this.G.camera.quaternion }
+                : null,
             swim: this.swim,
             action: c
               ? { type: c.type, t: c.t, dur: c.dur, item: c.itemId }
@@ -53415,7 +53483,7 @@ uniform float uWet; uniform float uNight;`,
             ...HA,
             outfit: {
               body: "Nude_Torso",
-              arms: "Nude_Hands",
+              arms: "Nude_Arms",
               legs: "Nude_Legs",
               feet: "Nude_Feet",
               head: null,
@@ -53633,10 +53701,14 @@ uniform float uWet; uniform float uNight;`,
         else {
           let C = e.swim ? hb.y + 0.06 : e.pos.y + (e.crouch ? 1.2 : 1.64);
           ((this.eyeY = this.eyeY == null || Math.abs(this.eyeY - C) > 1.5 ? C : Bt(this.eyeY, C, 10, t)),
-            (I = new R(e.pos.x, this.eyeY, e.pos.z).add(new R(l.x, 0, l.z).normalize().multiplyScalar(0.14))));
+            (this.eyeX = this.eyeX == null || Math.hypot(this.eyeX - hb.x, this.eyeZ - hb.z) > 0.6 ? hb.x : Bt(this.eyeX, hb.x, 22, t)),
+            (this.eyeZ = this.eyeZ == null || Math.hypot(this.eyeX - hb.x, this.eyeZ - hb.z) > 0.6 ? hb.z : Bt(this.eyeZ, hb.z, 22, t)),
+            (I = new R(this.eyeX, this.eyeY, this.eyeZ).add(new R(l.x, 0, l.z).normalize().multiplyScalar(0.1 + Math.max(0, -this.pitch - 0.3) * 0.12))));
         }
         let sb = this.pitch < -0.62 && !pz;
         e.char.av && e.char.av.mesh && e.char.av.mesh.visible !== sb && (e.char.av.mesh.visible = sb);
+        let fpv = !sb && !pz && !e.dead && !e.sleeping && !this.G.dialogue?.npc;
+        e.char.av && e.char.av.fp && e.char.av.fp.visible !== fpv && (e.char.av.fp.visible = fpv);
         this.trauma = Math.max(0, this.trauma - t * 1.6);
         let C = this.trauma * this.trauma;
         ((I.x += Math.sin(this.t * 37) * C * 0.05),
@@ -53653,6 +53725,7 @@ uniform float uWet; uniform float uNight;`,
         return;
       }
       e.char?.av?.mesh && !e.char.av.mesh.visible && (e.char.av.mesh.visible = !0);
+      e.char?.av?.fp && e.char.av.fp.visible && (e.char.av.fp.visible = !1);
       this.right.set(-Math.cos(this.yaw), 0, Math.sin(this.yaw));
       let c = e.crouch ? 0.45 : 0,
         h = e.pos.y + 1.55 - c - (e.swim ? 0.62 : 0) - (e.dead ? 1 : 0) - (e.sleeping ? 1.1 : 0),
@@ -63197,6 +63270,7 @@ uniform float uWet; uniform float uNight;`,
             (this.baseCam.fov = e.camera.fov)),
           e.cam.mode === "first" &&
             (e.player.char.setHeadVisible?.(!0),
+            e.player.char.av?.fp && (e.player.char.av.fp.visible = !1),
             e.player.char.av?.mesh && (e.player.char.av.mesh.visible = !0),
             (this.restoreHead = !0)),
           (this.el.hidden = !1),
