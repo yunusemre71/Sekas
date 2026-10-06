@@ -50987,7 +50987,8 @@ uniform float uWet; uniform float uNight;`,
           i.set(y, f.top + 0.02, g);
           let m = this.collide(),
             x = Math.hypot(i.x - y, i.z - g);
-          if ((u(), !(x > 0.18 || m < f.top - 0.3 || m > f.top + 0.4)))
+          if ((u(), !(x > 0.18 || m < f.top - 0.3 || m > f.top + 0.4))) {
+            if (this.indoors() !== this.indoors({ x: y, y: m, z: g })) return null;
             return {
               t: 0,
               dur: 0.5 + f.rise * 0.32,
@@ -51000,8 +51001,13 @@ uniform float uWet; uniform float uNight;`,
               yaw: Math.atan2(t, e),
               rise: m - a,
             };
+          }
         }
         return null;
+      }
+      indoors(t = this.pos) {
+        let e = this.G;
+        return !!(e.villages?.roofAbove(t) || e.structures?.roofAbove?.(t));
       }
       startAction(t, e, n = {}) {
         ((this.action = { type: t, t: 0, dur: e, ...n, fired: !1 }), n.itemId && (this.forceHeld = !0));
@@ -51165,7 +51171,7 @@ uniform float uWet; uniform float uNight;`,
             G = D ? (D.x * c + D.z * h) / Math.max(D.dt, 0.001) : 9;
           this.pushT = G < 0.9 ? (this.pushT || 0) + t : Math.min(0, this.pushT || 0) + t;
           let Y = n.pressed("Space");
-          if (Y || this.pushT > 0.3) {
+          if (Y || (this.pushT > 0.3 && !this.indoors())) {
             let X = this.climbProbe(c, h);
             X && (Y || X.rise <= 1.12)
               ? ((this.climb = X),
@@ -51270,8 +51276,18 @@ uniform float uWet; uniform float uNight;`,
           b = this.pos.x,
           _ = this.pos.z;
         ((this.pos.x += this.vel.x * t), (this.pos.z += this.vel.z * t), (this.pos.y += this.vel.y * t));
-        let E = this.collide(),
-          S = e.gen.heightAt(this.pos.x, this.pos.z),
+        let E = this.collide();
+        Math.hypot(this.pos.x - b, this.pos.z - _) > Math.hypot(this.vel.x, this.vel.z) * t + 0.45 &&
+        !this.climb &&
+        (this.revertT || 0) < 1.5
+          ? ((this.revertT = (this.revertT || 0) + t),
+            (this.pos.x = b),
+            (this.pos.z = _),
+            (this.vel.x = 0),
+            (this.vel.z = 0),
+            (E = this.collide()))
+          : (this.revertT = Math.max(0, (this.revertT || 0) - t * 0.5));
+        let S = e.gen.heightAt(this.pos.x, this.pos.z),
           k = Math.max(S, E);
         if (((this.onFloor = E > S + 0.05 && this.pos.y < E + 0.6), this.swim))
           (this.pos.y < S + 0.05 && ((this.pos.y = S + 0.05), this.vel.y < 0 && (this.vel.y = 0)),
