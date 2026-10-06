@@ -46195,8 +46195,11 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
     }
     render(t, e) {
       this.adapt();
-      let n = this.renderer;
-      (n.setRenderTarget(this.rt), n.render(t, e));
+      let n = this.renderer,
+        sl = (this._ft || 16) > 26 && (this.dynScale ?? 1) <= 0.7;
+      ((n.shadowMap.autoUpdate = !sl || (this._shN = (this._shN || 0) + 1) % 2 === 0),
+        n.setRenderTarget(this.rt),
+        n.render(t, e));
       let i = this.U;
       if (
         ((i.tColor.value = this.rt.textures[0]),
@@ -52951,7 +52954,7 @@ uniform float uWet; uniform float uNight;`,
         let E = this.collide();
         Math.hypot(this.pos.x - b, this.pos.z - _) > Math.hypot(this.vel.x, this.vel.z) * t + 0.45 &&
         !this.climb &&
-        (this.revertT || 0) < 1.5 && !window.__noRevert
+        (this.revertT || 0) < 1.5
           ? ((this.revertT = (this.revertT || 0) + t),
             (this.pos.x = b),
             (this.pos.z = _),
