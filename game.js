@@ -50971,8 +50971,9 @@ uniform float uWet; uniform float uNight;`,
   }
   var Si = { size: 3, wallH: 2.8, thick: 0.22, foundH: 0.45 },
     pi = { col: 12159573, dark: 9266744, beam: 7227948 };
-  function Da(r) {
-    let t = new bt(),
+  function Da(r, w) {
+    let P = sgPals[w || "oak"],
+      t = new bt(),
       e = Si.size,
       n = Si.wallH,
       i = Si.thick;
@@ -50984,7 +50985,7 @@ uniform float uWet; uniform float uNight;`,
         t.add(
           dt(
             new Mn(l - 0.02, s, e - 0.02, 2, 0.02),
-            a % 2 ? pi.col : 12883812,
+            a % 2 ? P.plank2 : P.plank,
             -e / 2 + l * (a + 0.5),
             -s / 2,
             0,
@@ -50992,26 +50993,26 @@ uniform float uWet; uniform float uNight;`,
         );
       }
       if (
-        (t.add(dt(new he(e, s * 0.6, 0.14), pi.beam, 0, -s * 0.55, e / 2 - 0.07)),
-        t.add(dt(new he(e, s * 0.6, 0.14), pi.beam, 0, -s * 0.55, -e / 2 + 0.07)),
+        (t.add(dt(new he(e, s * 0.6, 0.14), P.beam, 0, -s * 0.55, e / 2 - 0.07)),
+        t.add(dt(new he(e, s * 0.6, 0.14), P.beam, 0, -s * 0.55, -e / 2 + 0.07)),
         r === "foundation")
       )
         for (let a of [-e / 2 + 0.15, e / 2 - 0.15])
           for (let l of [-e / 2 + 0.15, e / 2 - 0.15])
-            t.add(dt(new $t(0.11, 0.13, 2.4, 8), pi.beam, a, -s - 1.2, l));
+            t.add(dt(new $t(0.11, 0.13, 2.4, 8), P.beam, a, -s - 1.2, l));
     } else if (r === "wall" || r === "doorway") {
       for (let l = 0; l < 6; l++) {
         let c = e / 6,
           h = -e / 2 + c * (l + 0.5);
         if (r === "doorway" && Math.abs(h) < 1.2 / 2) {
           let d = n - 2.15;
-          t.add(dt(new Mn(c - 0.02, d, i, 2, 0.02), l % 2 ? pi.col : 12883812, h, 2.15 + d / 2, 0));
-        } else t.add(dt(new Mn(c - 0.02, n, i, 2, 0.02), l % 2 ? pi.col : 12883812, h, n / 2, 0));
+          t.add(dt(new Mn(c - 0.02, d, i, 2, 0.02), l % 2 ? P.plank2 : P.plank, h, 2.15 + d / 2, 0));
+        } else t.add(dt(new Mn(c - 0.02, n, i, 2, 0.02), l % 2 ? P.plank2 : P.plank, h, n / 2, 0));
       }
-      (t.add(dt(new he(e, 0.14, i + 0.06), pi.beam, 0, n - 0.07, 0)),
-        t.add(dt(new he(e, 0.14, i + 0.06), pi.beam, 0, 0.07, 0)));
-      for (let l of [-e / 2 + 0.07, e / 2 - 0.07]) t.add(dt(new he(0.14, n, i + 0.08), pi.beam, l, n / 2, 0));
-      r === "doorway" && t.add(dt(new he(1.2 + 0.2, 0.12, i + 0.08), pi.beam, 0, 2.15 + 0.06, 0));
+      (t.add(dt(new he(e, 0.14, i + 0.06), P.beam, 0, n - 0.07, 0)),
+        t.add(dt(new he(e, 0.14, i + 0.06), P.beam, 0, 0.07, 0)));
+      for (let l of [-e / 2 + 0.07, e / 2 - 0.07]) t.add(dt(new he(0.14, n, i + 0.08), P.beam, l, n / 2, 0));
+      r === "doorway" && t.add(dt(new he(1.2 + 0.2, 0.12, i + 0.08), P.beam, 0, 2.15 + 0.06, 0));
     } else if (r === "door") {
       let a = new bt();
       (a.position.set(-1.16 / 2, 0, 0), t.add(a));
@@ -51019,14 +51020,14 @@ uniform float uWet; uniform float uNight;`,
         a.add(
           dt(
             new Mn(0.29 - 0.015, 2.1, 0.08, 2, 0.015),
-            l % 2 ? 11040842 : 10120256,
+            l % 2 ? P.d2 : P.d1,
             0.29 * (l + 0.5),
             2.1 / 2 + 0.02,
             0,
           ),
         );
-      (a.add(dt(new he(1.16, 0.1, 0.1), pi.beam, 1.16 / 2, 0.5, 0.02)),
-        a.add(dt(new he(1.16, 0.1, 0.1), pi.beam, 1.16 / 2, 1.6, 0.02)),
+      (a.add(dt(new he(1.16, 0.1, 0.1), P.beam, 1.16 / 2, 0.5, 0.02)),
+        a.add(dt(new he(1.16, 0.1, 0.1), P.beam, 1.16 / 2, 1.6, 0.02)),
         a.add(dt(new jt(0.04, 8, 6), 14205562, 1.16 - 0.12, 1.05, 0.08, 0, 0, 0, { metal: 0.5, rough: 0.3 })),
         (t.userData.pivot = a));
     } else if (r === "stairs") {
@@ -51034,14 +51035,14 @@ uniform float uWet; uniform float uNight;`,
         t.add(
           dt(
             new Mn(1.4, 0.1, 0.42, 2, 0.02),
-            s % 2 ? pi.col : 12883812,
+            s % 2 ? P.plank2 : P.plank,
             0,
             0.4 * (s + 1) - 0.05,
             -1.2 + s * 0.4,
           ),
         );
       for (let s of [-0.72, 0.72]) {
-        let o = dt(new he(0.1, 0.25, 3.6), pi.beam, s, 1.4, 0);
+        let o = dt(new he(0.1, 0.25, 3.6), P.beam, s, 1.4, 0);
         ((o.rotation.x = -Math.atan2(2.8, 2.8)), t.add(o));
       }
     }
@@ -51777,6 +51778,181 @@ uniform float uWet; uniform float uNight;`,
         phys: { t: "box", s: [0.3, 0.08, 0.3], m: 0.5 },
         desc: t.desc,
       }));
+  var sgPals = {
+    oak: { n: "Meşe", bark: 7227954, end: 13081186, plank: 12883812, plank2: 12159573, beam: 7227948, d1: 10120256, d2: 11040842, roof: 9266744, tint: 0x9a6b3f },
+    birch: { n: "Huş", bark: 0xdcd8cc, end: 0xede3c8, plank: 0xeee8d8, plank2: 0xe2dac6, beam: 0xc4b9a0, d1: 0xe8ddc0, d2: 0xdcd0b0, roof: 0xb5aca0, tint: 0xeee8d8 },
+    pine: { n: "Çam", bark: 0x7a4a32, end: 0xe3c07a, plank: 0xd9b26f, plank2: 0xc9a25f, beam: 0xa0803f, d1: 0xcfa866, d2: 0xbf9858, roof: 0x8d6b3c, tint: 0xd9b26f },
+    apple: { n: "Elma", bark: 0x6b4a3a, end: 0xcb8a5c, plank: 0xb9684a, plank2: 0xa65a3f, beam: 0x7a3f2b, d1: 0xa55e42, d2: 0x95523a, roof: 0x6e3a28, tint: 0xb9684a },
+    dead: { n: "Kara", bark: 0x2a2623, end: 0x3d3732, plank: 0x3a342f, plank2: 0x2e2926, beam: 0x1b1815, d1: 0x332e2a, d2: 0x2a2623, roof: 0x1f1b18, tint: 0x2e2926 },
+    stone: { n: "Taş", bark: 0x8f8b82, end: 0xa9a59c, plank: 0xa7a39a, plank2: 0x938f86, beam: 0x6e6a62, d1: 0x8a867d, d2: 0x7a766e, roof: 0x6b665e, tint: 0xa7a39a },
+  },
+    sgWoodIds = ["wood", "wood_pine", "wood_birch", "wood_apple", "wood_dead"],
+    sgWoodVar = { wood: "oak", wood_pine: "pine", wood_birch: "birch", wood_apple: "apple", wood_dead: "dead" },
+    sgPieceBases = ["foundation", "wall", "doorway", "door", "floor", "stairs", "window", "halfwall", "pillar", "fence", "roof", "table", "chair", "sidetable", "shelf"],
+    sgPieceId = (b, v) => (!v || v === "oak" ? b : b + "_" + v),
+    sgModelOf = (b, v) => (!v || v === "oak" ? b : b + "@" + v),
+    sgWoodOf = (t) =>
+      t === ft.PINE ? "wood_pine" : t === ft.BIRCH ? "wood_birch" : t === ft.APPLE ? "wood_apple" : t === ft.DEAD ? "wood_dead" : "wood",
+    sgWoodAt = (x, z) => {
+      let h = Math.abs(Math.sin(x * 12.9898 + z * 78.233) * 43758.5453) % 1;
+      return h < 0.4 ? "wood" : h < 0.65 ? "wood_pine" : h < 0.85 ? "wood_birch" : h < 0.92 ? "wood_apple" : "wood_dead";
+    };
+  function sgPiece(r, w) {
+    if (["foundation", "wall", "doorway", "door", "floor", "stairs"].includes(r)) return Da(r, w);
+    let P = sgPals[w || "oak"],
+      t = new bt(),
+      e = Si.size,
+      n = Si.wallH,
+      i = Si.thick,
+      M = (g, c, x, y, z, rx, ry, rz, o) => t.add(dt(g, c, x, y, z, rx, ry, rz, o));
+    switch (r) {
+      case "window": {
+        M(new Mn(0.9, n, i, 2, 0.02), P.plank, -1.05, n / 2, 0);
+        M(new Mn(0.9, n, i, 2, 0.02), P.plank2, 1.05, n / 2, 0);
+        M(new Mn(1.2, 0.95, i, 2, 0.02), P.plank, 0, 0.475, 0);
+        M(new Mn(1.2, 0.75, i, 2, 0.02), P.plank2, 0, 2.425, 0);
+        M(new he(e, 0.14, i + 0.06), P.beam, 0, n - 0.07, 0);
+        M(new he(e, 0.14, i + 0.06), P.beam, 0, 0.07, 0);
+        for (let a of [-e / 2 + 0.07, e / 2 - 0.07]) M(new he(0.14, n, i + 0.08), P.beam, a, n / 2, 0);
+        M(new he(1.4, 0.08, i + 0.12), P.beam, 0, 0.95, 0);
+        M(new he(1.4, 0.08, i + 0.12), P.beam, 0, 2.05, 0);
+        for (let a of [-0.6, 0.6]) M(new he(0.08, 1.12, i + 0.1), P.beam, a, 1.5, 0);
+        M(new he(0.05, 1.1, 0.05), P.beam, 0, 1.5, 0);
+        M(new he(1.2, 0.05, 0.05), P.beam, 0, 1.5, 0);
+        M(new he(1.2, 1.1, 0.03), 0xbfe3f0, 0, 1.5, 0, 0, 0, 0, { transparent: !0, opacity: 0.3, rough: 0.1 });
+        break;
+      }
+      case "halfwall":
+        M(new Mn(e - 0.02, 1.1, i, 2, 0.02), P.plank, 0, 0.55, 0);
+        M(new he(e, 0.1, i + 0.08), P.beam, 0, 1.15, 0);
+        for (let a of [-e / 2 + 0.07, e / 2 - 0.07]) M(new he(0.14, 1.1, i + 0.06), P.beam, a, 0.55, 0);
+        break;
+      case "pillar":
+        M(new he(0.32, n, 0.32), P.beam, 0, n / 2, 0);
+        M(new he(0.46, 0.14, 0.46), P.plank2, 0, 0.07, 0);
+        M(new he(0.46, 0.14, 0.46), P.plank2, 0, n - 0.07, 0);
+        break;
+      case "fence":
+        for (let a of [-1.4, 0, 1.4]) M(new he(0.12, 1.1, 0.12), P.beam, a, 0.55, 0);
+        for (let a of [0.5, 0.88]) M(new he(e - 0.05, 0.08, 0.06), P.plank, 0, a, 0);
+        break;
+      case "roof": {
+        let a = Math.atan2(1.3, 1.7),
+          l = Math.hypot(1.7, 1.3);
+        (M(new he(l, 0.12, 3.3), P.roof, 0.85, 0.65, 0, 0, 0, -a),
+          M(new he(l, 0.12, 3.3), P.roof, -0.85, 0.65, 0, 0, 0, a),
+          M(new he(0.2, 0.16, 3.36), P.beam, 0, 1.32, 0),
+          M(new he(0.1, 0.4, 3.3), P.beam, 1.55, 0.2, 0, 0, 0, 0));
+        break;
+      }
+      case "table":
+        M(new he(1.5, 0.07, 0.85), P.plank, 0, 0.78, 0);
+        M(new he(1.3, 0.08, 0.65), P.beam, 0, 0.7, 0);
+        for (let a of [-0.64, 0.64]) for (let l of [-0.34, 0.34]) M(new he(0.09, 0.76, 0.09), P.beam, a, 0.38, l);
+        break;
+      case "chair":
+        M(new he(0.46, 0.05, 0.46), P.plank, 0, 0.46, 0);
+        for (let a of [-0.19, 0.19]) for (let l of [-0.19, 0.19]) M(new he(0.05, 0.45, 0.05), P.beam, a, 0.225, l);
+        for (let a of [-0.19, 0.19]) M(new he(0.05, 0.5, 0.05), P.beam, a, 0.72, -0.2);
+        for (let a of [0.82, 0.66]) M(new he(0.4, 0.09, 0.03), P.plank2, 0, a, -0.2);
+        break;
+      case "sidetable":
+        M(new he(0.5, 0.55, 0.42), P.plank, 0, 0.3, 0);
+        M(new he(0.58, 0.05, 0.5), P.beam, 0, 0.6, 0);
+        M(new he(0.4, 0.17, 0.02), P.plank2, 0, 0.42, 0.215);
+        M(new jt(0.025, 8, 6), 0x8a7a60, 0, 0.42, 0.24);
+        for (let a of [-0.2, 0.2]) for (let l of [-0.16, 0.16]) M(new he(0.05, 0.06, 0.05), P.beam, a, 0.03, l);
+        break;
+      case "shelf":
+        for (let a of [-0.52, 0.52]) M(new he(0.05, 1.8, 0.28), P.beam, a, 0.9, 0);
+        for (let a of [0.1, 0.7, 1.25, 1.8]) M(new he(1.1, 0.05, 0.28), P.plank, 0, a, 0);
+        M(new he(1.04, 1.7, 0.02), P.plank2, 0, 0.95, -0.13);
+        break;
+    }
+    return t;
+  }
+  function sgFurnace() {
+    let t = new bt(),
+      M = (g, c, x, y, z, rx, ry, rz, o) => t.add(dt(g, c, x, y, z, rx, ry, rz, o));
+    (M(new he(1.0, 0.7, 0.9), 0xa7a39a, 0, 0.35, 0),
+      M(new he(0.86, 0.5, 0.78), 0x938f86, 0, 0.95, 0),
+      M(new he(0.3, 0.9, 0.3), 0x8a867d, 0, 1.6, -0.1),
+      M(new he(0.5, 0.36, 0.06), 0x14100c, 0, 0.55, 0.46),
+      M(new he(0.62, 0.08, 0.1), 0x6e6a62, 0, 0.77, 0.45));
+    let g = dt(new he(0.4, 0.26, 0.02), 0xff9a3a, 0, 0.53, 0.435, 0, 0, 0, { emissive: 0xff6a10, emissiveIntensity: 1.4 });
+    return ((g.visible = !1), t.add(g), (t.userData.glow = g), t);
+  }
+  function sgBucket() {
+    let t = new bt(),
+      M = (g, c, x, y, z, rx, ry, rz, o) => t.add(dt(g, c, x, y, z, rx, ry, rz, o));
+    (M(new $t(0.13, 0.1, 0.2, 12), 0xb98a55, 0, 0, 0),
+      M(new $t(0.134, 0.134, 0.02, 12), 0x6a6a6a, 0, 0.06, 0, 0, 0, 0, { metal: 0.5 }),
+      M(new $t(0.106, 0.106, 0.02, 12), 0x6a6a6a, 0, -0.06, 0, 0, 0, 0, { metal: 0.5 }),
+      M(new en(0.12, 0.008, 6, 14, Math.PI), 0x5a5a5a, 0, 0.1, 0, 0, 0, 0, { metal: 0.5 }));
+    return t;
+  }
+  function sgSandPile(c) {
+    let t = new bt();
+    for (let n = 0; n < 6; n++) {
+      let g = new jt(0.04 + (n % 3) * 0.008, 6, 5);
+      (g.scale(1, 0.55, 1), t.add(dt(g, c, Math.cos(n * 1.4) * 0.05, (n % 2) * 0.012, Math.sin(n * 1.4) * 0.05)));
+    }
+    return t;
+  }
+  function sgGlassItem() {
+    let t = new bt(),
+      o = { transparent: !0, opacity: 0.55, rough: 0.1 };
+    return (
+      t.add(dt(new he(0.14, 0.14, 0.02), 0xbfe3f0, 0, 0.07, 0, 0, 0, 0.2, o)),
+      t.add(dt(new he(0.08, 0.1, 0.02), 0xd7f0f8, 0.06, 0.04, 0.02, 0, 0.3, -0.3, o)),
+      t
+    );
+  }
+  function sgLog(w) {
+    let P = sgPals[w],
+      r = new bt();
+    return (
+      r.add(dt(yn(0.1, 0.095, 0.56, 10, 2, 0, 0, 0, 3), P.bark, 0, -0.28, 0)),
+      r.add(dt(new Fi(0.094, 12), P.end, 0, 0.281, 0, -Math.PI / 2)),
+      r.add(dt(new Fi(0.098, 12), P.end, 0, -0.281, 0, Math.PI / 2)),
+      r.add(dt(new lh(0.035, 0.045, 12), P.beam, 0, 0.283, 0, -Math.PI / 2)),
+      r
+    );
+  }
+  ((BA.furnace = sgFurnace), (BA.bucket = sgBucket), (BA.sand = () => sgSandPile(0xe6d3a0)), (BA.glass = sgGlassItem));
+  for (let w of Object.keys(sgPals)) {
+    w !== "stone" && w !== "oak" && (BA["log@" + w] = () => sgLog(w));
+    for (let b of sgPieceBases) {
+      if (w !== "oak") BA[b + "@" + w] = () => sgPiece(b, w);
+      else if (!BA[b]) BA[b] = () => sgPiece(b);
+    }
+  }
+  Object.assign(kt, {
+    window: { name: "Pencereli Duvar", cat: "build", stack: 10, model: "window", place: "window", build: !0, desc: "Temel kenarına oturur. Cam ışığı geçirir ama içeri girilmez." },
+    halfwall: { name: "Alçak Duvar", cat: "build", stack: 10, model: "halfwall", place: "halfwall", build: !0, desc: "Bel hizasında duvar. Üstünden bakılır." },
+    pillar: { name: "Direk", cat: "build", stack: 10, model: "pillar", place: "pillar", build: !0, desc: "Temelin köşelerine dikilir, taşıyıcı kolon." },
+    fence: { name: "Çit", cat: "build", stack: 10, model: "fence", place: "fence", build: !0, desc: "Bahçe ve ağıl için 3 metrelik çit." },
+    roof: { name: "Çatı Parçası", cat: "build", stack: 10, model: "roof", place: "roof", build: !0, desc: "Temel üstüne oturur. R ile döndür. Yağmurdan korur." },
+    table: { name: "Masa", cat: "build", stack: 3, model: "table", place: "table", desc: "Ahşap yemek masası." },
+    chair: { name: "Sandalye", cat: "build", stack: 5, model: "chair", place: "chair", desc: "Oturmak için. E ile otur." },
+    sidetable: { name: "Yan Sehpa", cat: "build", stack: 5, model: "sidetable", place: "sidetable", desc: "Küçük çekmeceli sehpa." },
+    shelf: { name: "Raf", cat: "build", stack: 3, model: "shelf", place: "shelf", desc: "Dört katlı ahşap raf." },
+    furnace: { name: "Taş Fırın", cat: "build", stack: 1, model: "furnace", place: "furnace", desc: "Taşlardan örülmüş fırın. Yakıtla yanar; kumu cama çevirir, yemek pişirir." },
+    bucket: { name: "Kova", cat: "tool", stack: 1, model: "bucket", pose: "tool", grip: Ln, phys: { t: "cyl", r: 0.12, h: 0.2, m: 0.8 }, desc: "Kumsala bakıp sol tıkla: kum toplar." },
+    sand: { name: "Kum", cat: "res", stack: 100, model: "sand", cookTo: "glass", cookTime: 12, furnace: !0, phys: { t: "sphere", r: 0.09, m: 1 }, desc: "Kumsaldan kovayla toplanır. Fırında cama dönüşür." },
+    glass: { name: "Cam", cat: "res", stack: 100, model: "glass", phys: { t: "box", s: [0.07, 0.07, 0.01], m: 0.4 }, desc: "Fırında kumdan elde edilir. Pencere yapımında kullanılır." },
+  });
+  for (let w of ["pine", "birch", "apple", "dead"]) {
+    let id = "wood_" + w;
+    kt[id] = { ...kt.wood, name: sgPals[w].n + " Odunu", model: "log@" + w, desc: "Aynı cins ağaçtan elde edilir. Kereste rengi ağaca göre değişir." };
+  }
+  kt.wood.name = "Meşe Odunu";
+  for (let b of sgPieceBases)
+    for (let w of Object.keys(sgPals))
+      if (w !== "oak") {
+        let o = kt[b];
+        kt[b + "_" + w] = { ...o, name: sgPals[w].n + " " + o.name, model: b + "@" + w, variant: w, base: b };
+      }
   for (let r in kt) kt[r].id = r;
   var w1 = [
       { id: "all", name: "Hepsi" },
@@ -51823,6 +51999,30 @@ uniform float uWet; uniform float uNight;`,
       { out: "shoes_peasant", n: 1, in: { hide: 1, rope: 1 }, time: 2, cat: "cloth" },
     ],
     v1 = new Map();
+  Wl.push(
+    { out: "window", n: 1, in: { wood: 5, glass: 2 }, time: 2.5, cat: "build", bench: !0 },
+    { out: "halfwall", n: 1, in: { wood: 3 }, time: 1.5, cat: "build", bench: !0 },
+    { out: "pillar", n: 1, in: { wood: 4 }, time: 1.8, cat: "build", bench: !0 },
+    { out: "fence", n: 1, in: { wood: 3, stick: 2 }, time: 1.5, cat: "build" },
+    { out: "roof", n: 1, in: { wood: 6 }, time: 2.2, cat: "build", bench: !0 },
+    { out: "table", n: 1, in: { wood: 8 }, time: 3, cat: "build", bench: !0 },
+    { out: "chair", n: 1, in: { wood: 4 }, time: 2, cat: "build", bench: !0 },
+    { out: "sidetable", n: 1, in: { wood: 5 }, time: 2.4, cat: "build", bench: !0 },
+    { out: "shelf", n: 1, in: { wood: 7 }, time: 2.8, cat: "build", bench: !0 },
+    { out: "furnace", n: 1, in: { stone: 10 }, time: 3, cat: "build" },
+    { out: "bucket", n: 1, in: { wood: 3, rope: 1 }, time: 2, cat: "build" },
+    { out: "foundation_stone", n: 1, in: { stone: 10 }, time: 2.5, cat: "build", bench: !0 },
+    { out: "wall_stone", n: 1, in: { stone: 8 }, time: 2.2, cat: "build", bench: !0 },
+    { out: "doorway_stone", n: 1, in: { stone: 7 }, time: 2.2, cat: "build", bench: !0 },
+    { out: "floor_stone", n: 1, in: { stone: 6 }, time: 2.2, cat: "build", bench: !0 },
+    { out: "stairs_stone", n: 1, in: { stone: 9 }, time: 2.6, cat: "build", bench: !0 },
+    { out: "window_stone", n: 1, in: { stone: 6, glass: 2 }, time: 2.6, cat: "build", bench: !0 },
+    { out: "halfwall_stone", n: 1, in: { stone: 4 }, time: 1.8, cat: "build", bench: !0 },
+    { out: "pillar_stone", n: 1, in: { stone: 5 }, time: 2, cat: "build", bench: !0 },
+    { out: "roof_stone", n: 1, in: { stone: 8 }, time: 2.4, cat: "build", bench: !0 },
+    { out: "fence_stone", n: 1, in: { stone: 4 }, time: 1.8, cat: "build" },
+  );
+  for (let r of Wl) sgPieceBases.includes(r.out) && (r.col = !0);
   function mi(r) {
     let t = kt[r];
     if (t && t.prop && Ia()) {
@@ -51938,8 +52138,26 @@ uniform float uWet; uniform float uNight;`,
       }
       count(t) {
         let e = 0;
+        if (t === "wood") {
+          for (let n of this.slots) n && sgWoodIds.includes(n.id) && (e += n.n);
+          return e;
+        }
         for (let n of this.slots) n && n.id === t && (e += n.n);
         return e;
+      }
+      removeWood(t) {
+        let e = sgWoodIds
+            .map((i) => [i, this.slots.reduce((a, s) => a + (s && s.id === i ? s.n : 0), 0)])
+            .filter((i) => i[1] > 0)
+            .sort((i, s) => s[1] - i[1]),
+          n = t,
+          i = null;
+        for (let [s] of e) {
+          if (n <= 0) break;
+          let o = this.removeRaw(s, n);
+          (i ||= s, (n -= o));
+        }
+        return { total: t - n, top: i };
       }
       hasAll(t) {
         for (let e in t) if (this.count(e) < t[e]) return !1;
@@ -51982,6 +52200,9 @@ uniform float uWet; uniform float uNight;`,
         return s >= e;
       }
       remove(t, e = 1) {
+        return t === "wood" ? this.removeWood(e).total : this.removeRaw(t, e);
+      }
+      removeRaw(t, e = 1) {
         let n = e;
         for (let i = this.slots.length - 1; i >= 0 && n > 0; i--) {
           let s = this.slots[i];
@@ -52062,9 +52283,11 @@ uniform float uWet; uniform float uNight;`,
       }
       craft(t, e = 1) {
         if (!this.canCraft(t, e)) return !1;
-        let n = this.G.inventory;
-        for (let i in t.in) n.remove(i, t.in[i] * e);
-        for (let i = 0; i < e; i++) this.queue.push({ r: t, t: t.time, total: t.time });
+        let n = this.G.inventory,
+          w = null;
+        for (let i in t.in) i === "wood" ? (w = n.removeWood(t.in[i] * e).top) : n.remove(i, t.in[i] * e);
+        let o = t.col && w && w !== "wood" ? sgPieceId(t.out, sgWoodVar[w]) : t.out;
+        for (let i = 0; i < e; i++) this.queue.push({ r: t, t: t.time, total: t.time, out: o, w });
         return (this.G.audio?.ui("craft_start"), !0);
       }
       cancel(t) {
@@ -52072,8 +52295,9 @@ uniform float uWet; uniform float uNight;`,
         if (e) {
           this.queue.splice(t, 1);
           for (let n in e.r.in) {
-            let i = this.G.inventory.add(n, e.r.in[n]);
-            i && this.G.dropItem(n, i);
+            let o = n === "wood" && e.w ? e.w : n,
+              i = this.G.inventory.add(o, e.r.in[n]);
+            i && this.G.dropItem(o, i);
           }
         }
       }
@@ -52082,9 +52306,10 @@ uniform float uWet; uniform float uNight;`,
         let e = this.queue[0];
         if (((e.t -= t), e.t <= 0)) {
           this.queue.shift();
-          let n = this.G.inventory.add(e.r.out, e.r.n);
-          (n && this.G.dropItem(e.r.out, n),
-            this.G.ui?.notify(`+${e.r.n} ${kt[e.r.out].name}`, e.r.out),
+          let o = e.out || e.r.out,
+            n = this.G.inventory.add(o, e.r.n);
+          (n && this.G.dropItem(o, n),
+            this.G.ui?.notify(`+${e.r.n} ${kt[o].name}`, o),
             this.G.audio?.ui("craft_done"),
             this.G.quests?.event("craft", e.r.out));
         }
@@ -53023,6 +53248,10 @@ uniform float uWet; uniform float uNight;`,
           this.consume(this.selected);
           return;
         }
+        if (n?.id === "bucket") {
+          this.useBucket();
+          return;
+        }
         if (n?.id === "waterskin") {
           i?.kind === "water"
             ? this.interact()
@@ -53041,6 +53270,33 @@ uniform float uWet; uniform float uNight;`,
         let l = s === "thrust" ? 0.45 : s === "punch" ? 0.42 : 0.44;
         (this.startAction(s, o, { hitAt: l, slot: this.selected, itemId: e?.id }),
           t.audio?.whoosh(s === "punch" ? 0.35 : 0.6));
+      }
+      useBucket() {
+        let t = this.G,
+          e = t.camera,
+          n = e.position.clone(),
+          i = new R();
+        e.getWorldDirection(i);
+        let s = null;
+        for (let a = 0.5; a < 5; a += 0.15) {
+          let l = n.clone().addScaledVector(i, a),
+            c = t.gen.heightAt(l.x, l.z);
+          if (l.y <= c + 0.05) {
+            ((l.y = c), (s = l));
+            break;
+          }
+        }
+        if (!s || t.gen.surfaceAt(s.x, s.z) !== "sand") {
+          t.ui?.notify("Kum toplamak için kumsala bakıp sol tıkla.", null);
+          return;
+        }
+        this.startAction("gather", 0.7);
+        let o = 1 + (Math.random() < 0.4 ? 1 : 0),
+          a = t.inventory.add("sand", o);
+        (a > 0 && t.dropItem("sand", a),
+          o - a > 0 && t.ui?.notify(`+${o - a} ${kt.sand.name}`, "sand"),
+          t.particles.dustPuff(s.clone(), 6),
+          t.audio?.rustle(s, 0.5));
       }
       consume(t) {
         let e = this.G,
@@ -59589,7 +59845,7 @@ uniform float uWet; uniform float uNight;`,
           f.y = Math.max(f.y, p + 0.4);
           let y = Math.min(l, c);
           ((c -= y),
-            this.spawnItem("wood", y, f, {
+            this.spawnItem(sgWoodOf(t.o.t), y, f, {
               x: (Math.random() - 0.5) * 1.5,
               y: 2 + Math.random() * 2,
               z: (Math.random() - 0.5) * 1.5,
@@ -60327,13 +60583,13 @@ uniform float uWet; uniform float uNight;`,
             e.audio?.chop(g),
             e.animals?.noise(g, 20, "chop"),
             h(W < 1 ? 3 : 1),
-            y.kind === "log" && Math.random() < 0.7 && this.give("wood", 1, g),
+            y.kind === "log" && Math.random() < 0.7 && this.give(sgWoodAt(m.x, m.z), 1, g),
             m.hp <= 0)
           ) {
             let v = x ? 1 : 0;
             (e.world.removePart(y.ch, m, v),
               x || ((m.rm |= 1), e.world.removePart(y.ch, m, 0)),
-              this.give("wood", y.kind === "log" ? 2 : 1 + Math.floor(Math.random() * 2), g),
+              this.give(sgWoodAt(m.x, m.z), y.kind === "log" ? 2 : 1 + Math.floor(Math.random() * 2), g),
               e.particles.dustPuff(g, 6),
               e.physics.refreshChunk(y.ch),
               e.audio?.poof(g));
@@ -60747,13 +61003,32 @@ uniform float uWet; uniform float uNight;`,
       snare: 0.4,
       deathbag: 0.4,
     },
-    ec = ["foundation", "wall", "doorway", "door", "floor", "stairs"];
+    ec = ["foundation", "wall", "doorway", "door", "floor", "stairs", "window", "halfwall", "pillar", "roof"];
+  (Object.assign(Hv, {
+    window: [
+      [-1.05, os / 2, 0, 0.45, os / 2, Si.thick / 2],
+      [1.05, os / 2, 0, 0.45, os / 2, Si.thick / 2],
+      [0, 0.475, 0, 0.6, 0.475, Si.thick / 2],
+      [0, 2.425, 0, 0.6, 0.375, Si.thick / 2],
+      [0, 1.5, 0, 0.6, 0.55, 0.03],
+    ],
+    halfwall: [[0, 0.55, 0, Ci / 2, 0.55, Si.thick / 2]],
+    pillar: [[0, os / 2, 0, 0.23, os / 2, 0.23]],
+    fence: [[0, 0.55, 0, 1.5, 0.55, 0.08]],
+    roof: [],
+    table: [[0, 0.4, 0, 0.75, 0.4, 0.43]],
+    chair: [[0, 0.25, 0, 0.25, 0.25, 0.25]],
+    sidetable: [[0, 0.3, 0, 0.29, 0.3, 0.25]],
+    shelf: [[0, 0.9, 0, 0.55, 0.9, 0.16]],
+    furnace: [[0, 0.6, 0, 0.55, 0.6, 0.5]],
+  }),
+    Object.assign(nu, { table: 0.9, chair: 0.4, sidetable: 0.4, shelf: 0.6, furnace: 0.75, fence: 1.3, roof: 1.4 }));
   function zi(r, t, e) {
     let n = Math.cos(e),
       i = Math.sin(e);
     return [r * n + t * i, -r * i + t * n];
   }
-  var Nv = { wood: 45, stick: 12, fat: 30, pinecone: 8, fiber: 4 },
+  var Nv = { wood: 45, wood_pine: 45, wood_birch: 45, wood_apple: 45, wood_dead: 45, stick: 12, fat: 30, pinecone: 8, fiber: 4 },
     ez = 0,
     ng = class {
       constructor(t, e, n, i, s = {}) {
@@ -60765,7 +61040,7 @@ uniform float uWet; uniform float uNight;`,
           (this.pos = n.clone()),
           (this.rot = i),
           (this.data = s),
-          (this.mesh = e === "deathbag" ? nz() : mi(e)),
+          (this.mesh = e === "deathbag" ? nz() : mi(sgModelOf(e, s.w))),
           this.mesh.position.copy(this.pos),
           (this.mesh.rotation.y = i),
           this.mesh.traverse((o) => {
@@ -60775,7 +61050,7 @@ uniform float uWet; uniform float uNight;`,
           (this.boxes = (Hv[e] || []).map((o) => this.worldBox(o))),
           (this.bodies = []),
           (this.t = Math.random() * 10),
-          e === "campfire" &&
+          (e === "campfire" || e === "furnace") &&
             ((this.data.lit = this.data.lit || !1),
             (this.data.fuel = this.data.fuel || 0),
             (this.data.burn = this.data.burn || 0),
@@ -60828,6 +61103,10 @@ uniform float uWet; uniform float uNight;`,
         switch (this.type) {
           case "campfire":
             return `[E] Kamp Ateşi${t.lit ? " (yanıyor)" : ""}   [E basılı] Topla`;
+          case "furnace":
+            return `[E] Taş Fırın${t.lit ? " (yanıyor)" : ""}   [E basılı] Topla`;
+          case "chair":
+            return "[E] Otur   [E basılı] Topla";
           case "chest":
             return "[E] Sandığı Aç   [E basılı] Topla";
           case "workbench":
@@ -60852,7 +61131,7 @@ uniform float uWet; uniform float uNight;`,
       }
       update(t) {
         let e = this.G;
-        if (((this.t += t), this.type === "campfire")) this.updateFire(t);
+        if (((this.t += t), this.type === "campfire" || this.type === "furnace")) this.updateFire(t);
         else if (this.type === "torchstand" && this.data.lit) {
           let n = this.mesh.userData.tip.getWorldPosition(new R());
           (Math.random() < t * 25 && e.particles.flame(n, 0.7),
@@ -60913,7 +61192,7 @@ uniform float uWet; uniform float uNight;`,
           for (let c = 1; c <= 4; c++) {
             let h = this.inv.slots[c],
               d = h ? kt[h.id] : null;
-            d && d.cookTo
+            d && d.cookTo && (!d.furnace || this.type === "furnace")
               ? ((this.cookP[c] += t),
                 this.cookP[c] >= d.cookTime &&
                   ((this.cookP[c] = 0),
@@ -60930,6 +61209,7 @@ uniform float uWet; uniform float uNight;`,
             this.inv.slots.slice(1).some((c) => c && kt[c.id].cookTo) &&
             e.audio?.sizzle(this.pos, 0.3);
         }
+        this.mesh.userData.glow && (this.mesh.userData.glow.visible = !!n.lit);
         let s = this.inv.slots.slice(1).map((a) => (a ? a.id : null)),
           o = s.join(",");
         if (o !== this.cookKey) {
@@ -61124,7 +61404,7 @@ uniform float uWet; uniform float uNight;`,
           if (
             !a.length ||
             s.type === "door" ||
-            ["sleepbag", "snare", "campfire", "deathbag"].includes(s.type)
+            ["sleepbag", "snare", "campfire", "deathbag", "roof"].includes(s.type)
           ) {
             let l = nu[s.type] || 0.7;
             a = [
@@ -61149,7 +61429,7 @@ uniform float uWet; uniform float uNight;`,
       }
       roofAbove(t) {
         for (let e of this.list) {
-          if (e.type !== "floor" || e.pos.y < t.y + 1.6 || e.pos.y > t.y + 8) continue;
+          if ((e.type !== "floor" && e.type !== "roof") || e.pos.y < t.y + 1.6 || e.pos.y > t.y + 8) continue;
           let n = t.x - e.pos.x,
             i = t.z - e.pos.z;
           if ((([n, i] = zi(n, i, -e.rot)), Math.abs(n) < Ci / 2 + 0.3 && Math.abs(i) < Ci / 2 + 0.3))
@@ -61160,7 +61440,7 @@ uniform float uWet; uniform float uNight;`,
       warmthAt(t) {
         let e = 0;
         for (let n of this.list)
-          if (n.type === "campfire" && n.data.lit) {
+          if ((n.type === "campfire" || n.type === "furnace") && n.data.lit) {
             let i = n.pos.distanceTo(t);
             i < 5.5 && (e += 1 - i / 5.5);
           } else if (n.type === "torchstand" && n.data.lit) {
@@ -61171,7 +61451,7 @@ uniform float uWet; uniform float uNight;`,
       }
       fireNear(t, e) {
         for (let n of this.list)
-          if ((n.type === "campfire" || n.type === "torchstand") && n.data.lit && n.pos.distanceTo(t) < e)
+          if ((n.type === "campfire" || n.type === "furnace" || n.type === "torchstand") && n.data.lit && n.pos.distanceTo(t) < e)
             return !0;
         return !1;
       }
@@ -61200,11 +61480,27 @@ uniform float uWet; uniform float uNight;`,
         let e = this.G;
         switch (t.type) {
           case "campfire":
+          case "furnace":
           case "chest":
           case "deathbag":
-            (e.ui.openPanel(t.type === "campfire" ? "fire" : "chest", t),
+            (e.ui.openPanel(t.type === "campfire" || t.type === "furnace" ? "fire" : "chest", t),
               t.type === "chest" && ((this.openChest = t), e.audio?.chest()));
             break;
+          case "chair": {
+            let n = Math.sin(t.rot),
+              i = Math.cos(t.rot);
+            e.player.restAt(
+              {
+                kind: "chair",
+                name: "Sandalye",
+                seat: { x: t.pos.x - n * 0.35, y: t.pos.y + 0.46, z: t.pos.z - i * 0.35 },
+                face: t.rot,
+                stand: { x: t.pos.x - n * 0.9, z: t.pos.z - i * 0.9 },
+              },
+              "sit",
+            );
+            break;
+          }
           case "workbench":
             e.ui.openPanel("craft", t);
             break;
@@ -61255,7 +61551,7 @@ uniform float uWet; uniform float uNight;`,
         let e = this.G;
         return t.type === "deathbag"
           ? !1
-          : t.type === "campfire" && (t.data.lit || t.inv.slots.some((i) => i))
+          : (t.type === "campfire" || t.type === "furnace") && (t.data.lit || t.inv.slots.some((i) => i))
             ? (e.ui?.notify("Önce ateşi söndür ve içini boşalt.", null), !1)
             : t.type === "chest" && t.inv.slots.some((i) => i)
               ? (e.ui?.notify("Sandık boş olmalı.", null), !1)
@@ -61271,7 +61567,7 @@ uniform float uWet; uniform float uNight;`,
                         s.pos.y >= t.pos.y - 0.1,
                     )
                   ? (e.ui?.notify("Üzerindeki parçaları önce sök.", null), !1)
-                  : (e.inventory.add(t.type, 1) && e.dropItem(t.type, 1),
+                  : (e.inventory.add(sgPieceId(t.type, t.data.w), 1) && e.dropItem(sgPieceId(t.type, t.data.w), 1),
                     this.remove(t),
                     e.ui?.notify(`${t.def.name} toplandı.`, t.type),
                     e.audio?.build(t.pos),
@@ -61406,7 +61702,7 @@ uniform float uWet; uniform float uNight;`,
             let f = Math.hypot(u.pos.x - n.x, u.pos.z - n.z) + Math.abs(u.pos.y - n.y) * 0.3;
             f < d && ((d = f), (h = u));
           }
-          if (h) (i.pos.copy(h.pos), (i.rot = h.rot + (e === "stairs" ? this.rotOff : 0)));
+          if (h) (i.pos.copy(h.pos), (i.rot = h.rot + (e === "stairs" || e === "roof" ? this.rotOff : 0)));
           else if (e === "foundation") {
             ((i.rot = t.player.yaw + this.rotOff), i.pos.set(n.x, 0, n.z));
             let u = -1e9,
@@ -61433,7 +61729,9 @@ uniform float uWet; uniform float uNight;`,
                   ? "Kapı çerçevesine yerleştir"
                   : e === "floor"
                     ? "Duvarların üstüne ya da temelin üstüne yerleştir"
-                    : "Bir temelin kenarına yerleştir"));
+                    : e === "roof" || e === "pillar"
+                      ? "Bir temelin ya da zeminin üstüne yerleştir"
+                      : "Bir temelin kenarına yerleştir"));
           if (
             (s &&
               e === "foundation" &&
@@ -61506,16 +61804,34 @@ uniform float uWet; uniform float uNight;`,
                 h = a.pos.clone().add(new R(Math.sin(c) * Ci, 0, Math.cos(c) * Ci));
               o("foundation", h, 1) || i.push({ pos: h, rot: a.rot });
             }
-        else if (t === "wall" || t === "doorway") {
+        else if (t === "wall" || t === "doorway" || t === "window" || t === "halfwall") {
+          let WL = ["wall", "doorway", "window", "halfwall"];
           for (let a of s.filter((l) => l.type === "foundation" || l.type === "floor"))
             for (let l = 0; l < 4; l++) {
               let c = a.rot + (l * Math.PI) / 2,
                 h = a.pos.clone().add(new R((Math.sin(c) * Ci) / 2, 0, (Math.cos(c) * Ci) / 2));
-              o(["wall", "doorway"], h) || i.push({ pos: h, rot: c });
+              o(WL, h) || i.push({ pos: h, rot: c });
             }
-          for (let a of s.filter((l) => l.type === "wall" || l.type === "doorway")) {
+          for (let a of s.filter((l) => l.type === "wall" || l.type === "doorway" || l.type === "window")) {
             let l = a.pos.clone().add(new R(0, os, 0));
-            !o(["wall", "doorway"], l) && !o("floor", l, 1.6) && i.push({ pos: l, rot: a.rot });
+            !o(WL, l) && !o("floor", l, 1.6) && i.push({ pos: l, rot: a.rot });
+          }
+        } else if (t === "pillar") {
+          for (let a of s.filter((l) => l.type === "foundation" || l.type === "floor"))
+            for (let [l, c] of [
+              [-1, -1],
+              [1, -1],
+              [-1, 1],
+              [1, 1],
+            ]) {
+              let [h, d] = zi(l * (Ci / 2), c * (Ci / 2), a.rot),
+                u = a.pos.clone().add(new R(h, 0, d));
+              o("pillar", u, 0.3) || i.push({ pos: u, rot: a.rot });
+            }
+        } else if (t === "roof") {
+          for (let a of s.filter((l) => l.type === "foundation" || l.type === "floor")) {
+            let l = a.pos.clone().add(new R(0, a.type === "foundation" ? os : 0.02, 0));
+            o("roof", l, 0.8) || i.push({ pos: l, rot: a.rot });
           }
         } else if (t === "door")
           for (let a of s.filter((l) => l.type === "doorway"))
@@ -61548,7 +61864,7 @@ uniform float uWet; uniform float uNight;`,
           s = t.inventory.slots[i];
         if (!s || s.id !== e) return;
         t.inventory.removeAt(i, 1);
-        let o = t.structures.create(n, this.pose.pos, this.pose.rot);
+        let o = t.structures.create(n, this.pose.pos, this.pose.rot, kt[e].variant ? { w: kt[e].variant } : void 0);
         (t.player.startAction("place", 0.5),
           t.particles.dustPuff(this.pose.pos.clone(), 8),
           t.audio?.build(this.pose.pos),
@@ -62063,6 +62379,7 @@ uniform float uWet; uniform float uNight;`,
         return nc[this.i];
       }
       event(t, e, n = 1) {
+        t === "gather" && sgWoodIds.includes(e) && (e = "wood");
         this.G.dialogue?.onEvent(t, e, n);
         let i = this.c;
         switch (t) {
@@ -62844,6 +63161,12 @@ uniform float uWet; uniform float uNight;`,
       hunter: ["hide", "meat_raw", "bone", "fat", "arrow", "bow", "spear", "spear_stone", "sword_stone"],
       healer: ["mushroom", "mushroom_red", "berry_red", "berry_blue", "fiber", "fat"],
     },
+    sgEco = (() => {
+      for (let w of sgWoodIds.slice(1)) xz[w] = 1;
+      Object.assign(xz, { sand: 1, glass: 5, bucket: 9, furnace: 36, table: 16, chair: 8, sidetable: 10, shelf: 14, window: 14, halfwall: 6, pillar: 8, fence: 7, roof: 12 });
+      for (let k in vz) vz[k] && vz[k].includes("wood") && vz[k].push(...sgWoodIds.slice(1));
+      return 1;
+    })(),
     wz = [
       "kuzey",
       "kuzeydoğu",
@@ -65875,7 +66198,7 @@ uniform float uWet; uniform float uNight;`,
   Je();
   cn();
   var Nt = (r) => document.getElementById(r),
-    Rr = { wood: 45, stick: 12, fat: 30, pinecone: 8, fiber: 4 },
+    Rr = { wood: 45, wood_pine: 45, wood_birch: 45, wood_apple: 45, wood_dead: 45, stick: 12, fat: 30, pinecone: 8, fiber: 4 },
     gu = class {
       constructor(t) {
         ((this.G = t),
@@ -66968,6 +67291,8 @@ uniform float uWet; uniform float uNight;`,
   A.debug = {
     In: () => In,
     models: () => to,
+    recipes: () => Wl,
+    items: () => kt,
     walk(r) {
       let t = [];
       for (let e = 0; e < r.floors.length; e++) {
