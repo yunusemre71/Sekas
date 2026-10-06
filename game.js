@@ -53448,8 +53448,8 @@ uniform float uWet; uniform float uNight;`,
             crouch: this.crouching || this.scramble,
             ...this.slopePose(t, e),
             fp:
-              this.G.cam.mode === "first" && !this.rest && !this.climb && !this.sleeping && !this.dead && !this.G.dialogue?.npc && this.G.cam.pitch > -0.62
-                ? { p: this.G.camera.position, q: this.G.camera.quaternion }
+              this.G.cam.mode === "first" && !this.rest && !this.climb && !this.sleeping && !this.dead && !this.G.dialogue?.npc
+                ? { p: this.G.camera.position, q: this.G.camera.quaternion, pitch: this.G.cam.pitch }
                 : null,
             swim: this.swim,
             action: c
@@ -53703,10 +53703,12 @@ uniform float uWet; uniform float uNight;`,
           ((this.eyeY = this.eyeY == null || Math.abs(this.eyeY - C) > 1.5 ? C : Bt(this.eyeY, C, 10, t)),
             (this.eyeX = this.eyeX == null || Math.hypot(this.eyeX - hb.x, this.eyeZ - hb.z) > 0.6 ? hb.x : Bt(this.eyeX, hb.x, 22, t)),
             (this.eyeZ = this.eyeZ == null || Math.hypot(this.eyeX - hb.x, this.eyeZ - hb.z) > 0.6 ? hb.z : Bt(this.eyeZ, hb.z, 22, t)),
-            (I = new R(this.eyeX, this.eyeY, this.eyeZ).add(new R(l.x, 0, l.z).normalize().multiplyScalar(0.1 + Math.max(0, -this.pitch - 0.3) * 0.12))));
+            (I = new R(this.eyeX, this.eyeY, this.eyeZ).add(new R(l.x, 0, l.z).normalize().multiplyScalar(0.1 + Math.min(1, Math.max(0, -this.pitch - 0.3) / 0.6) * 0.1))));
         }
-        let sb = this.pitch < -0.62 && !pz;
+        let sb = !1;
         e.char.av && e.char.av.mesh && e.char.av.mesh.visible !== sb && (e.char.av.mesh.visible = sb);
+        (this.headShown !== sb || this.headMode !== "first") &&
+          ((this.headShown = sb), (this.headMode = "first"), e.char.setHeadVisible?.(sb));
         let fpv = !sb && !pz && !e.dead && !e.sleeping && !this.G.dialogue?.npc;
         e.char.av && e.char.av.fp && e.char.av.fp.visible !== fpv && (e.char.av.fp.visible = fpv);
         this.trauma = Math.max(0, this.trauma - t * 1.6);
@@ -53726,6 +53728,7 @@ uniform float uWet; uniform float uNight;`,
       }
       e.char?.av?.mesh && !e.char.av.mesh.visible && (e.char.av.mesh.visible = !0);
       e.char?.av?.fp && e.char.av.fp.visible && (e.char.av.fp.visible = !1);
+      this.headMode === "first" && ((this.headMode = "third"), (this.headShown = !0), e.char?.setHeadVisible?.(!0));
       this.right.set(-Math.cos(this.yaw), 0, Math.sin(this.yaw));
       let c = e.crouch ? 0.45 : 0,
         h = e.pos.y + 1.55 - c - (e.swim ? 0.62 : 0) - (e.dead ? 1 : 0) - (e.sleeping ? 1.1 : 0),
