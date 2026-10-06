@@ -58007,26 +58007,30 @@ uniform float uWet; uniform float uNight;`,
           case "tree": {
             let l = e.obj,
               c = l.t === ft.APPLE && t.world.hasApples(e.ch, l);
-            (i?.tool === "axe" ? (s = "[Sol Tık] Kes") : (o = "Kesmek için Taş Balta gerekli"),
+            (i?.tool === "axe"
+              ? (s = "[Sol Tık] Kes")
+              : i && i.dmg
+                ? (s = "[Sol Tık] Kes (yavaş, aleti yıpratır)")
+                : (o = "Kesmek için balta gerekli"),
               c && (s = (s ? s + "   " : "") + "[E] Ağacı Salla"),
               (a = l.hp / ve[l.t].hp));
             break;
           }
           case "stump":
-            ((s = i?.tool === "axe" ? "[Sol Tık] Parçala" : null),
+            ((s = i?.tool === "axe" ? "[Sol Tık] Parçala" : i && i.dmg ? "[Sol Tık] Parçala (yavaş)" : null),
               s || (o = "Balta ile odun çıkarabilirsin"));
             break;
           case "log":
-            ((s = i?.tool === "axe" ? "[Sol Tık] Parçala" : null),
+            ((s = i?.tool === "axe" ? "[Sol Tık] Parçala" : i && i.dmg ? "[Sol Tık] Parçala (yavaş)" : null),
               s || (o = "Balta ile odun çıkarabilirsin"),
               (a = e.obj.hp / ve[e.obj.t].hp));
             break;
           case "rock":
             (i?.tool === "pick"
               ? (s = "[Sol Tık] Kaz")
-              : i?.tool === "axe"
-                ? (s = "[Sol Tık] Kaz (verimsiz)")
-                : (o = "Kazmak için Taş Kazma gerekli"),
+              : i?.tool === "axe" || (i && i.dmg)
+                ? (s = "[Sol Tık] Kır (yavaş, aleti çabuk yıpratır)")
+                : (o = "Kazmak için kazma gerekli"),
               (a = e.obj.hp / ve[e.obj.t].hp));
             break;
           case "bush": {
@@ -58150,10 +58154,10 @@ uniform float uWet; uniform float uNight;`,
           .clone()
           .addScaledVector(l, 0.9)
           .setY(n.pos.y + 1.1),
-        h = () => {
+        h = (W = 1) => {
           (o &&
             o.dur &&
-            i.useDurability(t.slot, 1) &&
+            i.useDurability(t.slot, W) &&
             (e.ui?.notify(`${o.name} kırıldı!`, null, "bad"), e.audio?.breakTool()),
             e.ui?.refreshHotbar());
         },
@@ -58226,10 +58230,14 @@ uniform float uWet; uniform float uNight;`,
       let g = y.point || c;
       switch (y.kind) {
         case "tree": {
-          let m = y.obj;
-          o?.tool === "axe"
-            ? ((e.lastChop = { ch: y.ch, o: m, t: e.env.total }),
-              e.world.setHp(y.ch, m, m.hp - a),
+          let m = y.obj,
+            W = o?.tool === "axe" ? 1 : o?.tool === "pick" ? 0.35 : 0.22;
+          o && (o.tool === "axe" || o.dmg)
+            ? (o.tool !== "axe" &&
+                !this.wrongToolTip &&
+                ((this.wrongToolTip = !0), e.ui?.notify("Bu aletle ağaç kesmek çok uzun sürer ve aleti yıpratır. Balta kullan.", null)),
+              (e.lastChop = { ch: y.ch, o: m, t: e.env.total }),
+              e.world.setHp(y.ch, m, m.hp - Math.max(1, a * W)),
               e.particles.chips(g, "wood", 7, l.clone().negate()),
               Math.random() < 0.6 && e.particles.leafBurst(new R(m.x, m.y + (m.H || 6) * 0.75, m.z), 6, m.t),
               e.audio?.chop(g),
@@ -58237,7 +58245,7 @@ uniform float uWet; uniform float uNight;`,
               e.animals?.noise(g, 28, "chop"),
               this.treeWobble(y.ch, m),
               Math.random() < 0.12 && this.give("stick", 1),
-              h(),
+              h(W < 1 ? 3 : 1),
               m.hp <= 0 && this.fell(y.ch, m))
             : o
               ? (e.audio?.thud(g, 0.5),
@@ -58251,19 +58259,20 @@ uniform float uWet; uniform float uNight;`,
         case "stump":
         case "log": {
           let m = y.obj;
-          if (o?.tool !== "axe") {
+          if (!o || (o.tool !== "axe" && !o.dmg)) {
             e.audio?.thud(g, 0.4);
             break;
           }
-          let x = De(m.t),
+          let W = o.tool === "axe" ? 1 : o.tool === "pick" ? 0.35 : 0.22,
+            x = De(m.t),
             w = y.kind === "stump" ? 30 : ve[m.t].hp;
           if (
             (x && m.hp > 30 && (m.hp = 30),
-            e.world.setHp(y.ch, m, Math.min(m.hp, w) - a),
+            e.world.setHp(y.ch, m, Math.min(m.hp, w) - Math.max(1, a * W)),
             e.particles.chips(g, "wood", 6, l.clone().negate()),
             e.audio?.chop(g),
             e.animals?.noise(g, 20, "chop"),
-            h(),
+            h(W < 1 ? 3 : 1),
             y.kind === "log" && Math.random() < 0.7 && this.give("wood", 1, g),
             m.hp <= 0)
           ) {
@@ -58280,8 +58289,12 @@ uniform float uWet; uniform float uNight;`,
         case "rock": {
           let m = y.obj,
             x = ve[m.t];
-          if (o?.tool === "pick" || o?.tool === "axe") {
-            let w = o.tool === "pick" ? 1 : 0.45;
+          if (o && (o.tool === "pick" || o.tool === "axe" || o.dmg)) {
+            let w = o.tool === "pick" ? 1 : o.tool === "axe" ? 0.3 : 0.2;
+            o.tool !== "pick" &&
+              !this.wrongRockTip &&
+              ((this.wrongRockTip = !0),
+              e.ui?.notify("Taşı kazmayla kır. Başka aletle çok uzun sürer ve alet çabuk yıpranır.", null));
             if (
               (e.world.setHp(y.ch, m, m.hp - a * w),
               e.particles.chips(g, "stone", 8, l.clone().negate()),
@@ -58291,7 +58304,7 @@ uniform float uWet; uniform float uNight;`,
               e.cam.shake(0.08),
               Math.random() < 0.75 * w + 0.1 && this.give("stone", 1 + (Math.random() < 0.3 ? 1 : 0), g),
               Math.random() < 0.12 * x.flint * (o.tool === "pick" ? 1.5 : 0.5) && this.give("flint", 1, g),
-              h(),
+              h(o.tool === "pick" ? 1 : o.tool === "axe" ? 4 : 3),
               m.hp <= 0)
             ) {
               (e.world.removePart(y.ch, m, 0), (m.rm |= 1));
