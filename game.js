@@ -32727,12 +32727,12 @@ varying float vLeaf;
         });
       case "guard":
         return {
-          body: "Knight_Body_Armor",
-          arms: "Knight_Arms",
-          legs: "Knight_Legs",
-          feet: "Knight_Feet",
-          head: e.next() < 0.45 ? "Knight_Head_Armet" : null,
-          acc: e.next() < 0.6 ? ["Knight_Acc_Pauldrons_Round"] : [],
+          body: e.next() < 0.5 ? "Peasant_Body" : "Ranger_Body",
+          arms: "Peasant_Arms",
+          legs: "Peasant_Legs",
+          feet: "Peasant_Feet",
+          head: null,
+          acc: [],
         };
       case "smith":
         return {
@@ -33643,7 +33643,7 @@ varying float vLeaf;
         (bd = null),
         (Md = null));
       lm = {};
-      ((P1 = { smith: "Hammer_Small", woodcutter: "Axe", guard: "Sword", hunter: "Dagger", farmer: null }),
+      ((P1 = { smith: "Hammer_Small", woodcutter: "Axe", guard: "Scythe", hunter: "Dagger", farmer: null }),
         (p3 = new Set(["guard", "smith", "woodcutter", "hunter"])),
         (m3 = new Set(["farmer", "woodcutter", "hunter", "child", "elder", "healer"])),
         (eo = new R()),
@@ -33954,7 +33954,7 @@ varying float vLeaf;
               n = P1[this.def.role] || null;
             (this.setTool(n, "r"),
               (this.weapon =
-                n === "Sword"
+                n === "Sword" || n === "Scythe"
                   ? "sword"
                   : n === "Axe"
                     ? "axe"
@@ -34594,8 +34594,8 @@ varying float vLeaf;
                   this.av.setHeld(t, null);
                   continue;
                 }
-                let n = e === "WoodenStaff" ? 1 : e === "Shield_Round" ? 0.85 : 0.9;
-                this.av.setHeld(t, Pa(e, n), e.startsWith("Shield") ? p1 : e.startsWith("Axe") ? ZA : cd);
+                let n = e === "WoodenStaff" ? 1 : e === "Shield_Round" ? 0.85 : e === "Scythe" ? 1.9 : 0.9;
+                this.av.setHeld(t, Pa(e, n), e.startsWith("Shield") ? p1 : e.startsWith("Axe") ? ZA : e === "Scythe" ? { pos: [0, 0, 0], rot: [0, 0, 0] } : cd);
               }
           }
           placeCarry() {
@@ -35540,8 +35540,8 @@ varying float vLeaf;
               i = this.r;
             for (let s = i.int(0, n.length - 1); ; s++) {
               let o = this.G.env.nightFactor > 0.35;
-              (this.setTool("Sword", "r"),
-                this.setTool(o ? null : "Shield_Round", "l"),
+              (this.setTool("Scythe", "r"),
+                this.setTool(null, "l"),
                 this.setCarry(o ? "lantern" : null));
               let a = n[s % n.length];
               if (!(yield* this.goTo({ node: a }))) {
@@ -35551,7 +35551,7 @@ varying float vLeaf;
               let l = this.v.site,
                 c = e.nodes[a],
                 h = Math.atan2(c.x - l.x, c.z - l.z);
-              (yield* this.act(o ? "Idle_Lantern_Loop" : "Idle_Shield_Loop", 10 + i.next() * 14, {
+              (yield* this.act(o ? "Idle_Lantern_Loop" : "Idle_Loop", 10 + i.next() * 14, {
                 face: h + (i.next() - 0.5) * 1.2,
               }),
                 yield);
@@ -35725,9 +35725,9 @@ varying float vLeaf;
               (this.toolsHidden = !1));
             let t = P1[this.def.role];
             (this.setTool(t || null, "r"),
-              this.setTool(this.def.role === "guard" ? "Shield_Round" : null, "l"),
+              this.setTool(null, "l"),
               (this.weapon =
-                t === "Sword"
+                t === "Sword" || t === "Scythe"
                   ? "sword"
                   : t === "Axe"
                     ? "axe"
@@ -60371,7 +60371,7 @@ uniform float uWet; uniform float uNight;`,
       guard: [
         "Geceleri köyün etrafını dolaşırım. Fenerler sönmesin diye.",
         "Kurtlar ağıllara yanaşırsa uyarı borusunu çalarım.",
-        "Kılıcımı demirci yaptı. Keskindir.",
+        "Tırpanımı demirci biledi. Keskindir.",
       ],
       woodcutter: [
         "Ağaç devrilirken altında durma! Kaç kişi ezildi bilsen...",
