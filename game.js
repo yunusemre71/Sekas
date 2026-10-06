@@ -29738,6 +29738,374 @@ varying float vLeaf;
       e
     );
   }
+  function sgNudeParts(r, t, bp) {
+    let e = t === "f",
+      n = (v, M, T) => (v < M ? M : v > T ? T : v),
+      i = (v, M, T) => {
+        let b = n((v - M) / (T - M), 0, 1);
+        return b * b * (3 - 2 * b);
+      },
+      s = (v, M) => {
+        if (v <= M[0][0]) return M[0].slice(1);
+        for (let T = 0; T < M.length - 1; T++) {
+          let b = M[T],
+            _ = M[T + 1];
+          if (v >= b[0] && v <= _[0]) {
+            let E = _[0] === b[0] ? 0 : (v - b[0]) / (_[0] - b[0]);
+            return b.slice(1).map((S, k) => S + (_[k + 1] - S) * E);
+          }
+        }
+        return M[M.length - 1].slice(1);
+      },
+      bw = (v, M) => {
+        let T = [];
+        for (let b = 0; b < M.length; b++) {
+          let [_, E] = M[b];
+          E > 0.001 && T.push([_, E]);
+        }
+        return T;
+      },
+      sk = (v) => (v[0] >= 0 ? "_l" : "_r"),
+      sub = (v, M) => [v[0] - M[0], v[1] - M[1], v[2] - M[2]],
+      crs = (v, M) => [v[1] * M[2] - v[2] * M[1], v[2] * M[0] - v[0] * M[2], v[0] * M[1] - v[1] * M[0]],
+      nrm = (v) => {
+        let M = Math.hypot(v[0], v[1], v[2]) || 1;
+        return [v[0] / M, v[1] / M, v[2] / M];
+      },
+      out = {},
+      part = "Nude_Torso",
+      slot = (m) => (out[part + ":" + m] ||= { part, m, v: [], i: [] }),
+      E = 14;
+    function tube(rg, ref, wf, capA = !0, capB = !0) {
+      let M = rg.length,
+        T = [];
+      for (let k = 0; k < M; k++) {
+        let I = rg[k],
+          C = nrm(sub(rg[Math.min(M - 1, k + 1)].c, rg[Math.max(0, k - 1)].c)),
+          z = nrm(crs(C, ref)),
+          H = crs(z, C),
+          P = [];
+        for (let U = 0; U < E; U++) {
+          let D = (U / E) * Math.PI * 2,
+            G = Math.cos(D),
+            Y = Math.sin(D),
+            X = [z[0] * G * I.ru + H[0] * Y * I.rv, z[1] * G * I.ru + H[1] * Y * I.rv, z[2] * G * I.ru + H[2] * Y * I.rv],
+            Z = nrm([z[0] * (G / I.ru) + H[0] * (Y / I.rv), z[1] * (G / I.ru) + H[1] * (Y / I.rv), z[2] * (G / I.ru) + H[2] * (Y / I.rv)]);
+          P.push({ p: [I.c[0] + X[0], I.c[1] + X[1], I.c[2] + X[2]], n: Z });
+        }
+        T.push({ P, ax: C, c: I.c, mat: I.mat || "skin" });
+      }
+      let flip = !1;
+      {
+        let a = T[0].P[0],
+          b = T[0].P[1],
+          c = T[1].P[0],
+          nn = crs(sub(b.p, a.p), sub(c.p, a.p));
+        flip = nn[0] * a.n[0] + nn[1] * a.n[1] + nn[2] * a.n[2] < 0;
+      }
+      let add = (m, pts) => {
+        let o = slot(m),
+          b = o.v.length;
+        for (let q of pts) o.v.push({ p: q.p, n: q.n, w: wf(q.p) });
+        return b;
+      };
+      for (let k = 0; k < M - 1; k++) {
+        let o = slot(T[k].mat),
+          a = add(T[k].mat, T[k].P),
+          b = add(T[k].mat, T[k + 1].P);
+        for (let U = 0; U < E; U++) {
+          let D = (U + 1) % E,
+            [p, q] = flip ? [D, U] : [U, D];
+          o.i.push(a + p, a + q, b + q, a + p, b + q, b + p);
+        }
+      }
+      for (let [k, sg, on] of [
+        [0, -1, capA],
+        [M - 1, 1, capB],
+      ]) {
+        if (!on) continue;
+        let I = T[k],
+          m = k === M - 1 && M > 1 ? T[k - 1].mat : I.mat,
+          o = slot(m),
+          a = o.v.length,
+          nv = I.ax.map((q) => q * sg),
+          ap = [I.c[0] + nv[0] * 0.002, I.c[1] + nv[1] * 0.002, I.c[2] + nv[2] * 0.002];
+        o.v.push({ p: ap, n: nv, w: wf(ap) });
+        for (let U = 0; U < E; U++) o.v.push({ p: I.P[U].p, n: nv, w: wf(I.P[U].p) });
+        for (let U = 0; U < E; U++) {
+          let D = 1 + ((U + 1) % E),
+            q = 1 + U,
+            ccw = (sg > 0) !== flip;
+          ccw ? o.i.push(a, a + q, a + D) : o.i.push(a, a + D, a + q);
+        }
+      }
+    }
+    let torso = e
+        ? [
+            [0.98, 0.16, 0.1, -0.01],
+            [1.05, 0.14, 0.095, -0.01],
+            [1.12, 0.12, 0.085, -0.008],
+            [1.2, 0.122, 0.09, -0.003],
+            [1.28, 0.14, 0.115, 0.012],
+            [1.36, 0.155, 0.12, 0.012],
+            [1.43, 0.155, 0.1, -0.002],
+            [1.48, 0.15, 0.088, -0.01],
+            [1.515, 0.09, 0.062, -0.02],
+            [1.56, 0.058, 0.055, -0.025],
+          ]
+        : [
+            [0.98, 0.158, 0.105, -0.01],
+            [1.05, 0.152, 0.1, -0.01],
+            [1.12, 0.15, 0.095, -0.008],
+            [1.2, 0.158, 0.1, -0.005],
+            [1.28, 0.178, 0.112, 0],
+            [1.36, 0.192, 0.118, 0],
+            [1.43, 0.192, 0.108, -0.005],
+            [1.48, 0.175, 0.092, -0.01],
+            [1.515, 0.105, 0.066, -0.02],
+            [1.56, 0.06, 0.056, -0.025],
+          ],
+      hips = e
+        ? [
+            [1.045, 0.15, 0.1, -0.01],
+            [0.99, 0.17, 0.108, -0.01],
+            [0.93, 0.168, 0.095, -0.012],
+            [0.9, 0.12, 0.07, -0.012],
+          ]
+        : [
+            [1.045, 0.158, 0.105, -0.01],
+            [0.99, 0.168, 0.108, -0.01],
+            [0.93, 0.166, 0.095, -0.012],
+            [0.9, 0.12, 0.07, -0.012],
+          ],
+      spineW = (y) => {
+        let b = [
+            ["pelvis", 0.949],
+            ["spine_01", 1.072],
+            ["spine_02", 1.178],
+            ["spine_03", 1.311],
+            ["neck_01", 1.52],
+            ["Head", 1.6],
+          ],
+          o = [];
+        if (y <= b[0][1]) return [["pelvis", 1]];
+        for (let k = 0; k < b.length - 1; k++)
+          if (y <= b[k + 1][1]) {
+            let q = (y - b[k][1]) / (b[k + 1][1] - b[k][1]);
+            return [
+              [b[k][0], 1 - q],
+              [b[k + 1][0], q],
+            ];
+          }
+        return [["Head", 1]];
+      };
+    {
+      let rg = [];
+      for (let y = 0.98; y <= 1.5601; y += 0.03) {
+        let [hw, hd, zc] = s(y, torso);
+        rg.push({ c: [0, y, zc], ru: hw, rv: hd });
+      }
+      tube(rg, [0, 0, 1], (p) => spineW(p[1]), !0, !0);
+      // neck
+      let nk = [];
+      for (let y = 1.5; y <= 1.66; y += 0.04) nk.push({ c: [0, y, -0.025 + (y - 1.5) * 0.12], ru: 0.058, rv: 0.058 });
+      tube(nk, [0, 0, 1], (p) => (p[1] < 1.56 ? [["neck_01", 1]] : [["neck_01", 0.5], ["Head", 0.5]]), !1, !1);
+      // arms (upper)
+      for (let sg of [1, -1]) {
+        let f = sg > 0 ? "_l" : "_r",
+          rg2 = [];
+        for (let x = 0.1; x <= 0.7001; x += 0.036) {
+          let rad = s(x, [[0.1, 0.062], [0.17, 0.062], [0.22, 0.058], [0.3, 0.053], [0.38, 0.05], [0.443, 0.05], [0.5, 0.048], [0.58, 0.04], [0.65, 0.034], [0.72, 0.032]])[0],
+            zc = -0.065 - n((x - 0.3) / 0.15, 0, 1) * 0.012 + n((x - 0.46) / 0.2, 0, 1) * 0.012;
+          rg2.push({ c: [x * sg, 1.45, zc], ru: rad * (x < 0.25 ? 0.95 : 1), rv: rad * (x < 0.25 ? 0.95 : 1) });
+        }
+        tube(
+          rg2,
+          [0, 1, 0],
+          (p) => {
+            let x = Math.abs(p[0]),
+              a = i(x, 0.1, 0.2),
+              b = i(x, 0.405, 0.48),
+              c = i(x, 0.64, 0.7);
+            return [
+              ["clavicle" + f, 1 - a],
+              ["upperarm" + f, a * (1 - b)],
+              ["lowerarm" + f, a * b * (1 - c)],
+              ["hand" + f, a * b * c],
+            ];
+          },
+          !0,
+          !0,
+        );
+      }
+    }
+    part = "Nude_Legs";
+    {
+      let rg = [];
+      for (let k = 0; k < hips.length; k++) {
+        let [y, hw, hd, zc] = hips[k],
+          m = k === 0 ? "shorts" : "shorts";
+        rg.push({ c: [0, y, zc], ru: hw * (k === 0 ? 0.99 : 1.045), rv: hd * (k === 0 ? 0.99 : 1.045), mat: m });
+      }
+      rg.splice(1, 0, { c: [0, 1.04, hips[0][3]], ru: hips[0][1] * 1.045, rv: hips[0][2] * 1.045, mat: "shorts" });
+      tube(rg, [0, 0, 1], () => [["pelvis", 1]], !0, !0);
+    }
+    // legs
+    for (let sg of [1, -1]) {
+      let f = sg > 0 ? "_l" : "_r",
+        rg = [],
+        rl = (y) =>
+          s(y, [
+            [0.1, 0.034],
+            [0.2, 0.038],
+            [0.28, 0.048],
+            [0.4, 0.058],
+            [0.5, 0.055],
+            [0.542, 0.055],
+            [0.62, 0.064],
+            [0.72, 0.074],
+            [0.82, 0.082],
+            [0.92, 0.088],
+            [1.0, 0.09],
+          ])[0],
+        zl = (y) => -0.036 - n((0.542 - y) / 0.456, 0, 1) * 0.052 + n((y - 0.542) / 0.46, 0, 1) * 0.01,
+        hem = 0.76,
+        ys = [];
+      for (let y = 1.0; y > 0.1; y -= 0.045) ys.push(y);
+      ys.push(0.1);
+      let split = !1;
+      for (let y of ys) {
+        if (!split && y < hem) {
+          split = !0;
+          rg.push({ c: [0.091 * sg, hem, zl(hem)], ru: rl(hem) * 1.07, rv: rl(hem) * 1.07, mat: "shorts" });
+          rg.push({ c: [0.091 * sg, hem - 0.004, zl(hem)], ru: rl(hem), rv: rl(hem), mat: "skin" });
+        }
+        let sh = y >= hem;
+        rg.push({ c: [0.091 * sg, y, zl(y)], ru: rl(y) * (sh ? 1.07 : 1), rv: rl(y) * (sh ? 1.07 : 1), mat: sh ? "shorts" : "skin" });
+      }
+      let lw = (p) => {
+          let y = p[1],
+            a = i(-y, -1.0, -0.88),
+            b = i(-y, -0.57, -0.51),
+            c = i(-y, -0.16, -0.1);
+          return [
+            ["pelvis", 1 - a],
+            ["thigh" + f, a * (1 - b)],
+            ["calf" + f, a * b * (1 - c)],
+            ["foot" + f, a * b * c],
+          ];
+        },
+        cut = rg.findIndex((q) => q.c[1] <= 0.5);
+      (tube(rg.slice(0, cut + 1), [0, 0, 1], lw, !0, !0), (part = "Nude_Feet"), tube(rg.slice(cut), [0, 0, 1], lw, !0, !0), (part = "Nude_Legs"));
+    }
+    part = "Nude_Hands";
+    for (let sg of [1, -1]) {
+      let f = sg > 0 ? "_l" : "_r",
+        P = (nm) => bp(nm + f),
+        wr = P("hand"),
+        kn = ["index", "middle", "ring", "pinky"].map((nm) => P(nm + "_01")),
+        ka = [0, 1, 2].map((q) => kn.reduce((u, v) => u + v[q], 0) / 4),
+        chain = (names, rad, ref) => {
+          let pts = names.map((nm) => P(nm)),
+            d = sub(pts[pts.length - 1], pts[0]),
+            dd = d[0] * d[0] + d[1] * d[1] + d[2] * d[2],
+            tj = pts.map((v) => (sub(v, pts[0])[0] * d[0] + sub(v, pts[0])[1] * d[1] + sub(v, pts[0])[2] * d[2]) / dd),
+            bn = names.slice(0, -1).map((nm) => nm + f),
+            pr = [...pts];
+          pr.unshift(pts[0].map((v, q) => v - d[q] * 0.08));
+          let rg = pr.map((v, q) => ({ c: v, ru: rad[Math.min(q, rad.length - 1)], rv: rad[Math.min(q, rad.length - 1)] }));
+          tube(
+            rg,
+            ref,
+            (p) => {
+              let sT = ((p[0] - pts[0][0]) * d[0] + (p[1] - pts[0][1]) * d[1] + (p[2] - pts[0][2]) * d[2]) / dd,
+                o = [],
+                dl = 0.12;
+              for (let k = 0; k < bn.length; k++) {
+                let a = k === 0 ? 1 : i(sT, tj[k] - dl, tj[k] + dl),
+                  b = k < bn.length - 1 ? 1 - i(sT, tj[k + 1] - dl, tj[k + 1] + dl) : 1;
+                o.push([bn[k], a * b]);
+              }
+              return o;
+            },
+            !0,
+            !0,
+          );
+        };
+      tube(
+        [
+          { c: [wr[0] - 0.02 * sg, wr[1], wr[2]], ru: 0.036, rv: 0.026 },
+          { c: wr, ru: 0.04, rv: 0.026 },
+          { c: [(wr[0] + ka[0]) / 2, (wr[1] + ka[1]) / 2, (wr[2] + ka[2]) / 2 + 0.004], ru: 0.047, rv: 0.027 },
+          { c: [ka[0] - 0.006 * sg, ka[1], ka[2]], ru: 0.046, rv: 0.024 },
+        ],
+        [0, 1, 0],
+        () => [["hand" + f, 1]],
+        !0,
+        !0,
+      );
+      for (let nm of ["index", "middle", "ring", "pinky"])
+        chain([nm + "_01", nm + "_02", nm + "_03", nm + "_04_leaf"].map((q) => q + ""), [0.0105, 0.0098, 0.0088, 0.0075, 0.006], [0, 1, 0]);
+      chain(["thumb_01", "thumb_02", "thumb_03", "thumb_04_leaf"], [0.0125, 0.0115, 0.0105, 0.009, 0.007], [0, 0, 1]);
+    }
+    part = "Nude_Feet";
+    for (let sg of [1, -1]) {
+      let f = sg > 0 ? "_l" : "_r",
+        pts = [
+          [0.17, -0.088, 0.036, 0.036],
+          [0.1, -0.09, 0.038, 0.04],
+          [0.05, -0.085, 0.04, 0.043],
+          [0.034, -0.03, 0.034, 0.045],
+          [0.03, 0.04, 0.03, 0.048],
+          [0.024, 0.1, 0.024, 0.042],
+          [0.02, 0.134, 0.014, 0.022],
+        ],
+        rg = pts.map(([y, z, ru, rv]) => ({ c: [0.091 * sg, y, z], ru, rv }));
+      tube(
+        rg,
+        [1, 0, 0],
+        (p) => {
+          let a = i(p[2], -0.01, 0.07);
+          return [
+            ["foot" + f, 1 - a],
+            ["ball" + f, a],
+          ];
+        },
+        !0,
+        !0,
+      );
+    }
+    let res = {};
+    for (let o of Object.values(out)) {
+      if (!o.v.length) continue;
+      let K = o.v.length,
+        ie = new Float32Array(K * 3),
+        ee = new Float32Array(K * 3),
+        se = new Float32Array(K * 2),
+        ne = new Uint16Array(K * 4),
+        ae = new Float32Array(K * 4);
+      for (let ce = 0; ce < K; ce++) {
+        let le = o.v[ce];
+        ((ie[ce * 3] = le.p[0]), (ie[ce * 3 + 1] = le.p[1]), (ie[ce * 3 + 2] = le.p[2]));
+        ((ee[ce * 3] = le.n[0]), (ee[ce * 3 + 1] = le.n[1]), (ee[ce * 3 + 2] = le.n[2]));
+        let he = le.w.filter((q) => q[1] > 0.001 && r[q[0]] !== void 0);
+        (he.sort((q, u) => u[1] - q[1]), (he = he.slice(0, 4)));
+        let pe = he.reduce((q, u) => q + u[1], 0) || 1;
+        for (let q = 0; q < he.length; q++) ((ne[ce * 4 + q] = r[he[q][0]]), (ae[ce * 4 + q] = he[q][1] / pe));
+      }
+      (res[o.part] ||= []).push({
+        pos: ie,
+        nrm: ee,
+        uv: se,
+        si: ne,
+        sw: ae,
+        idx: Uint32Array.from(o.i),
+        mat: o.m === "skin" ? "MI_Regular_Skin" : "SG_Shorts",
+        cnt: K,
+      });
+    }
+    return res;
+  }
   function n1(r) {
     let t = r.scene;
     t.updateMatrixWorld(!0);
@@ -29811,6 +30179,10 @@ varying float vLeaf;
           return { pos: k, nrm: I, uv: C, si: z, sw: H, idx: P, mat: U, cnt: S };
         })));
     }
+    Object.assign(
+      c,
+      sgNudeParts(s, t.children.some((w) => /Female|Hair_Long|Hair_Buns/.test(w.name)) ? "f" : "m", (w) => o[w].getWorldPosition(new R()).toArray()),
+    );
     let p = e.clone(!0),
       y = (w) =>
         w.thigh_l.getWorldPosition(new R()).distanceTo(w.calf_l.getWorldPosition(new R())) +
@@ -29934,6 +30306,8 @@ varying float vLeaf;
     } else if (r.startsWith("MI_Regular"))
       ((n = new fe({ color: ed(t.skin || "#c98d66"), roughness: 0.62, metalness: 0 })),
         Re(n, { rim: 1.15, ink: 0.55 }));
+    else if (r === "SG_Shorts")
+      ((n = new fe({ color: 3160668, roughness: 0.85, metalness: 0 })), Re(n, { rim: 1, ink: 0.55 }));
     else if (r === "SG_Boxer") {
       ((n = new fe({ color: ed(t.skin || "#c98d66"), roughness: 0.62, metalness: 0 })),
         Re(n, { rim: 1.15, ink: 0.55 }));
@@ -52820,10 +53194,10 @@ uniform float uWet; uniform float uNight;`,
         let t = {
             ...HA,
             outfit: {
-              body: "!skin:Peasant_Body",
-              arms: "!skin:Peasant_Arms",
-              legs: "!skin:Peasant_Legs",
-              feet: "!skin:Peasant_Feet",
+              body: "Nude_Torso",
+              arms: "Nude_Hands",
+              legs: "Nude_Legs",
+              feet: "Nude_Feet",
               head: null,
               acc: [],
             },
@@ -66221,6 +66595,7 @@ uniform float uWet; uniform float uNight;`,
   }
   A.toggleMusic = () => {};
   A.debug = {
+    In: () => In,
     walk(r) {
       let t = [];
       for (let e = 0; e < r.floors.length; e++) {
