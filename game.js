@@ -53312,7 +53312,7 @@ uniform float uWet; uniform float uNight;`,
             h = this.pos.z - n.pos.z;
           ((this.pos.x += (c / i) * (0.75 - i) * 0.6), (this.pos.z += (h / i) * (0.75 - i) * 0.6));
         }
-        i < 60 && e.villages?.push2D(this.pos, 0.3, this.pos.y);
+        (i < 60 && e.villages?.push2D(this.pos, 0.3, this.pos.y), i < 150 && cm(e, this.pos, 0.34));
         let o = i < 80 ? e.villages?.villageAt(this.pos.x, this.pos.z, 10) : null,
           a = e.bridges?.floorAt(this.pos.x, this.pos.z, this.pos.y);
         this.pos.y =
@@ -53424,10 +53424,55 @@ uniform float uWet; uniform float uNight;`,
       preload() {
         this.preloaded || ((this.preloaded = !0), Na(xd));
       }
+      forestSpawn() {
+        let e = this.G,
+          n = e.player.pos,
+          i = e.gen.nearestSite(n.x, n.z, 3);
+        if (!i || i.d < 70 || i.d > 520 || this.list.length >= 2) return !1;
+        let s = i.site,
+          o = e.gen.layout(s),
+          a = e.player.yaw + (Math.random() - 0.5) * 1.8,
+          l = 85 + Math.random() * 40,
+          c = n.x + Math.sin(a) * l,
+          h = n.z + Math.cos(a) * l;
+        if (e.gen.heightAt(c, h) < 1 || e.gen.villageInfluence(c, h, 30) > 0 || e.gen.normalAt(c, h).y < 0.85) return !1;
+        let d = [],
+          u = o.plaza.x - c,
+          f = o.plaza.z - h,
+          p = Math.hypot(u, f),
+          y = Math.max(6, Math.floor(p / 8)),
+          g = -f / p,
+          m = u / p,
+          x = Math.random() * 6.28;
+        for (let v = 0; v <= y; v++) {
+          let M = v / y,
+            T = Math.sin(M * 6 + x) * 5 * Math.sin(Math.PI * M),
+            b = c + u * M + g * T,
+            _ = h + f * M + m * T;
+          if (e.gen.heightAt(b, _) < 0.8 || e.gen.normalAt(b, _).y < 0.8) {
+            if (v < 8) return !1;
+            break;
+          }
+          if (e.gen.villageInfluence(b, _, 30) > 0.3) break;
+          d.push([b, _]);
+        }
+        if (d.length < 8) return !1;
+        let w = e.gen.nearestSite(c, h, 3),
+          M2 = { a: w && w.site !== s ? w.site : s, b: s, pts: d, forest: !0 };
+        return (this.list.push(new Nm(this, M2, 0, 1)), !0);
+      }
       update(t) {
         let e = this.G;
         if (e.state !== "playing" && e.state !== "paused") return;
         for (let u of this.list) u.update(t);
+        if (e.state === "playing") {
+          let u = e.player.pos,
+            f = e.gen.nearestSite(u.x, u.z, 2);
+          f && f.d > 90 && !e.player.swim && !e.player.indoors?.()
+            ? ((this.forestT = (this.forestT || 0) + t),
+              this.forestT >= 15 && ((this.forestT = 0), In.ready && Math.random() < 0.2 && this.forestSpawn()))
+            : (this.forestT = Math.max(0, (this.forestT || 0) - t));
+        }
         if (((this.t -= t), this.t > 0)) return;
         ((this.t = 7), this.preload());
         let n = e.player.pos;
