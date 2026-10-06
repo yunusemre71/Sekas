@@ -25724,7 +25724,7 @@ void main() {
     Je = tn(() => {
       vh = {
         low: {
-          name: "D\xFC\u015F\xFCk",
+          name: "Düşük",
           viewRadius: 3,
           nearRadius: 1,
           grassRadius: 18,
@@ -25750,7 +25750,7 @@ void main() {
           maxLights: 4,
         },
         high: {
-          name: "Y\xFCksek",
+          name: "Yüksek",
           viewRadius: 5,
           nearRadius: 2,
           grassRadius: 40,
@@ -26358,35 +26358,35 @@ void main() {
       Je();
       ((oi = 640),
         (dx = [
-          "Kara\xE7am",
-          "Ye\u015Filyurt",
-          "Akp\u0131nar",
-          "\xC7aml\u0131ca",
-          "Ta\u015Fk\xF6pr\xFC",
-          "Derek\xF6y",
-          "G\xF6k\xE7eova",
-          "Sar\u0131kaya",
-          "Kuzuk\xF6y",
-          "Elmal\u0131",
-          "Yaylaba\u015F\u0131",
-          "Il\u0131cak\xF6y",
-          "Kayal\u0131dere",
-          "S\xF6\u011F\xFCtl\xFC",
-          "Ard\u0131\xE7l\u0131",
-          "Me\u015Feb\xFCk\xFC",
-          "P\u0131narba\u015F\u0131",
-          "K\u0131z\u0131la\u011Fa\xE7",
-          "Orman\xFCst\xFC",
-          "G\xF6ldere",
+          "Karaçam",
+          "Yeşilyurt",
+          "Akpınar",
+          "Çamlıca",
+          "Taşköprü",
+          "Dereköy",
+          "Gökçeova",
+          "Sarıkaya",
+          "Kuzuköy",
+          "Elmalı",
+          "Yaylabaşı",
+          "Ilıcaköy",
+          "Kayalıdere",
+          "Söğütlü",
+          "Ardıçlı",
+          "Meşebükü",
+          "Pınarbaşı",
+          "Kızılağaç",
+          "Ormanüstü",
+          "Göldere",
           "Ceviz Yurdu",
-          "Bo\u011Fazk\xF6y",
-          "De\u011Firmendere",
+          "Boğazköy",
+          "Değirmendere",
           "Kocayayla",
-          "\xC7\u0131naralt\u0131",
-          "Sazl\u0131ca",
-          "Da\u011Fard\u0131",
-          "Bah\xE7ecik",
-          "Kavakl\u0131",
+          "Çınaraltı",
+          "Sazlıca",
+          "Dağardı",
+          "Bahçecik",
+          "Kavaklı",
           "Aksu",
         ]));
       KT = {
@@ -26986,7 +26986,7 @@ void main() {
       }),
         (ve = []));
       ve[ft.PINE] = {
-        name: "\xC7am A\u011Fac\u0131",
+        name: "Çam Ağacı",
         tpl: "pine",
         kind: "tree",
         hp: 70,
@@ -26995,7 +26995,7 @@ void main() {
         lodKeep: !0,
       };
       ve[ft.OAK] = {
-        name: "Me\u015Fe A\u011Fac\u0131",
+        name: "Meşe Ağacı",
         tpl: "oak",
         kind: "tree",
         hp: 90,
@@ -27004,7 +27004,7 @@ void main() {
         lodKeep: !0,
       };
       ve[ft.BIRCH] = {
-        name: "Hu\u015F A\u011Fac\u0131",
+        name: "Huş Ağacı",
         tpl: "birch",
         kind: "tree",
         hp: 55,
@@ -27013,7 +27013,7 @@ void main() {
         lodKeep: !0,
       };
       ve[ft.APPLE] = {
-        name: "Yabani Elma A\u011Fac\u0131",
+        name: "Yabani Elma Ağacı",
         tpl: "apple",
         kind: "tree",
         hp: 50,
@@ -27023,7 +27023,7 @@ void main() {
         lodKeep: !0,
       };
       ve[ft.DEAD] = {
-        name: "Kuru A\u011Fa\xE7",
+        name: "Kuru Ağaç",
         tpl: "dead",
         kind: "tree",
         hp: 35,
@@ -27031,9 +27031,9 @@ void main() {
         sticks: [3, 5],
         lodKeep: !0,
       };
-      ve[ft.BUSH] = { name: "\xC7al\u0131", tpl: "bush", kind: "bush", hp: 1, lodKeep: !0 };
+      ve[ft.BUSH] = { name: "Çalı", tpl: "bush", kind: "bush", hp: 1, lodKeep: !0 };
       ve[ft.BERRY_R] = {
-        name: "Ahududu \xC7al\u0131s\u0131",
+        name: "Ahududu Çalısı",
         tpl: "berry_r",
         lodTpl: "bush",
         kind: "bush",
@@ -27041,7 +27041,7 @@ void main() {
         lodKeep: !0,
       };
       ve[ft.BERRY_B] = {
-        name: "Yaban Mersini \xC7al\u0131s\u0131",
+        name: "Yaban Mersini Çalısı",
         tpl: "berry_b",
         lodTpl: "bush",
         kind: "bush",
@@ -27058,7 +27058,7 @@ void main() {
         lodKeep: !0,
       };
       ve[ft.BOULDER] = {
-        name: "B\xFCy\xFCk Kaya",
+        name: "Büyük Kaya",
         tpl: "boulder",
         kind: "rock",
         hp: 140,
@@ -27066,23 +27066,23 @@ void main() {
         flint: 0.8,
         lodKeep: !0,
       };
-      ve[ft.LOG] = { name: "Devrik K\xFCt\xFCk", tpl: "log", kind: "log", hp: 60, wood: [4, 6], lodKeep: !0 };
-      ve[ft.STUMP] = { name: "K\xFCt\xFCk", tpl: "stump", kind: "stump", hp: 30, wood: [1, 2], lodKeep: !1 };
+      ve[ft.LOG] = { name: "Devrik Kütük", tpl: "log", kind: "log", hp: 60, wood: [4, 6], lodKeep: !0 };
+      ve[ft.STUMP] = { name: "Kütük", tpl: "stump", kind: "stump", hp: 30, wood: [1, 2], lodKeep: !1 };
       ve[ft.MUSH_B] = {
-        name: "\xC7ay\u0131r Mantar\u0131",
+        name: "Çayır Mantarı",
         tpl: "mush_b",
         kind: "pickup",
         item: "mushroom",
         count: [1, 3],
       };
       ve[ft.MUSH_R] = {
-        name: "Sinek Mantar\u0131",
+        name: "Sinek Mantarı",
         tpl: "mush_r",
         kind: "pickup",
         item: "mushroom_red",
         count: [1, 2],
       };
-      ve[ft.FERN] = { name: "E\u011Frelti Otu", tpl: "fern", kind: "plant", item: "fiber", count: [1, 2] };
+      ve[ft.FERN] = { name: "Eğrelti Otu", tpl: "fern", kind: "plant", item: "fiber", count: [1, 2] };
       ve[ft.TALLGRASS] = { name: "Uzun Ot", tpl: "tallgrass", kind: "plant", item: "fiber", count: [2, 3] };
       ve[ft.REEDS] = { name: "Saz", tpl: "reeds", kind: "plant", item: "fiber", count: [2, 4] };
       ve[ft.STICK] = {
@@ -27094,7 +27094,7 @@ void main() {
         physItem: !0,
       };
       ve[ft.STONE] = {
-        name: "Ta\u015F",
+        name: "Taş",
         tpl: "stone",
         kind: "pickup",
         item: "stone",
@@ -27102,7 +27102,7 @@ void main() {
         physItem: !0,
       };
       ve[ft.FLINT] = {
-        name: "\xC7akmakta\u015F\u0131",
+        name: "Çakmaktaşı",
         tpl: "flint",
         kind: "pickup",
         item: "flint",
@@ -27110,14 +27110,14 @@ void main() {
         physItem: !0,
       };
       ve[ft.PINECONE] = {
-        name: "\xC7am Kozala\u011F\u0131",
+        name: "Çam Kozalağı",
         tpl: "pinecone",
         kind: "pickup",
         item: "pinecone",
         count: [1, 1],
         physItem: !0,
       };
-      ve[ft.LILY] = { name: "Nil\xFCfer", tpl: "lily", kind: "decor", lodKeep: !0 };
+      ve[ft.LILY] = { name: "Nilüfer", tpl: "lily", kind: "decor", lodKeep: !0 };
       ((De = (r) => r <= ft.DEAD), (hp = 480), (dp = 700));
     });
   function Re(r, t = {}) {
@@ -31108,7 +31108,7 @@ varying float vLeaf;
     let m = [];
     for (let v of [-1, 1]) {
       let M = new bt();
-      if ((u.add(M), r.name === "Tav\u015Fan")) {
+      if ((u.add(M), r.name === "Tavşan")) {
         M.position.set(v * f * 0.35, f * 0.75, -f * 0.1);
         let T = $e(1, t.body, 0, 0.12, 0, 0.045, 0.16, 0.025);
         (M.add(T), M.add($e(1, t.inner, 0, 0.12, 0.01, 0.03, 0.13, 0.02)), (M.rotation.z = -v * 0.15));
@@ -31157,7 +31157,7 @@ varying float vLeaf;
           u.add(M));
       }
     let w = new bt();
-    if ((w.position.set(0, s * 0.25, -o * 0.52), n.add(w), r.name === "Tav\u015Fan"))
+    if ((w.position.set(0, s * 0.25, -o * 0.52), n.add(w), r.name === "Tavşan"))
       w.add($e(0.055, 16777215, 0, 0, -0.02));
     else if (r.name === "Geyik")
       (w.add($e(1, t.body, 0, 0, -0.06, 0.07, 0.1, 0.06)),
@@ -31211,7 +31211,7 @@ varying float vLeaf;
       di();
       rm = {
         rabbit: {
-          name: "Tav\u015Fan",
+          name: "Tavşan",
           size: 0.45,
           hp: 12,
           walk: 1,
@@ -31362,7 +31362,7 @@ varying float vLeaf;
           smell: 10,
         },
         bear: {
-          name: "Boz Ay\u0131",
+          name: "Boz Ayı",
           size: 1.6,
           hp: 260,
           walk: 1.5,
@@ -31418,7 +31418,7 @@ varying float vLeaf;
           modelOnly: !0,
         },
         cow: {
-          name: "\u0130nek",
+          name: "İnek",
           size: 1.45,
           hp: 95,
           walk: 0.9,
@@ -31440,7 +31440,7 @@ varying float vLeaf;
           modelOnly: !0,
         },
         bull: {
-          name: "Bo\u011Fa",
+          name: "Boğa",
           size: 1.55,
           hp: 140,
           walk: 0.9,
@@ -31507,7 +31507,7 @@ varying float vLeaf;
           modelOnly: !0,
         },
         donkey: {
-          name: "E\u015Fek",
+          name: "Eşek",
           size: 1.3,
           hp: 80,
           walk: 0.9,
@@ -31593,7 +31593,7 @@ varying float vLeaf;
           modelOnly: !0,
         },
         dog: {
-          name: "K\xF6pek",
+          name: "Köpek",
           size: 0.7,
           hp: 45,
           walk: 1.4,
@@ -31735,7 +31735,7 @@ varying float vLeaf;
               this.home && this.home.village && this.G.villages?.onFarmAnimalKilled(this),
               this.G.audio?.animalDie(this.type, this.pos),
               this.G.ui?.notify(
-                `${this.sp.name} avland\u0131! B\u0131\xE7akla y\xFCzebilirsin.`,
+                `${this.sp.name} avlandı! Bıçakla yüzebilirsin.`,
                 null,
                 "good",
               ),
@@ -31980,9 +31980,9 @@ varying float vLeaf;
                 s = this.sp.dmg * (0.85 + Math.random() * 0.3),
                 o =
                   this.type === "wolf"
-                    ? "Kurtlar seni par\xE7alad\u0131"
+                    ? "Kurtlar seni parçaladı"
                     : this.type === "bear"
-                      ? "Bir ay\u0131 taraf\u0131ndan \xF6ld\xFCr\xFCld\xFCn"
+                      ? "Bir ayı tarafından öldürüldün"
                       : "Yaban domuzu seni devirdi";
               (e.player.damage(s, o, i, {
                 knock: this.type === "bear" ? 9 : this.type === "boar" ? 7 : 3,
@@ -32822,7 +32822,7 @@ varying float vLeaf;
           child: u,
           old: g,
           personality:
-            h === "elder" ? "bilge" : u ? n.pick(["ne\u015Feli", "utanga\xE7", "geveze"]) : n.pick(n3),
+            h === "elder" ? "bilge" : u ? n.pick(["neşeli", "utangaç", "geveze"]) : n.pick(n3),
           spec: x,
           household: a[d],
           lotId: v ? v.lot : -1,
@@ -33508,8 +33508,8 @@ varying float vLeaf;
           "Mehmet",
           "Mustafa",
           "Hasan",
-          "H\xFCseyin",
-          "\u0130brahim",
+          "Hüseyin",
+          "İbrahim",
           "Osman",
           "Yusuf",
           "Ali",
@@ -33520,39 +33520,39 @@ varying float vLeaf;
           "Emre",
           "Kerem",
           "Selim",
-          "R\u0131za",
+          "Rıza",
           "Cafer",
           "Recep",
           "Bekir",
-          "\u015E\xFCkr\xFC",
+          "Şükrü",
           "Fikret",
           "Nuri",
-          "Sad\u0131k",
+          "Sadık",
           "Veli",
           "Davut",
-          "\xD6mer",
+          "Ömer",
           "Tahsin",
         ]),
         (QA = [
-          "Ay\u015Fe",
+          "Ayşe",
           "Fatma",
           "Emine",
           "Hatice",
           "Zeynep",
           "Elif",
           "Meryem",
-          "\u015Eerife",
+          "Şerife",
           "Hacer",
-          "G\xFCls\xFCm",
+          "Gülsüm",
           "Sultan",
           "Esma",
-          "Nazl\u0131",
+          "Nazlı",
           "Dilek",
           "Sevda",
           "Leyla",
           "Nermin",
           "Pakize",
-          "H\xFClya",
+          "Hülya",
           "Feride",
           "Saadet",
           "Remziye",
@@ -33561,58 +33561,58 @@ varying float vLeaf;
         (e3 = ["Ece", "Defne", "Su", "Ela", "Nehir", "Duru"]),
         (um = {
           elder: "Muhtar",
-          merchant: "T\xFCccar",
-          innkeeper: "Hanc\u0131",
+          merchant: "Tüccar",
+          innkeeper: "Hancı",
           smith: "Demirci",
-          farmer: "\xC7ift\xE7i",
-          hunter: "Avc\u0131",
-          healer: "\u015Eifac\u0131",
-          guard: "Bek\xE7i",
+          farmer: "Çiftçi",
+          hunter: "Avcı",
+          healer: "Şifacı",
+          guard: "Bekçi",
           woodcutter: "Oduncu",
           child: "",
         }),
-        (n3 = ["ne\u015Feli", "huysuz", "utanga\xE7", "geveze", "bilge"]),
+        (n3 = ["neşeli", "huysuz", "utangaç", "geveze", "bilge"]),
         (i3 = ["#f1caa6", "#e3b088", "#d29a72", "#bd8560", "#a06c48", "#7e5236"]),
         (s3 = ["#1c120c", "#2e1d12", "#4a2e1a", "#6e4626", "#94683a", "#2a2422"]),
         (o3 = ["#bdb6ab", "#d8d2c8", "#9a948c"]),
         (wd = ["#ffffff", "#f2e6d8", "#e4ecff", "#ffe6dc", "#e8f6e0", "#f6efd0"]),
         (yr = {
           angry: [
-            "Sen ne yapt\u0131\u011F\u0131n\u0131 san\u0131yorsun?!",
+            "Sen ne yaptığını sanıyorsun?!",
             "Al sana!",
-            "Bunu \xF6deyeceksin!",
-            "Gel bakal\u0131m buraya!",
-            "Sana g\xFCn\xFCn\xFC g\xF6sterece\u011Fim!",
+            "Bunu ödeyeceksin!",
+            "Gel bakalım buraya!",
+            "Sana gününü göstereceğim!",
           ],
           guard: [
             "Dur orada!",
-            "Silah\u0131n\u0131 indir, yoksa ben indiririm!",
-            "K\xF6yde kavga yok!",
+            "Silahını indir, yoksa ben indiririm!",
+            "Köyde kavga yok!",
             "Teslim ol!",
           ],
           scared: [
-            "\u0130mdat!",
-            "Yard\u0131m edin!",
-            "Bek\xE7iler! Bek\xE7iler!",
+            "İmdat!",
+            "Yardım edin!",
+            "Bekçiler! Bekçiler!",
             "Bana dokunma!",
-            "Ka\xE7\u0131n, deli var!",
+            "Kaçın, deli var!",
           ],
           calm: [
-            "Bir daha buralarda g\xF6rmeyeyim seni.",
+            "Bir daha buralarda görmeyeyim seni.",
             "Defol git!",
             "Bu seferlik affettim.",
-            "Akl\u0131n\u0131 ba\u015F\u0131na topla!",
+            "Aklını başına topla!",
           ],
-          blocked: ["Pardon, ge\xE7ebilir miyim?", "Yolu t\u0131k\u0131yorsun yolcu.", "M\xFCsaadenle..."],
+          blocked: ["Pardon, geçebilir miyim?", "Yolu tıkıyorsun yolcu.", "Müsaadenle..."],
           intruder: [
-            "Evimde ne i\u015Fin var senin?",
-            "Buras\u0131 benim evim, haberin olsun!",
-            "Kap\u0131y\u0131 \xE7almak diye bir \u015Fey var!",
+            "Evimde ne işin var senin?",
+            "Burası benim evim, haberin olsun!",
+            "Kapıyı çalmak diye bir şey var!",
           ],
           sell: [
-            "Taze \xFCr\xFCnler, taze!",
+            "Taze ürünler, taze!",
             "Gel bak, hepsi ucuz!",
-            "Pazarl\u0131k yok ama mallar iyi!",
+            "Pazarlık yok ama mallar iyi!",
             "Ne ararsan bende!",
           ],
         }),
@@ -33857,7 +33857,7 @@ varying float vLeaf;
               if (l || e.dead || (i.kind === "wait" && i.t > 300) || (i.kind === "come" && i.t > 45)) {
                 (l &&
                   a < 40 &&
-                  t.dialogue?.bark(this, "Buradan \xF6tesine gelemem, k\xF6ye d\xF6n\xFCyorum!"),
+                  t.dialogue?.bark(this, "Buradan ötesine gelemem, köye dönüyorum!"),
                   this.release());
                 return;
               }
@@ -33870,7 +33870,7 @@ varying float vLeaf;
                 }
                 if (m) {
                   (i.fought ||
-                    t.dialogue?.bark(this, Vi(["Arkanday\u0131m!", "Defol hayvan!", "Ben hallederim!"])),
+                    t.dialogue?.bark(this, Vi(["Arkandayım!", "Defol hayvan!", "Ben hallederim!"])),
                     (i.fought = !0),
                     yield* this.fightAnimal(m));
                   continue;
@@ -33903,9 +33903,9 @@ varying float vLeaf;
                   t.dialogue?.bark(
                     this,
                     Vi([
-                      "Buyur, beni \xE7a\u011F\u0131rm\u0131\u015Fs\u0131n?",
-                      "Geldim i\u015Fte, ne laz\u0131m?",
-                      "Buraday\u0131m!",
+                      "Buyur, beni çağırmışsın?",
+                      "Geldim işte, ne lazım?",
+                      "Buradayım!",
                     ]),
                   )),
                   yield* this.idleFor(0.5, !0),
@@ -34034,7 +34034,7 @@ varying float vLeaf;
                   (e.combat?.fell(t.ch, n),
                     e.dialogue?.bark(
                       this,
-                      Vi(["Devriliyooor!", "\u0130\u015Fte bu!", "Bir tane daha m\u0131?"]),
+                      Vi(["Devriliyooor!", "İşte bu!", "Bir tane daha mı?"]),
                     ));
                   break;
                 }
@@ -34058,6 +34058,16 @@ varying float vLeaf;
                 (this.criticalT = this.critical ? this.criticalT + t : 0),
                 (this.ghost = Math.max(0, this.ghost - t)),
                 this.scared > 0 && (this.scared -= t));
+              if (
+                (this.reaggroT > 0 && (this.reaggroT -= t),
+                !this.hostile && this.down <= 0 && !n.dead && i < 9 && !(this.reaggroT > 0) && !this.inside)
+              ) {
+                let o = e.dialogue;
+                o &&
+                  o.grudgeStage?.(this) === 3 &&
+                  Math.abs(n.pos.y - this.pos.y) < 3 &&
+                  (this.fighter ? this.becomeHostile() : this.scared <= 0 && this.becomeScared());
+              }
               try {
                 this.down > 0
                   ? this.updateDown(t)
@@ -34874,7 +34884,7 @@ varying float vLeaf;
             try {
               if (!(yield* this.goTo({ node: e.gnode, x: e.x, z: e.z }))) return;
               let n = this.def,
-                i = n.child || (n.personality === "ne\u015Feli" && this.r.next() < 0.5),
+                i = n.child || (n.personality === "neşeli" && this.r.next() < 0.5),
                 s = 0,
                 o = 50 + this.r.next() * 60;
               for (; s < o; ) {
@@ -35375,7 +35385,7 @@ varying float vLeaf;
                     yield* this.act("PickUp_Table", 0.85, { loop: !1, seg: [0.8, 0.1], clipDur: 0.85 }),
                     (s.servedTo = s.taken),
                     s.taken === this.G.player &&
-                      this.G.dialogue?.bark(this, "Buyur, evin bir k\xF6\u015Fesi say!"));
+                      this.G.dialogue?.bark(this, "Buyur, evin bir köşesi say!"));
                 } finally {
                   this.setCarry(null);
                 }
@@ -35695,7 +35705,8 @@ varying float vLeaf;
             (this.talking && i.dialogue?.close(),
               this.forceStand(),
               this.chatHost && (this.chatHost = null),
-              n === "player" && g3(this.v, this, this.hp <= 0 ? "ko" : "hit"),
+              n === "player" &&
+                (i.dialogue?.onHit?.(this, this.hp <= 0 ? "ko" : "hit"), g3(this.v, this, this.hp <= 0 ? "ko" : "hit")),
               this.hp <= 0 && this.knockOut());
           }
           becomeHostile() {
@@ -35703,8 +35714,9 @@ varying float vLeaf;
             if (((this.order = null), !this.fighter)) return this.becomeScared();
             (this.hostile || this.G.dialogue?.bark(this, Vi(this.def.role === "guard" ? yr.guard : yr.angry)),
               (this.hostile = !0),
+              this.G.dialogue?.holdGrudge?.(this),
               (this.calmT = 0),
-              (this.lostT = -Math.min(20, this.playerDist / 3)),
+              (this.lostT = -Math.min(6, this.playerDist / 8)),
               (this.chaseRoute = null),
               this.stopRoutine(),
               (this.mode = null),
@@ -35736,7 +35748,9 @@ varying float vLeaf;
               this.talking && this.G.dialogue?.close());
           }
           calmDown() {
-            ((this.hostile = !1),
+            (this.G.dialogue?.holdGrudge?.(this),
+              (this.reaggroT = 6),
+              (this.hostile = !1),
               (this.atk = null),
               (this.chaseRoute = null),
               this.av.stop("atk", 0.2),
@@ -35785,9 +35799,9 @@ varying float vLeaf;
               o = Math.hypot(i, s);
             if (
               ((this.calmT += t),
-              (this.lostT = n.dead || o > 45 ? this.lostT + t : Math.min(0, this.lostT) + 0),
-              o < 45 && this.lostT > 0 && (this.lostT = 0),
-              n.dead || this.lostT > 7 || this.calmT > 90)
+              (this.lostT = n.dead || o > 22 ? this.lostT + t : Math.min(0, this.lostT) + 0),
+              o < 22 && this.lostT > 0 && (this.lostT = 0),
+              n.dead || this.lostT > 4 || this.calmT > 40 || (this.home && Math.hypot(this.pos.x - this.v.site.x, this.pos.z - this.v.site.z) > 120))
             )
               return this.calmDown();
             this.atkCool -= t;
@@ -35868,7 +35882,7 @@ varying float vLeaf;
               this.av.stop("talk", 0.1),
               this.av.stop("atk", 0.1),
               this.av.play("Death01", { tag: "state", hold: !0, fadeIn: 0.12, lowerFollow: !1 }),
-              this.G.ui?.notify(`${this.name} bay\u0131ld\u0131!`, null, "bad"),
+              this.G.ui?.notify(`${this.name} bayıldı!`, null, "bad"),
               this.talking && this.G.dialogue?.close());
           }
           updateDown(t) {
@@ -36539,7 +36553,7 @@ varying float vLeaf;
         t.chance(0.3) &&
         s.roof.mat !== "thatch"),
       (s.sign =
-        { inn: "HAN", smithy: "DEM\u0130RC\u0130", healer: "\u015E\u0130FACI", merchant: "D\xDCKK\xC2N" }[
+        { inn: "HAN", smithy: "DEMİRCİ", healer: "ŞİFACI", merchant: "DÜKKÂN" }[
           n
         ] || null),
       A3(s, z, F, t, r),
@@ -38236,7 +38250,7 @@ varying float vLeaf;
           let p = i;
           n.rests.push({
             kind: "seat",
-            name: "S\u0131ra",
+            name: "Sıra",
             sleep: !1,
             seat: { ...l(0, 0.45 + 0.01, 0) },
             face: t.yaw,
@@ -39133,7 +39147,7 @@ varying float vLeaf;
           G = Math.atan2(D.x - b.x, D.z - b.z);
         s.rests.push({
           kind: "bed",
-          name: b.guest ? "Misafir Yata\u011F\u0131" : "Yatak",
+          name: b.guest ? "Misafir Yatağı" : "Yatak",
           seat: { x: D.x, y: I - 0.06, z: D.z },
           face: G,
           lie: { x: b.x - S * 0.05, y: I, z: b.z - k * 0.05 },
@@ -39155,7 +39169,7 @@ varying float vLeaf;
           S = b.yaw;
         s.rests.push({
           kind: "seat",
-          name: b.inn ? "Tabure" : E > 0.6 ? "S\u0131ra" : "Sandalye",
+          name: b.inn ? "Tabure" : E > 0.6 ? "Sıra" : "Sandalye",
           sleep: !1,
           seat: { x: b.x, y: _ + (b.h || 0.46), z: b.z },
           face: S,
@@ -40388,11 +40402,11 @@ varying float vLeaf;
       di();
       Sn();
       ((J1 = {
-        wheat: { name: "Bu\u011Fday", row: 0.82, step: 0.55, carry: "sheaf", item: "wheat" },
-        corn: { name: "M\u0131s\u0131r", row: 1, step: 0.6, carry: "basket", item: "corn" },
+        wheat: { name: "Buğday", row: 0.82, step: 0.55, carry: "sheaf", item: "wheat" },
+        corn: { name: "Mısır", row: 1, step: 0.6, carry: "basket", item: "corn" },
         cabbage: { name: "Lahana", row: 0.85, step: 0.62, carry: "basket", item: "cabbage" },
-        carrot: { name: "Havu\xE7", row: 0.7, step: 0.42, carry: "basket", item: "carrot" },
-        pumpkin: { name: "Bal Kaba\u011F\u0131", row: 1.5, step: 1.2, carry: "pumpkin", item: "pumpkin" },
+        carrot: { name: "Havuç", row: 0.7, step: 0.42, carry: "basket", item: "carrot" },
+        pumpkin: { name: "Bal Kabağı", row: 1.5, step: 1.2, carry: "pumpkin", item: "pumpkin" },
       }),
         (qe = {
           soil: At(6965808),
@@ -41014,10 +41028,10 @@ varying float vLeaf;
           if (t.guest)
             return this.rented()
               ? null
-              : "Buras\u0131 handa kiral\u0131k bir oda. \xD6nce hanc\u0131yla konu\u015F.";
+              : "Burası handa kiralık bir oda. Önce hancıyla konuş.";
           let e = t.owners?.find((n) => !n.def.child) || t.owners?.[0];
           return e
-            ? `Burada ${e.name} yat\u0131yor. Handa oda tutabilir ya da bir bankta uyuyabilirsin.`
+            ? `Burada ${e.name} yatıyor. Handa oda tutabilir ya da bir bankta uyuyabilirsin.`
             : null;
         }
         rented() {
@@ -41131,7 +41145,7 @@ varying float vLeaf;
                 main: m.main,
                 side: m.side,
                 barn: m.barn,
-                name: m.barn ? "Ambar Kap\u0131s\u0131" : "Kap\u0131",
+                name: m.barn ? "Ambar Kapısı" : "Kapı",
                 pos: new R(E, l + m.h / 2, S),
                 out: g({ x: m.outPt[0], y: m.outPt[1], z: m.outPt[2] }),
                 in: g({ x: m.inPt[0], y: m.inPt[1], z: m.inPt[2] }),
@@ -41855,7 +41869,7 @@ varying float vLeaf;
               w: c,
               h: 1.2,
               gate: !0,
-              name: "A\u011F\u0131l Kap\u0131s\u0131",
+              name: "Ağıl Kapısı",
               pos: new R(d, a + 0.6, u),
               autoT: 0,
             },
@@ -42213,8 +42227,8 @@ varying float vLeaf;
             o &&
               !this.known.has(o.id) &&
               (this.known.add(o.id),
-              e.ui?.notify(`${o.name} k\xF6y\xFCne ula\u015Ft\u0131n!`, null, "good"),
-              e.ui?.banner?.(o.name, "K\xF6y"),
+              e.ui?.notify(`${o.name} köyüne ulaştın!`, null, "good"),
+              e.ui?.banner?.(o.name, "Köy"),
               e.quests?.event("village", o.id));
           }
           *boxesNear(t, e, n) {
@@ -42343,14 +42357,14 @@ varying float vLeaf;
                   let l = Rm(t, e, { ...a, hz: 0.25 }, i ? i.t : n);
                   l !== null &&
                     (!i || l < i.t) &&
-                    (i = { t: l, tgt: { kind: "door", door: o, name: o.name || "Kap\u0131", reach: 2.8 } });
+                    (i = { t: l, tgt: { kind: "door", door: o, name: o.name || "Kapı", reach: 2.8 } });
                 }
               }
             return i;
           }
           toggleDoor(t, e) {
             if (e === this.G.player && !t.open && t.locked) {
-              (this.G.ui?.notify("Kap\u0131 kilitli. Bu saatte herkes uyuyor.", null),
+              (this.G.ui?.notify("Kapı kilitli. Bu saatte herkes uyuyor.", null),
                 this.G.audio?.thud?.(t.pos, 0.3));
               return;
             }
@@ -42368,7 +42382,7 @@ varying float vLeaf;
             let i = t.house.front;
             (i && (n.spawn = { x: i.out.x, z: i.out.z }),
               this.G.ui?.notify(
-                "Hanc\u0131 kahvalt\u0131n\u0131 getirdi. Do\u011Fma noktan art\u0131k bu han.",
+                "Hancı kahvaltını getirdi. Doğma noktan artık bu han.",
                 null,
                 "good",
               ));
@@ -45539,7 +45553,7 @@ ${fi}
       },
     ],
     Po = {
-      clear: { name: "A\xE7\u0131k", cover: 0.3, dark: 0, rain: 0, wind: 0.28, fog: 1, sun: 1, temp: 0 },
+      clear: { name: "Açık", cover: 0.3, dark: 0, rain: 0, wind: 0.28, fog: 1, sun: 1, temp: 0 },
       cloudy: {
         name: "Bulutlu",
         cover: 0.75,
@@ -45551,7 +45565,7 @@ ${fi}
         temp: -2,
       },
       rain: {
-        name: "Ya\u011Fmurlu",
+        name: "Yağmurlu",
         cover: 1,
         dark: 0.68,
         rain: 0.75,
@@ -45561,7 +45575,7 @@ ${fi}
         temp: -5,
       },
       storm: {
-        name: "F\u0131rt\u0131na",
+        name: "Fırtına",
         cover: 1,
         dark: 0.85,
         rain: 1,
@@ -49367,7 +49381,7 @@ uniform float uWet; uniform float uNight;`,
         model: "log",
         fuel: 45,
         phys: { t: "cyl", r: 0.1, h: 0.56, m: 3 },
-        desc: "A\u011Fa\xE7 keserek elde edilir. \u0130n\u015Faat, alet ve yak\u0131t i\xE7in temel malzeme.",
+        desc: "Ağaç keserek elde edilir. İnşaat, alet ve yakıt için temel malzeme.",
       },
       stick: {
         name: "Dal",
@@ -49376,24 +49390,24 @@ uniform float uWet; uniform float uNight;`,
         model: "stick",
         fuel: 12,
         phys: { t: "box", s: [0.03, 0.31, 0.03], m: 0.4 },
-        desc: "Yerde bulunur, a\u011Fa\xE7 ve \xE7al\u0131lardan d\xFC\u015Fer.",
+        desc: "Yerde bulunur, ağaç ve çalılardan düşer.",
       },
       stone: {
-        name: "Ta\u015F",
+        name: "Taş",
         cat: "res",
         stack: 100,
         model: "stone",
         phys: { t: "sphere", r: 0.095, m: 1.2 },
         throwDmg: 4,
-        desc: "Yerden toplan\u0131r, kayalardan kaz\u0131l\u0131r. F\u0131rlat\u0131labilir.",
+        desc: "Yerden toplanır, kayalardan kazılır. Fırlatılabilir.",
       },
       flint: {
-        name: "\xC7akmakta\u015F\u0131",
+        name: "Çakmaktaşı",
         cat: "res",
         stack: 50,
         model: "flint",
         phys: { t: "sphere", r: 0.065, m: 0.4 },
-        desc: "Keskin alet u\xE7lar\u0131 ve ate\u015F yakmak i\xE7in. Su kenarlar\u0131nda ve kayalarda bulunur.",
+        desc: "Keskin alet uçları ve ateş yakmak için. Su kenarlarında ve kayalarda bulunur.",
       },
       fiber: {
         name: "Bitki Lifi",
@@ -49402,15 +49416,15 @@ uniform float uWet; uniform float uNight;`,
         model: "fiber",
         fuel: 5,
         phys: { t: "box", s: [0.05, 0.2, 0.05], m: 0.2 },
-        desc: "Uzun ot, e\u011Frelti ve sazlardan toplan\u0131r.",
+        desc: "Uzun ot, eğrelti ve sazlardan toplanır.",
       },
       rope: {
-        name: "\u0130p",
+        name: "İp",
         cat: "res",
         stack: 50,
         model: "rope",
         phys: { t: "cyl", r: 0.09, h: 0.06, m: 0.3 },
-        desc: "Bitki liflerinden \xF6r\xFCl\xFCr.",
+        desc: "Bitki liflerinden örülür.",
       },
       hide: {
         name: "Deri",
@@ -49418,7 +49432,7 @@ uniform float uWet; uniform float uNight;`,
         stack: 50,
         model: "hide",
         phys: { t: "box", s: [0.22, 0.04, 0.18], m: 0.6 },
-        desc: "Avlanan hayvanlardan b\u0131\xE7akla y\xFCz\xFCl\xFCr.",
+        desc: "Avlanan hayvanlardan bıçakla yüzülür.",
       },
       bone: {
         name: "Kemik",
@@ -49426,26 +49440,26 @@ uniform float uWet; uniform float uNight;`,
         stack: 50,
         model: "bone",
         phys: { t: "box", s: [0.04, 0.16, 0.04], m: 0.3 },
-        desc: "Avlanan hayvanlardan \xE7\u0131kar.",
+        desc: "Avlanan hayvanlardan çıkar.",
       },
       fat: {
-        name: "Hayvan Ya\u011F\u0131",
+        name: "Hayvan Yağı",
         cat: "res",
         stack: 50,
         model: "fat",
         fuel: 30,
         phys: { t: "sphere", r: 0.08, m: 0.3 },
-        desc: "\u0130yi bir yak\u0131t. Domuz ve ay\u0131dan \xE7\u0131kar.",
+        desc: "İyi bir yakıt. Domuz ve ayıdan çıkar.",
       },
       pinecone: {
-        name: "\xC7am Kozala\u011F\u0131",
+        name: "Çam Kozalağı",
         cat: "res",
         stack: 50,
         model: "pinecone",
         fuel: 8,
         phys: { t: "sphere", r: 0.05, m: 0.1 },
         throwDmg: 1,
-        desc: "\xC7am a\u011Fa\xE7lar\u0131n\u0131n dibinde. Yak\u0131t olarak kullan\u0131labilir.",
+        desc: "Çam ağaçlarının dibinde. Yakıt olarak kullanılabilir.",
       },
       berry_red: {
         name: "Ahududu",
@@ -49456,7 +49470,7 @@ uniform float uWet; uniform float uNight;`,
         water: 4,
         phys: { t: "sphere", r: 0.05, m: 0.1 },
         grip: Ln,
-        desc: "Tatl\u0131 ve sulu. \xC7al\u0131larda yeniden yeti\u015Fir.",
+        desc: "Tatlı ve sulu. Çalılarda yeniden yetişir.",
       },
       berry_blue: {
         name: "Yaban Mersini",
@@ -49470,17 +49484,17 @@ uniform float uWet; uniform float uNight;`,
         desc: "Lezzetli orman meyvesi.",
       },
       mushroom: {
-        name: "\xC7ay\u0131r Mantar\u0131",
+        name: "Çayır Mantarı",
         cat: "food",
         stack: 20,
         model: "mush_b",
         food: 9,
         phys: { t: "sphere", r: 0.06, m: 0.1 },
         grip: Ln,
-        desc: "Kahverengi \u015Fapkal\u0131, yenebilir.",
+        desc: "Kahverengi şapkalı, yenebilir.",
       },
       mushroom_red: {
-        name: "Sinek Mantar\u0131",
+        name: "Sinek Mantarı",
         cat: "food",
         stack: 20,
         model: "mush_r",
@@ -49488,7 +49502,7 @@ uniform float uWet; uniform float uNight;`,
         poison: 35,
         phys: { t: "sphere", r: 0.06, m: 0.1 },
         grip: Ln,
-        desc: "K\u0131rm\u0131z\u0131 benekli. ZEH\u0130RL\u0130! Ama yine de sen bilirsin...",
+        desc: "Kırmızı benekli. ZEHİRLİ! Ama yine de sen bilirsin...",
       },
       apple: {
         name: "Yabani Elma",
@@ -49500,10 +49514,10 @@ uniform float uWet; uniform float uNight;`,
         phys: { t: "sphere", r: 0.07, m: 0.15 },
         grip: Ln,
         throwDmg: 1,
-        desc: "Elma a\u011Fac\u0131n\u0131 sallayarak d\xFC\u015F\xFCrebilirsin.",
+        desc: "Elma ağacını sallayarak düşürebilirsin.",
       },
       meat_raw: {
-        name: "\xC7i\u011F Et",
+        name: "Çiğ Et",
         cat: "food",
         stack: 20,
         model: "meat_raw",
@@ -49514,10 +49528,10 @@ uniform float uWet; uniform float uNight;`,
         cookTime: 20,
         phys: { t: "box", s: [0.13, 0.04, 0.09], m: 0.5 },
         grip: Ln,
-        desc: "\xC7i\u011F yemek midene dokunabilir. Kamp ate\u015Finde pi\u015Fir.",
+        desc: "Çiğ yemek midene dokunabilir. Kamp ateşinde pişir.",
       },
       meat_cooked: {
-        name: "Pi\u015Fmi\u015F Et",
+        name: "Pişmiş Et",
         cat: "food",
         stack: 20,
         model: "meat_cooked",
@@ -49527,20 +49541,20 @@ uniform float uWet; uniform float uNight;`,
         cookTime: 28,
         phys: { t: "box", s: [0.13, 0.04, 0.09], m: 0.5 },
         grip: Ln,
-        desc: "Doyurucu ve iyile\u015Ftirici.",
+        desc: "Doyurucu ve iyileştirici.",
       },
       meat_burnt: {
-        name: "Yan\u0131k Et",
+        name: "Yanık Et",
         cat: "food",
         stack: 20,
         model: "meat_burnt",
         food: 8,
         phys: { t: "box", s: [0.13, 0.04, 0.09], m: 0.5 },
         grip: Ln,
-        desc: "K\xF6m\xFCr gibi olmu\u015F...",
+        desc: "Kömür gibi olmuş...",
       },
       fish_raw: {
-        name: "\xC7i\u011F Bal\u0131k",
+        name: "Çiğ Balık",
         cat: "food",
         stack: 20,
         model: "fish_raw",
@@ -49551,10 +49565,10 @@ uniform float uWet; uniform float uNight;`,
         cookTime: 15,
         phys: { t: "box", s: [0.2, 0.05, 0.05], m: 0.4 },
         grip: Ln,
-        desc: "Taze tutuldu. Pi\u015Firince \xE7ok daha iyi.",
+        desc: "Taze tutuldu. Pişirince çok daha iyi.",
       },
       fish_cooked: {
-        name: "Pi\u015Fmi\u015F Bal\u0131k",
+        name: "Pişmiş Balık",
         cat: "food",
         stack: 20,
         model: "fish_cooked",
@@ -49568,17 +49582,17 @@ uniform float uWet; uniform float uNight;`,
         desc: "Nefis!",
       },
       fish_burnt: {
-        name: "Yan\u0131k Bal\u0131k",
+        name: "Yanık Balık",
         cat: "food",
         stack: 20,
         model: "fish_burnt",
         food: 6,
         phys: { t: "box", s: [0.2, 0.05, 0.05], m: 0.4 },
         grip: Ln,
-        desc: "Fazla pi\u015Fmi\u015F.",
+        desc: "Fazla pişmiş.",
       },
       axe: {
-        name: "Ta\u015F Balta",
+        name: "Taş Balta",
         cat: "tool",
         stack: 1,
         model: "axe",
@@ -49591,10 +49605,10 @@ uniform float uWet; uniform float uNight;`,
         act: "chop",
         grip: pr,
         phys: { t: "box", s: [0.05, 0.28, 0.08], m: 1 },
-        desc: "A\u011Fa\xE7 kesmek i\xE7in. Silah olarak da i\u015F g\xF6r\xFCr.",
+        desc: "Ağaç kesmek için. Silah olarak da iş görür.",
       },
       pickaxe: {
-        name: "Ta\u015F Kazma",
+        name: "Taş Kazma",
         cat: "tool",
         stack: 1,
         model: "pickaxe",
@@ -49607,10 +49621,10 @@ uniform float uWet; uniform float uNight;`,
         act: "mine",
         grip: pr,
         phys: { t: "box", s: [0.05, 0.28, 0.12], m: 1 },
-        desc: "Kayalar\u0131 k\u0131r\u0131p ta\u015F ve \xE7akmakta\u015F\u0131 \xE7\u0131kar\u0131r.",
+        desc: "Kayaları kırıp taş ve çakmaktaşı çıkarır.",
       },
       knife: {
-        name: "Ta\u015F B\u0131\xE7ak",
+        name: "Taş Bıçak",
         cat: "tool",
         stack: 1,
         model: "knife",
@@ -49623,7 +49637,7 @@ uniform float uWet; uniform float uNight;`,
         act: "swing",
         grip: pr,
         phys: { t: "box", s: [0.03, 0.13, 0.02], m: 0.3 },
-        desc: "Av\u0131 y\xFCzmek (deri, et, kemik) i\xE7in gerekli.",
+        desc: "Avı yüzmek (deri, et, kemik) için gerekli.",
       },
       club: {
         name: "Sopa",
@@ -49639,10 +49653,10 @@ uniform float uWet; uniform float uNight;`,
         act: "swing",
         grip: pr,
         phys: { t: "box", s: [0.05, 0.3, 0.05], m: 1 },
-        desc: "A\u011F\u0131r vuru\u015Flar, hayvanlar\u0131 geri iter.",
+        desc: "Ağır vuruşlar, hayvanları geri iter.",
       },
       spear: {
-        name: "Ah\u015Fap M\u0131zrak",
+        name: "Ahşap Mızrak",
         cat: "weapon",
         stack: 1,
         model: "spear",
@@ -49656,10 +49670,10 @@ uniform float uWet; uniform float uNight;`,
         throwable: !0,
         grip: { pos: [0, 0, 0], rot: [Math.PI / 2, 0, 0] },
         phys: { t: "box", s: [0.025, 0.85, 0.025], m: 1.2 },
-        desc: "Sapla ya da sa\u011F t\u0131kla ni\u015Fan al\u0131p f\u0131rlat. Bal\u0131k av\u0131nda da i\u015Fe yarar.",
+        desc: "Sapla ya da sağ tıkla nişan alıp fırlat. Balık avında da işe yarar.",
       },
       spear_stone: {
-        name: "Ta\u015F U\xE7lu M\u0131zrak",
+        name: "Taş Uçlu Mızrak",
         cat: "weapon",
         stack: 1,
         model: "spear_stone",
@@ -49673,7 +49687,7 @@ uniform float uWet; uniform float uNight;`,
         throwable: !0,
         grip: { pos: [0, 0, 0], rot: [Math.PI / 2, 0, 0] },
         phys: { t: "box", s: [0.03, 0.88, 0.03], m: 1.3 },
-        desc: "\xC7ok daha \xF6l\xFCmc\xFCl bir m\u0131zrak.",
+        desc: "Çok daha ölümcül bir mızrak.",
       },
       bow: {
         name: "Yay",
@@ -49687,7 +49701,7 @@ uniform float uWet; uniform float uNight;`,
         pose: "bow",
         grip: { pos: [0, 0, 0], rot: [Math.PI / 2, Math.PI / 2, 0] },
         phys: { t: "box", s: [0.05, 0.45, 0.05], m: 0.6 },
-        desc: "Sa\u011F t\u0131k ni\u015Fan, sol t\u0131k bas\u0131l\u0131 tut-gerdir, b\u0131rak. Ok gerekir.",
+        desc: "Sağ tık nişan, sol tık basılı tut-gerdir, bırak. Ok gerekir.",
       },
       arrow: {
         name: "Ok",
@@ -49696,7 +49710,7 @@ uniform float uWet; uniform float uNight;`,
         model: "arrow",
         dmg: 34,
         phys: { t: "box", s: [0.015, 0.36, 0.015], m: 0.05 },
-        desc: "Yay ile at\u0131l\u0131r. D\xFC\u015Fen oklar geri toplanabilir.",
+        desc: "Yay ile atılır. Düşen oklar geri toplanabilir.",
       },
       rod: {
         name: "Olta",
@@ -49708,10 +49722,10 @@ uniform float uWet; uniform float uNight;`,
         pose: "tool",
         grip: { pos: [0, 0.02, 0], rot: [Math.PI / 2 - 0.5, 0, 0] },
         phys: { t: "box", s: [0.03, 0.9, 0.03], m: 0.5 },
-        desc: "Suya bakarken sol t\u0131k\u0131 bas\u0131l\u0131 tutup b\u0131rakarak at. Bal\u0131k vurunca t\u0131kla ve sarmaya ba\u015Fla!",
+        desc: "Suya bakarken sol tıkı basılı tutup bırakarak at. Balık vurunca tıkla ve sarmaya başla!",
       },
       torch: {
-        name: "Me\u015Fale",
+        name: "Meşale",
         cat: "tool",
         stack: 1,
         model: "torch",
@@ -49724,7 +49738,7 @@ uniform float uWet; uniform float uNight;`,
         act: "swing",
         grip: { pos: [0, 0, 0], rot: [Math.PI / 2 + 0.6, 0, 0] },
         phys: { t: "box", s: [0.04, 0.25, 0.04], m: 0.4 },
-        desc: "Karanl\u0131\u011F\u0131 ayd\u0131nlat\u0131r, \u0131s\u0131t\u0131r ve kurtlar\u0131 uzak tutar. Elde tutulurken yanar.",
+        desc: "Karanlığı aydınlatır, ısıtır ve kurtları uzak tutar. Elde tutulurken yanar.",
       },
       bandage: {
         name: "Bandaj",
@@ -49735,7 +49749,7 @@ uniform float uWet; uniform float uNight;`,
         stopBleed: !0,
         phys: { t: "cyl", r: 0.05, h: 0.08, m: 0.1 },
         grip: Ln,
-        desc: "Kanamay\u0131 durdurur ve biraz iyile\u015Ftirir.",
+        desc: "Kanamayı durdurur ve biraz iyileştirir.",
       },
       waterskin: {
         name: "Deri Matara",
@@ -49749,7 +49763,7 @@ uniform float uWet; uniform float uNight;`,
         desc: "Suya bakarken kullanarak doldur. Her yudum +20 su.",
       },
       bread: {
-        name: "K\xF6y Ekme\u011Fi",
+        name: "Köy Ekmeği",
         cat: "food",
         stack: 10,
         model: "bread",
@@ -49757,10 +49771,10 @@ uniform float uWet; uniform float uNight;`,
         value: 6,
         phys: { t: "box", s: [0.2, 0.08, 0.12], m: 0.4 },
         grip: Ln,
-        desc: "F\u0131r\u0131ndan yeni \xE7\u0131km\u0131\u015F, mis gibi.",
+        desc: "Fırından yeni çıkmış, mis gibi.",
       },
       cheese: {
-        name: "Ke\xE7i Peyniri",
+        name: "Keçi Peyniri",
         cat: "food",
         stack: 10,
         model: "cheese",
@@ -49772,7 +49786,7 @@ uniform float uWet; uniform float uNight;`,
         desc: "Tuzlu ve doyurucu.",
       },
       stew: {
-        name: "G\xFCve\xE7",
+        name: "Güveç",
         cat: "food",
         stack: 5,
         model: "stew",
@@ -49782,10 +49796,10 @@ uniform float uWet; uniform float uNight;`,
         value: 14,
         phys: { t: "cyl", r: 0.1, h: 0.08, m: 0.6 },
         grip: Ln,
-        desc: "Handan s\u0131cak bir kap g\xFCve\xE7. Can da yeniler.",
+        desc: "Handan sıcak bir kap güveç. Can da yeniler.",
       },
       herb_tea: {
-        name: "\u015Eifal\u0131 \xC7ay",
+        name: "Şifalı Çay",
         cat: "med",
         stack: 5,
         model: "herb_tea",
@@ -49795,36 +49809,36 @@ uniform float uWet; uniform float uNight;`,
         value: 12,
         phys: { t: "cyl", r: 0.05, h: 0.09, m: 0.2 },
         grip: Ln,
-        desc: "Zehri temizler, i\xE7ini \u0131s\u0131t\u0131r.",
+        desc: "Zehri temizler, içini ısıtır.",
       },
       wool: {
-        name: "Y\xFCn",
+        name: "Yün",
         cat: "res",
         stack: 50,
         model: "wool",
         value: 3,
         phys: { t: "sphere", r: 0.09, m: 0.2 },
-        desc: "Koyunlardan. T\xFCccarlar iyi para verir.",
+        desc: "Koyunlardan. Tüccarlar iyi para verir.",
       },
       letter: {
-        name: "M\xFCh\xFCrl\xFC Mektup",
+        name: "Mühürlü Mektup",
         cat: "quest",
         stack: 5,
         model: "letter",
         quest: !0,
         phys: { t: "box", s: [0.2, 0.02, 0.13], m: 0.05 },
         grip: Ln,
-        desc: "Ba\u015Fka bir k\xF6ye ula\u015Ft\u0131r\u0131lmas\u0131 gereken bir mektup.",
+        desc: "Başka bir köye ulaştırılması gereken bir mektup.",
       },
       amulet: {
-        name: "Kay\u0131p Kolye",
+        name: "Kayıp Kolye",
         cat: "quest",
         stack: 1,
         model: "amulet",
         quest: !0,
         phys: { t: "sphere", r: 0.06, m: 0.1 },
         grip: Ln,
-        desc: "Birine \xE7ok de\u011Ferli oldu\u011Fu belli.",
+        desc: "Birine çok değerli olduğu belli.",
       },
       toy: {
         name: "Tahta At",
@@ -49834,7 +49848,7 @@ uniform float uWet; uniform float uNight;`,
         quest: !0,
         phys: { t: "box", s: [0.18, 0.12, 0.08], m: 0.1 },
         grip: Ln,
-        desc: "Bir \xE7ocu\u011Fun kaybetti\u011Fi oyuncak.",
+        desc: "Bir çocuğun kaybettiği oyuncak.",
       },
       iron_axe: {
         name: "Demir Balta",
@@ -49853,10 +49867,10 @@ uniform float uWet; uniform float uNight;`,
         value: 60,
         grip: pr,
         phys: { t: "box", s: [0.06, 0.32, 0.03], m: 1.2 },
-        desc: "Demirci i\u015Fi. A\u011Fa\xE7lar\u0131 \xE7ok daha h\u0131zl\u0131 keser.",
+        desc: "Demirci işi. Ağaçları çok daha hızlı keser.",
       },
       iron_knife: {
-        name: "Demir B\u0131\xE7ak",
+        name: "Demir Bıçak",
         cat: "tool",
         stack: 1,
         model: "knife",
@@ -49872,10 +49886,10 @@ uniform float uWet; uniform float uNight;`,
         value: 40,
         grip: pr,
         phys: { t: "box", s: [0.03, 0.16, 0.02], m: 0.3 },
-        desc: "Keskin. Avlar\u0131 daha verimli y\xFCzer.",
+        desc: "Keskin. Avları daha verimli yüzer.",
       },
       sword: {
-        name: "K\u0131l\u0131\xE7",
+        name: "Kılıç",
         cat: "weapon",
         stack: 1,
         model: "club",
@@ -49891,23 +49905,23 @@ uniform float uWet; uniform float uNight;`,
         value: 95,
         grip: pr,
         phys: { t: "box", s: [0.04, 0.45, 0.02], m: 1.4 },
-        desc: "K\xF6y demircisinin en iyi i\u015Fi. Kurtlara kar\u015F\u0131 g\xFCvencen.",
+        desc: "Köy demircisinin en iyi işi. Kurtlara karşı güvencen.",
       },
       campfire: {
-        name: "Kamp Ate\u015Fi",
+        name: "Kamp Ateşi",
         cat: "build",
         stack: 5,
         model: "campfire",
         place: "campfire",
-        desc: "Is\u0131nmak, yemek pi\u015Firmek ve hayvanlar\u0131 korkutmak i\xE7in. Yakmak i\xE7in \xE7akmakta\u015F\u0131 gerekir.",
+        desc: "Isınmak, yemek pişirmek ve hayvanları korkutmak için. Yakmak için çakmaktaşı gerekir.",
       },
       workbench: {
-        name: "\xC7al\u0131\u015Fma Tezgah\u0131",
+        name: "Çalışma Tezgahı",
         cat: "build",
         stack: 1,
         model: "workbench",
         place: "workbench",
-        desc: "Geli\u015Fmi\u015F \xFCretim i\xE7in yak\u0131n\u0131nda olman gerekir.",
+        desc: "Gelişmiş üretim için yakınında olman gerekir.",
       },
       sleepbag: {
         name: "Uyku Tulumu",
@@ -49915,75 +49929,75 @@ uniform float uWet; uniform float uNight;`,
         stack: 1,
         model: "sleepbag",
         place: "sleepbag",
-        desc: "Do\u011Fma noktas\u0131 olur. Geceleri uyuyarak sabah\u0131 getirebilirsin.",
+        desc: "Doğma noktası olur. Geceleri uyuyarak sabahı getirebilirsin.",
       },
       chest: {
-        name: "Ah\u015Fap Sand\u0131k",
+        name: "Ahşap Sandık",
         cat: "build",
         stack: 3,
         model: "chest",
         place: "chest",
-        desc: "18 b\xF6lmeli depolama.",
+        desc: "18 bölmeli depolama.",
       },
       torchstand: {
-        name: "Me\u015Fale Dire\u011Fi",
+        name: "Meşale Direği",
         cat: "build",
         stack: 5,
         model: "torchstand",
         place: "torchstand",
-        desc: "Kamp\u0131n\u0131 ayd\u0131nlat\u0131r.",
+        desc: "Kampını aydınlatır.",
       },
       spikes: {
-        name: "Kaz\u0131kl\u0131 Barikat",
+        name: "Kazıklı Barikat",
         cat: "build",
         stack: 3,
         model: "spikes",
         place: "spikes",
-        desc: "Yakla\u015Fan hayvanlara hasar verir.",
+        desc: "Yaklaşan hayvanlara hasar verir.",
       },
       snare: {
-        name: "Tav\u015Fan Tuza\u011F\u0131",
+        name: "Tavşan Tuzağı",
         cat: "build",
         stack: 5,
         model: "snare",
         place: "snare",
-        desc: "Kendi kendine tav\u015Fan yakalar. Ara s\u0131ra kontrol et!",
+        desc: "Kendi kendine tavşan yakalar. Ara sıra kontrol et!",
       },
       foundation: {
-        name: "Ah\u015Fap Temel",
+        name: "Ahşap Temel",
         cat: "build",
         stack: 10,
         model: "foundation",
         place: "foundation",
         build: !0,
-        desc: "Yap\u0131lar\u0131n\u0131n zemini. Di\u011Fer temellere kenetlenir.",
+        desc: "Yapılarının zemini. Diğer temellere kenetlenir.",
       },
       wall: {
-        name: "Ah\u015Fap Duvar",
+        name: "Ahşap Duvar",
         cat: "build",
         stack: 10,
         model: "wall",
         place: "wall",
         build: !0,
-        desc: "Temel kenarlar\u0131na oturur.",
+        desc: "Temel kenarlarına oturur.",
       },
       doorway: {
-        name: "Kap\u0131 \xC7er\xE7evesi",
+        name: "Kapı Çerçevesi",
         cat: "build",
         stack: 10,
         model: "doorway",
         place: "doorway",
         build: !0,
-        desc: "\u0130\xE7ine kap\u0131 tak\u0131labilen duvar.",
+        desc: "İçine kapı takılabilen duvar.",
       },
       door: {
-        name: "Ah\u015Fap Kap\u0131",
+        name: "Ahşap Kapı",
         cat: "build",
         stack: 5,
         model: "door",
         place: "door",
         build: !0,
-        desc: "Kap\u0131 \xE7er\xE7evesine tak\u0131l\u0131r. E ile a\xE7/kapa.",
+        desc: "Kapı çerçevesine takılır. E ile aç/kapa.",
       },
       floor: {
         name: "Tavan / Zemin",
@@ -49992,7 +50006,7 @@ uniform float uWet; uniform float uNight;`,
         model: "floor",
         place: "floor",
         build: !0,
-        desc: "Duvarlar\u0131n \xFCst\xFCne \xE7at\u0131 olarak oturur. Ya\u011Fmurdan korur.",
+        desc: "Duvarların üstüne çatı olarak oturur. Yağmurdan korur.",
       },
       stairs: {
         name: "Merdiven",
@@ -50001,7 +50015,7 @@ uniform float uWet; uniform float uNight;`,
         model: "stairs",
         place: "stairs",
         build: !0,
-        desc: "Temel \xFCst\xFCne kurulur, ikinci kata \xE7\u0131kar\u0131r.",
+        desc: "Temel üstüne kurulur, ikinci kata çıkarır.",
       },
     };
   for (let r in kt) kt[r].id = r;
@@ -50009,9 +50023,9 @@ uniform float uWet; uniform float uNight;`,
       { id: "all", name: "Hepsi" },
       { id: "tool", name: "Aletler" },
       { id: "weapon", name: "Silahlar" },
-      { id: "build", name: "Yap\u0131" },
+      { id: "build", name: "Yapı" },
       { id: "res", name: "Malzeme" },
-      { id: "med", name: "Bak\u0131m" },
+      { id: "med", name: "Bakım" },
     ],
     Wl = [
       { out: "rope", n: 1, in: { fiber: 3 }, time: 1.2, cat: "res" },
@@ -50389,7 +50403,7 @@ uniform float uWet; uniform float uNight;`,
           a = i.grip || { pos: [0, -0.02, 0.03], rot: [0, 0, 0] };
         (this.char.setHeld(o, s, a), (this.heldModel = s));
       }
-      damage(t, e = "Yaraland\u0131n", n = null, i = {}) {
+      damage(t, e = "Yaralandın", n = null, i = {}) {
         if (this.dead || this.godMode) return;
         let s = this.G;
         ((this.stats.hp -= t),
@@ -50407,7 +50421,7 @@ uniform float uWet; uniform float uNight;`,
           i.bleed &&
             Math.random() < i.bleed &&
             ((this.bleed = Math.max(this.bleed, 25 + Math.random() * 15)),
-            s.ui?.notify("Kan\u0131yorsun! Bandaj kullan.", null, "bad")),
+            s.ui?.notify("Kanıyorsun! Bandaj kullan.", null, "bad")),
           s.ui?.flashHurt(t),
           (t >= 2 || n) && (this.hitCool = 8),
           this.rest ? this.standUp() : this.sleeping && this.wake(),
@@ -50454,7 +50468,7 @@ uniform float uWet; uniform float uNight;`,
           this.setPosition(e.x, e.z),
           this.unstick(),
           t.ui?.hideDeath(),
-          t.ui?.notify(n ? "Uyku tulumunda uyand\u0131n." : "Yabanc\u0131 bir yerde uyand\u0131n...", null));
+          t.ui?.notify(n ? "Uyku tulumunda uyandın." : "Yabancı bir yerde uyandın...", null));
       }
       unstick() {
         for (let t = 0; t < 20; t++) {
@@ -50485,9 +50499,9 @@ uniform float uWet; uniform float uNight;`,
         let e = this.G,
           n = e.env.hours();
         return !e.env.isNight() && n > 5.5 && n < 19.5
-          ? "Uyumak i\xE7in hava kararmal\u0131."
+          ? "Uyumak için hava kararmalı."
           : this.attackers().length || this.hitCool > 0
-            ? "Biri sana sald\u0131r\u0131yor, \u015Fimdi uyuyamazs\u0131n!"
+            ? "Biri sana saldırıyor, şimdi uyuyamazsın!"
             : t?.blocked
               ? t.blocked
               : null;
@@ -50785,13 +50799,13 @@ uniform float uWet; uniform float uNight;`,
             G > 6.2 && G < 12
               ? (e.villages?.onPlayerWake?.(D),
                 this.standUp(),
-                e.ui?.notify(`G\xFCnayd\u0131n! ${e.env.day}. g\xFCn ba\u015Fl\u0131yor.`, null),
+                e.ui?.notify(`Günaydın! ${e.env.day}. gün başlıyor.`, null),
                 e.quests?.event("sleep"),
                 e.saves?.save?.())
               : this.attackers(16).length
                 ? (this.standUp(),
                   e.ui?.notify(
-                    "Bir h\u0131r\u0131lt\u0131yla uyand\u0131n! Yak\u0131nda biri var...",
+                    "Bir hırıltıyla uyandın! Yakında biri var...",
                     null,
                     "bad",
                   ))
@@ -50929,7 +50943,7 @@ uniform float uWet; uniform float uNight;`,
               let G = -this.vel.y;
               ((this.landed = yt(G / 12, 0.2, 1)),
                 G > 4 && (e.audio?.land(G), this.footstep(!0)),
-                G > 13.5 && this.damage((G - 13.5) * 5.5, "Y\xFCksekten d\xFC\u015Ft\xFCn"));
+                G > 13.5 && this.damage((G - 13.5) * 5.5, "Yüksekten düştün"));
             }
             ((this.pos.y = k), (this.vel.y = 0), (this.grounded = !0), (this.airTime = 0));
           } else ((this.grounded = !1), (this.airTime += t));
@@ -51087,7 +51101,7 @@ uniform float uWet; uniform float uNight;`,
                 : n.mb(0) &&
                   e.inventory.count(s.ammo) === 0 &&
                   n.mpressed(0) &&
-                  e.ui?.notify("Okun kalmad\u0131!", null, "bad"),
+                  e.ui?.notify("Okun kalmadı!", null, "bad"),
               n.mreleased(0) && this.draw > 0.15
                 ? (e.combat.fireArrow(this.draw),
                   e.inventory.remove("arrow", 1),
@@ -51198,7 +51212,7 @@ uniform float uWet; uniform float uNight;`,
       useBandageQuick() {
         let t = this.G.inventory.slots.findIndex((e) => e && e.id === "bandage");
         if (t < 0) {
-          this.G.ui?.notify("Bandaj\u0131n yok.", null);
+          this.G.ui?.notify("Bandajın yok.", null);
           return;
         }
         this.consume(t);
@@ -51220,7 +51234,7 @@ uniform float uWet; uniform float uNight;`,
                 this.startAction("eat", 1, { itemId: "waterskin", onDone: () => this.drinkAmount(20) }),
                 t.audio?.drink(),
                 t.ui?.refreshHotbar())
-              : t.ui?.notify("Matara bo\u015F. Suya bak\u0131p E ile doldur.", null);
+              : t.ui?.notify("Matara boş. Suya bakıp E ile doldur.", null);
           return;
         }
         let s = "punch",
@@ -51229,7 +51243,7 @@ uniform float uWet; uniform float uNight;`,
         if (
           (n?.act && ((s = n.act), (o = n.speed || 0.6), (a = n.stamina || 5)), this.stats.stam < a * 0.5)
         ) {
-          (t.ui?.notify("\xC7ok yorgunsun...", null), (this.cooldown = 0.3));
+          (t.ui?.notify("Çok yorgunsun...", null), (this.cooldown = 0.3));
           return;
         }
         ((this.stats.stam -= a), (this.stamDelay = 0.9));
@@ -51253,8 +51267,8 @@ uniform float uWet; uniform float uNight;`,
                   i.curePoison && (this.poison = 0),
                   e.ui?.notify(
                     i.curePoison
-                      ? "\u0130\xE7in \u0131s\u0131nd\u0131, mide bulant\u0131n ge\xE7ti."
-                      : "Yaran\u0131 sard\u0131n.",
+                      ? "İçin ısındı, mide bulantın geçti."
+                      : "Yaranı sardın.",
                     null,
                     "good",
                   ),
@@ -51266,7 +51280,7 @@ uniform float uWet; uniform float uNight;`,
             return;
           }
           if (i.cat === "quest") {
-            e.ui?.notify("Bu bir g\xF6rev e\u015Fyas\u0131. Sahibine g\xF6t\xFCr.", null);
+            e.ui?.notify("Bu bir görev eşyası. Sahibine götür.", null);
             return;
           }
           if (this.stats.food >= 99.5 && !i.water && !i.heal) {
@@ -51286,7 +51300,7 @@ uniform float uWet; uniform float uNight;`,
                   i.poisonChance &&
                     Math.random() < i.poisonChance &&
                     ((this.poison = Math.max(this.poison, i.poison)),
-                    e.ui?.notify("Miden buland\u0131... \xC7i\u011F yememeliydin.", null, "bad")),
+                    e.ui?.notify("Miden bulandı... Çiğ yememeliydin.", null, "bad")),
                   i.poison && !i.poisonChance && e.ui?.notify("Zehirlendin!", null, "bad"),
                   e.quests?.event("eat", n.id));
               },
@@ -51343,7 +51357,7 @@ uniform float uWet; uniform float uNight;`,
               let o = t.world.getMods(e.ch.key, !0),
                 a = o.hv[e.obj.id];
               a !== void 0 && t.env.total - a < 300
-                ? t.ui?.notify("Bu \xE7al\u0131da i\u015Fe yarar bir \u015Fey kalmad\u0131.", null)
+                ? t.ui?.notify("Bu çalıda işe yarar bir şey kalmadı.", null)
                 : ((o.hv[e.obj.id] = t.env.total),
                   i(Math.random() < 0.5 ? "stick" : "fiber", 1 + Math.floor(Math.random() * 2)));
             }
@@ -51370,7 +51384,7 @@ uniform float uWet; uniform float uNight;`,
                   { x: 0, y: 0, z: 0 },
                 );
               }
-            } else t.ui?.notify("A\u011Fa\xE7 kesmek i\xE7in Ta\u015F Balta gerekli.", null);
+            } else t.ui?.notify("Ağaç kesmek için Taş Balta gerekli.", null);
             break;
           }
           case "item": {
@@ -51402,7 +51416,7 @@ uniform float uWet; uniform float uNight;`,
                 t.ui?.refreshHotbar());
             else {
               if (this.stats.water >= 99.5) {
-                t.ui?.notify("Susamad\u0131m.", null);
+                t.ui?.notify("Susamadım.", null);
                 break;
               }
               (this.startAction("drink", 1.3, { onDone: () => this.drinkAmount(18) }),
@@ -51412,7 +51426,7 @@ uniform float uWet; uniform float uNight;`,
             break;
           }
           case "carcass":
-            t.ui?.notify("Le\u015Fi par\xE7alamak i\xE7in b\u0131\xE7ak/balta ile vur.", null);
+            t.ui?.notify("Leşi parçalamak için bıçak/balta ile vur.", null);
             break;
           case "npc":
             t.dialogue?.open(e.npc);
@@ -51420,7 +51434,7 @@ uniform float uWet; uniform float uNight;`,
           case "rest": {
             let s = e.spot;
             if (s.taken && s.taken !== this) {
-              t.ui?.notify("Oras\u0131 dolu.", null);
+              t.ui?.notify("Orası dolu.", null);
               break;
             }
             let o = t.env.isNight() || t.env.hours() > 19.5 || t.env.hours() < 5.5;
@@ -51450,16 +51464,16 @@ uniform float uWet; uniform float uNight;`,
                   ? (t.audio?.bark(s.pos, 1, 0.6),
                     (s.followT = 60),
                     s.setState("follow"),
-                    t.ui?.notify("K\xF6pek seni sevdi! Bir s\xFCre pe\u015Finden gelecek.", null, "good"))
+                    t.ui?.notify("Köpek seni sevdi! Bir süre peşinden gelecek.", null, "good"))
                   : t.audio?.animalIdle(s.type, s.pos, !1, "wander"));
             break;
           }
           case "stump":
           case "log":
-            t.ui?.notify("Odun i\xE7in balta ile vur.", null);
+            t.ui?.notify("Odun için balta ile vur.", null);
             break;
           case "rock":
-            t.ui?.notify("Ta\u015F i\xE7in kazma ile vur.", null);
+            t.ui?.notify("Taş için kazma ile vur.", null);
             break;
         }
       }
@@ -51494,12 +51508,12 @@ uniform float uWet; uniform float uNight;`,
           n.dBurn >= 1 &&
             ((n.dBurn = 0),
             e.inventory.useDurability(this.selected, 1) &&
-              (e.ui?.notify("Me\u015Fale s\xF6nd\xFC.", null), e.audio?.fizzle()),
+              (e.ui?.notify("Meşale söndü.", null), e.audio?.fizzle()),
             e.ui?.refreshHotbar()),
           (e.env.rainAmount || 0) > 0.6 &&
             !this.sheltered &&
             Math.random() < t * 0.02 &&
-            (e.ui?.notify("Ya\u011Fmur me\u015Faleyi s\xF6nd\xFCr\xFCyor!", null, "bad"),
+            (e.ui?.notify("Yağmur meşaleyi söndürüyor!", null, "bad"),
             e.inventory.useDurability(this.selected, 20)));
       }
       updateStats(t) {
@@ -51524,7 +51538,7 @@ uniform float uWet; uniform float uNight;`,
           let c = 22;
           (n.food < 15 && (c *= 0.5), n.temp < 35.5 && (c *= 0.6), (n.stam = Math.min(100, n.stam + t * c)));
         }
-        (this.swim && n.stam <= 0 && this.damage(t * 4, "Bo\u011Fuldun"),
+        (this.swim && n.stam <= 0 && this.damage(t * 4, "Boğuldun"),
           (this.shelterT = (this.shelterT || 0) - t),
           this.shelterT <= 0 &&
             ((this.shelterT = 0.5),
@@ -51549,7 +51563,7 @@ uniform float uWet; uniform float uNight;`,
             (n.hp -= t * 0.55),
             (this.bleedFx = (this.bleedFx || 0) + t),
             this.bleedFx > 1.2 && ((this.bleedFx = 0), e.ui?.flashHurt(2)),
-            n.hp <= 0 && this.die("Kan kayb\u0131ndan \xF6ld\xFCn")),
+            n.hp <= 0 && this.die("Kan kaybından öldün")),
           this.poison > 0)
         ) {
           if (
@@ -51570,7 +51584,7 @@ uniform float uWet; uniform float uNight;`,
               e.audio?.vomit(),
               (n.water = Math.max(0, n.water - 6)));
           }
-          n.hp <= 0 && this.die("Zehirlenerek \xF6ld\xFCn");
+          n.hp <= 0 && this.die("Zehirlenerek öldün");
         }
         if (
           (n.food <= 0 && (n.hp -= t * 0.35),
@@ -51580,12 +51594,12 @@ uniform float uWet; uniform float uNight;`,
         ) {
           let c =
             n.water <= 0
-              ? "Susuzluktan \xF6ld\xFCn"
+              ? "Susuzluktan öldün"
               : n.food <= 0
-                ? "A\xE7l\u0131ktan \xF6ld\xFCn"
+                ? "Açlıktan öldün"
                 : n.temp < 35.5
-                  ? "Donarak \xF6ld\xFCn"
-                  : this.lastDamageCause || "\xD6ld\xFCn";
+                  ? "Donarak öldün"
+                  : this.lastDamageCause || "Öldün";
           this.die(c);
         }
         n.food > 55 &&
@@ -51722,9 +51736,9 @@ uniform float uWet; uniform float uNight;`,
       ) {
         let s =
           t === "first"
-            ? "Birinci \u015Fah\u0131s"
+            ? "Birinci şahıs"
             : e === 1
-              ? "Sa\u011F omuz"
+              ? "Sağ omuz"
               : e === -1
                 ? "Sol omuz"
                 : "Tam arkadan";
@@ -51846,26 +51860,26 @@ uniform float uWet; uniform float uNight;`,
   gd();
   Sn();
   var y5 = [
-      "Kervanc\u0131 Hamza",
+      "Kervancı Hamza",
       "Yolcu Ferhat",
       "Seyyah Bilal",
-      "T\xFCccar Haydar",
-      "\xC7er\xE7i R\xFCstem",
+      "Tüccar Haydar",
+      "Çerçi Rüstem",
       "Yolcu Kadir",
       "Seyyah Zeki",
-      "Arabac\u0131 Necip",
+      "Arabacı Necip",
     ],
-    x5 = ["Yolcu G\xFClizar", "Seyyah Melek", "\xC7er\xE7i Hanife", "Yolcu Saliha", "Seyyah Nurhan"],
+    x5 = ["Yolcu Gülizar", "Seyyah Melek", "Çerçi Hanife", "Yolcu Saliha", "Seyyah Nurhan"],
     v5 = [
-      "Selam yolcu! Yolun a\xE7\u0131k olsun.",
-      "Merhaba! {to} k\xF6y\xFCne gidiyorum, yol uzun.",
-      "Hay\u0131rl\u0131 yolculuklar!",
-      "{from} k\xF6y\xFCnden geliyorum. Ormanda kurt sesleri var, dikkat et.",
-      "Hayvan\u0131m yoruldu, {to} k\xF6y\xFCnde biraz dinlenece\u011Fiz.",
-      "Bu patika {to} k\xF6y\xFCne \xE7\u0131kar, kaybolma.",
-      "Ak\u015Fama kadar var\u0131r\u0131z in\u015Fallah.",
+      "Selam yolcu! Yolun açık olsun.",
+      "Merhaba! {to} köyüne gidiyorum, yol uzun.",
+      "İyi yolculuklar!",
+      "{from} köyünden geliyorum. Ormanda kurt sesleri var, dikkat et.",
+      "Hayvanım yoruldu, {to} köyünde biraz dinleneceğiz.",
+      "Bu patika {to} köyüne çıkar, kaybolma.",
+      "Akşama kadar varırız herhalde.",
     ],
-    w5 = ["Ne yap\u0131yorsun?!", "Yard\u0131m edin, e\u015Fk\u0131ya!", "Dokunma bana!", "Deli misin sen?!"],
+    w5 = ["Ne yapıyorsun?!", "Yardım edin, eşkıya!", "Dokunma bana!", "Deli misin sen?!"],
     b5 = [
       {
         body: "Ranger_Body",
@@ -51926,7 +51940,7 @@ uniform float uWet; uniform float uNight;`,
           gender: o,
           child: !1,
           old: !1,
-          personality: "ne\u015Feli",
+          personality: "neşeli",
           seed: s.int(0, 1e9),
           spec: a,
           role: "traveler",
@@ -52202,7 +52216,7 @@ uniform float uWet; uniform float uNight;`,
             ((this.down = 50),
             (this.fleeT = 0),
             this.av.play("Death01", { tag: "state", hold: !0, fadeIn: 0.12, lowerFollow: !1 }),
-            this.G.ui?.notify(`${this.name} bay\u0131ld\u0131!`, null, "bad")));
+            this.G.ui?.notify(`${this.name} bayıldı!`, null, "bad")));
       }
       dispose() {
         ((this.gone = !0), this.av.dispose(), this.rope?.removeFromParent(), this.lamp?.removeFromParent());
@@ -57858,7 +57872,7 @@ uniform float uWet; uniform float uNight;`,
           if (c.rm & 2) return;
           let u = c.rm & 1,
             f = tg(n, i, c.x, c.z, c.cr * 1.25 + 0.1, c.y - 0.3, c.y + (u ? 0.7 : 4.5));
-          f >= 0 && a(f, { kind: u ? "stump" : "tree", obj: c, ch: h, name: u ? "K\xFCt\xFCk" : d.name });
+          f >= 0 && a(f, { kind: u ? "stump" : "tree", obj: c, ch: h, name: u ? "Kütük" : d.name });
           return;
         }
         if (!(c.rm & 1))
@@ -57950,7 +57964,7 @@ uniform float uWet; uniform float uNight;`,
             a(d, {
               kind: c.dead ? "carcass" : "animal",
               animal: c,
-              name: c.sp.name + (c.dead ? " (Le\u015F)" : ""),
+              name: c.sp.name + (c.dead ? " (Leş)" : ""),
               reach: c.dead ? 3.4 : 3.6,
             });
         }
@@ -57979,32 +57993,32 @@ uniform float uWet; uniform float uNight;`,
         s = null,
         o = null,
         a = null;
-      if (t.physics.held) s = "[Sol T\u0131k] F\u0131rlat   [F] B\u0131rak";
+      if (t.physics.held) s = "[Sol Tık] Fırlat   [F] Bırak";
       else if (e)
         switch (e.kind) {
           case "tree": {
             let l = e.obj,
               c = l.t === ft.APPLE && t.world.hasApples(e.ch, l);
-            (i?.tool === "axe" ? (s = "[Sol T\u0131k] Kes") : (o = "Kesmek i\xE7in Ta\u015F Balta gerekli"),
-              c && (s = (s ? s + "   " : "") + "[E] A\u011Fac\u0131 Salla"),
+            (i?.tool === "axe" ? (s = "[Sol Tık] Kes") : (o = "Kesmek için Taş Balta gerekli"),
+              c && (s = (s ? s + "   " : "") + "[E] Ağacı Salla"),
               (a = l.hp / ve[l.t].hp));
             break;
           }
           case "stump":
-            ((s = i?.tool === "axe" ? "[Sol T\u0131k] Par\xE7ala" : null),
-              s || (o = "Balta ile odun \xE7\u0131karabilirsin"));
+            ((s = i?.tool === "axe" ? "[Sol Tık] Parçala" : null),
+              s || (o = "Balta ile odun çıkarabilirsin"));
             break;
           case "log":
-            ((s = i?.tool === "axe" ? "[Sol T\u0131k] Par\xE7ala" : null),
-              s || (o = "Balta ile odun \xE7\u0131karabilirsin"),
+            ((s = i?.tool === "axe" ? "[Sol Tık] Parçala" : null),
+              s || (o = "Balta ile odun çıkarabilirsin"),
               (a = e.obj.hp / ve[e.obj.t].hp));
             break;
           case "rock":
             (i?.tool === "pick"
-              ? (s = "[Sol T\u0131k] Kaz")
+              ? (s = "[Sol Tık] Kaz")
               : i?.tool === "axe"
-                ? (s = "[Sol T\u0131k] Kaz (verimsiz)")
-                : (o = "Kazmak i\xE7in Ta\u015F Kazma gerekli"),
+                ? (s = "[Sol Tık] Kaz (verimsiz)")
+                : (o = "Kazmak için Taş Kazma gerekli"),
               (a = e.obj.hp / ve[e.obj.t].hp));
             break;
           case "bush": {
@@ -58012,7 +58026,7 @@ uniform float uWet; uniform float uNight;`,
             l.berry && t.world.hasBerries(e.ch, e.obj)
               ? (s = `[E] ${kt[l.berry].name} Topla`)
               : l.berry
-                ? (o = "Meyveler yeniden yeti\u015Fiyor")
+                ? (o = "Meyveler yeniden yetişiyor")
                 : (s = "[E] Dal ve Lif Topla");
             break;
           }
@@ -58037,16 +58051,16 @@ uniform float uWet; uniform float uNight;`,
               l.home &&
                 l.home.village &&
                 !l.dead &&
-                ((o = `${l.home.village.site.name} k\xF6y\xFCn\xFCn hayvan\u0131`),
+                ((o = `${l.home.village.site.name} köyünün hayvanı`),
                 (l.type === "sheep" || l.type === "llama") && l.shornDay !== t.env.day
                   ? i?.tool === "knife"
-                    ? (s = "[E] Y\xFCn\xFCn\xFC K\u0131rk")
-                    : (o += " \xB7 y\xFCn k\u0131rkmak i\xE7in b\u0131\xE7ak tut")
-                  : (s = l.type === "dog" ? "[E] Sev" : "[E] Ok\u015Fa")));
+                    ? (s = "[E] Yününü Kırk")
+                    : (o += " \xB7 yün kırkmak için bıçak tut")
+                  : (s = l.type === "dog" ? "[E] Sev" : "[E] Okşa")));
             break;
           }
           case "npc":
-            ((s = "[E] Konu\u015F"), (o = t.dialogue?.subtitle(e.npc) || null));
+            ((s = "[E] Konuş"), (o = t.dialogue?.subtitle(e.npc) || null));
             break;
           case "rest": {
             let l = e.spot,
@@ -58055,25 +58069,25 @@ uniform float uWet; uniform float uNight;`,
             l.taken && l.taken !== t.player
               ? (o = `${l.name} dolu`)
               : h && l.sleep !== !1
-                ? (s = `[E] ${l.kind === "bed" ? "Yata\u011Fa yat, uyu" : "Bankta uyu"}`)
-                : ((s = l.kind === "bed" ? "[E] Yata\u011F\u0131n kenar\u0131na otur" : "[E] Otur"),
-                  l.sleep !== !1 && (o = "Hava karar\u0131nca burada uyuyabilirsin"));
+                ? (s = `[E] ${l.kind === "bed" ? "Yatağa yat, uyu" : "Bankta uyu"}`)
+                : ((s = l.kind === "bed" ? "[E] Yatağın kenarına otur" : "[E] Otur"),
+                  l.sleep !== !1 && (o = "Hava kararınca burada uyuyabilirsin"));
             break;
           }
           case "door":
-            ((s = e.door.open ? "[E] Kap\u0131y\u0131 kapat" : "[E] Kap\u0131y\u0131 a\xE7"),
-              e.door.locked && ((s = null), (o = "Kap\u0131 kilitli")));
+            ((s = e.door.open ? "[E] Kapıyı kapat" : "[E] Kapıyı aç"),
+              e.door.locked && ((s = null), (o = "Kapı kilitli")));
             break;
           case "carcass":
             i?.tool === "knife" || i?.tool === "axe"
-              ? (s = "[Sol T\u0131k] Y\xFCz / Par\xE7ala")
-              : (o = "Y\xFCzmek i\xE7in B\u0131\xE7ak ya da Balta gerekli");
+              ? (s = "[Sol Tık] Yüz / Parçala")
+              : (o = "Yüzmek için Bıçak ya da Balta gerekli");
             break;
           case "water":
             (n?.id === "waterskin"
-              ? (s = n.d < kt.waterskin.dur ? "[E] Mataray\u0131 Doldur" : "[E] \u0130\xE7")
-              : (s = "[E] Su \u0130\xE7"),
-              i?.fishing && (s = "[Sol T\u0131k] Olta At   " + s));
+              ? (s = n.d < kt.waterskin.dur ? "[E] Matarayı Doldur" : "[E] İç")
+              : (s = "[E] Su İç"),
+              i?.fishing && (s = "[Sol Tık] Olta At   " + s));
             break;
         }
       ((this.prompt = s), (this.sub = o), (this.hp = a));
@@ -58132,7 +58146,7 @@ uniform float uWet; uniform float uNight;`,
           (o &&
             o.dur &&
             i.useDurability(t.slot, 1) &&
-            (e.ui?.notify(`${o.name} k\u0131r\u0131ld\u0131!`, null, "bad"), e.audio?.breakTool()),
+            (e.ui?.notify(`${o.name} kırıldı!`, null, "bad"), e.audio?.breakTool()),
             e.ui?.refreshHotbar());
         },
         d = null,
@@ -58194,8 +58208,8 @@ uniform float uWet; uniform float uNight;`,
           e.audio?.hitFlesh(v, o ? 1 : 0.4),
           e.cam.shake(0.12),
           (e.hitstop = 0.06),
-          m && o && e.ui?.notify("Gizli sald\u0131r\u0131! x2 hasar", null, "good"),
-          o || e.ui?.notify("\xC7\u0131plak elle avlanamazs\u0131n, bir silah yap!", null),
+          m && o && e.ui?.notify("Gizli saldırı! x2 hasar", null, "good"),
+          o || e.ui?.notify("Çıplak elle avlanamazsın, bir silah yap!", null),
           h());
         return;
       }
@@ -58220,10 +58234,10 @@ uniform float uWet; uniform float uNight;`,
             : o
               ? (e.audio?.thud(g, 0.5),
                 e.particles.chips(g, "wood", 3),
-                e.ui?.notify("Bu alet a\u011Fa\xE7 kesmeye uygun de\u011Fil.", null))
+                e.ui?.notify("Bu alet ağaç kesmeye uygun değil.", null))
               : (e.audio?.thud(g, 0.3),
-                n.damage(1, "A\u011Faca yumruk att\u0131n"),
-                e.ui?.notify("Ahh! A\u011Faca yumruk atmak ac\u0131t\u0131r. Balta laz\u0131m.", null));
+                n.damage(1, "Ağaca yumruk attın"),
+                e.ui?.notify("Ahh! Ağaca yumruk atmak acıtır. Balta lazım.", null));
           break;
         }
         case "stump":
@@ -58290,8 +58304,8 @@ uniform float uWet; uniform float uNight;`,
             }
           } else
             (e.audio?.thud(g, 0.3),
-              o || n.damage(1, "Kayaya yumruk att\u0131n"),
-              e.ui?.notify("Ta\u015F \xE7\u0131karmak i\xE7in Ta\u015F Kazma laz\u0131m.", null));
+              o || n.damage(1, "Kayaya yumruk attın"),
+              e.ui?.notify("Taş çıkarmak için Taş Kazma lazım.", null));
           break;
         }
         case "carcass": {
@@ -58301,7 +58315,7 @@ uniform float uWet; uniform float uNight;`,
             (e.particles.hurtPuff(g), e.audio?.hitFlesh(g, 0.7));
             for (let [w, v] of x) this.give(w, v, g);
             h();
-          } else e.ui?.notify("Le\u015Fi y\xFCzmek i\xE7in Ta\u015F B\u0131\xE7ak gerekli.", null);
+          } else e.ui?.notify("Leşi yüzmek için Taş Bıçak gerekli.", null);
           break;
         }
         case "item": {
@@ -58353,7 +58367,7 @@ uniform float uWet; uniform float uNight;`,
       if (
         (s(e.player.pos) < 1.3 &&
           Math.hypot(e.player.pos.x - n.x, e.player.pos.z - n.z) > 1.5 &&
-          e.player.damage(45, "A\u011Fac\u0131n alt\u0131nda kald\u0131n"),
+          e.player.damage(45, "Ağacın altında kaldın"),
         e.animals)
       )
         for (let o of e.animals.list)
@@ -58478,7 +58492,7 @@ uniform float uWet; uniform float uNight;`,
                 e.particles.hurtPuff(h),
                 e.audio?.hitFlesh(h, 1),
                 e.ui?.hitMarker(),
-                u && e.ui?.notify("Sessiz at\u0131\u015F! Bonus hasar", null, "good"),
+                u && e.ui?.notify("Sessiz atış! Bonus hasar", null, "good"),
                 i.id === "arrow"
                   ? Math.random() < 0.6 && (c.stuckArrows = (c.stuckArrows || 0) + 1)
                   : e.physics.spawnItem(
@@ -58672,7 +58686,7 @@ uniform float uWet; uniform float uNight;`,
           (this.G = t.G),
           (this.id = ++ez),
           (this.type = e),
-          (this.def = e === "deathbag" ? { name: "S\u0131rt \xC7antan (\xD6l\xFCm)" } : kt[e]),
+          (this.def = e === "deathbag" ? { name: "Sırt Çantan (Ölüm)" } : kt[e]),
           (this.pos = n.clone()),
           (this.rot = i),
           (this.data = s),
@@ -58738,27 +58752,27 @@ uniform float uWet; uniform float uNight;`,
         let t = this.data;
         switch (this.type) {
           case "campfire":
-            return `[E] Kamp Ate\u015Fi${t.lit ? " (yan\u0131yor)" : ""}   [E bas\u0131l\u0131] Topla`;
+            return `[E] Kamp Ateşi${t.lit ? " (yanıyor)" : ""}   [E basılı] Topla`;
           case "chest":
-            return "[E] Sand\u0131\u011F\u0131 A\xE7   [E bas\u0131l\u0131] Topla";
+            return "[E] Sandığı Aç   [E basılı] Topla";
           case "workbench":
-            return "[E] Tezgahta \xDCret   [E bas\u0131l\u0131] Topla";
+            return "[E] Tezgahta Üret   [E basılı] Topla";
           case "sleepbag":
-            return "[E] Uyu   [E bas\u0131l\u0131] Topla";
+            return "[E] Uyu   [E basılı] Topla";
           case "door":
-            return t.open ? "[E] Kapat" : "[E] A\xE7";
+            return t.open ? "[E] Kapat" : "[E] Aç";
           case "torchstand":
             return t.lit
-              ? "[E] S\xF6nd\xFCr   [E bas\u0131l\u0131] Topla"
-              : "[E] Yak   [E bas\u0131l\u0131] Topla";
+              ? "[E] Söndür   [E basılı] Topla"
+              : "[E] Yak   [E basılı] Topla";
           case "snare":
-            return t.caught ? "[E] Av\u0131 Al" : "Tuzak kurulu (bekleniyor)   [E bas\u0131l\u0131] Topla";
+            return t.caught ? "[E] Avı Al" : "Tuzak kurulu (bekleniyor)   [E basılı] Topla";
           case "deathbag":
-            return "[E] E\u015Fyalar\u0131n\u0131 Geri Al";
+            return "[E] Eşyalarını Geri Al";
           case "spikes":
-            return "[E bas\u0131l\u0131] Topla";
+            return "[E basılı] Topla";
           default:
-            return "[E bas\u0131l\u0131] S\xF6k";
+            return "[E basılı] Sök";
         }
       }
       update(t) {
@@ -58807,12 +58821,12 @@ uniform float uWet; uniform float uNight;`,
               ? ((n.burn += Nv[c.id]), this.inv.removeAt(0, 1))
               : ((n.lit = !1),
                 e.audio?.fizzle(this.pos),
-                e.player.pos.distanceTo(this.pos) < 20 && e.ui?.notify("Kamp ate\u015Fi s\xF6nd\xFC.", null));
+                e.player.pos.distanceTo(this.pos) < 20 && e.ui?.notify("Kamp ateşi söndü.", null));
           }
           i &&
             Math.random() < t * 0.01 &&
             ((n.lit = !1),
-            e.ui?.notify("Ya\u011Fmur ate\u015Fi s\xF6nd\xFCrd\xFC!", null, "bad"),
+            e.ui?.notify("Yağmur ateşi söndürdü!", null, "bad"),
             e.audio?.fizzle(this.pos));
           let a = this.pos.clone().setY(this.pos.y + 0.15);
           (e.player.pos.distanceTo(this.pos) < 90 &&
@@ -58833,7 +58847,7 @@ uniform float uWet; uniform float uNight;`,
                   kt[d.cookTo].cookTo && e.quests?.event("cook", d.cookTo),
                   d.cookTo.includes("burnt") &&
                     e.player.pos.distanceTo(this.pos) < 15 &&
-                    e.ui?.notify("Bir \u015Feyler yan\u0131yor!", null, "bad"),
+                    e.ui?.notify("Bir şeyler yanıyor!", null, "bad"),
                   e.audio?.sizzle(this.pos)))
               : (this.cookP[c] = 0);
           }
@@ -58960,7 +58974,7 @@ uniform float uWet; uniform float uNight;`,
             !this.G.player.dead &&
             Math.hypot(t.x - s.pos.x, t.z - s.pos.z) < 1.3 &&
             Math.random() < 0.02 &&
-            this.G.player.damage(3, "Kendi kaz\u0131klar\u0131na tak\u0131ld\u0131n");
+            this.G.player.damage(3, "Kendi kazıklarına takıldın");
         }
         return i;
       }
@@ -59143,7 +59157,7 @@ uniform float uWet; uniform float uNight;`,
               : e.inventory.count("flint") > 0 || e.player.torchLit
                 ? ((t.data.lit = !0), e.audio?.ignite(t.pos))
                 : e.ui?.notify(
-                    "Yakmak i\xE7in \xE7akmakta\u015F\u0131 ya da yanan me\u015Fale laz\u0131m.",
+                    "Yakmak için çakmaktaşı ya da yanan meşale lazım.",
                     null,
                   );
             break;
@@ -59167,12 +59181,12 @@ uniform float uWet; uniform float uNight;`,
         return t.type === "deathbag"
           ? !1
           : t.type === "campfire" && (t.data.lit || t.inv.slots.some((i) => i))
-            ? (e.ui?.notify("\xD6nce ate\u015Fi s\xF6nd\xFCr ve i\xE7ini bo\u015Falt.", null), !1)
+            ? (e.ui?.notify("Önce ateşi söndür ve içini boşalt.", null), !1)
             : t.type === "chest" && t.inv.slots.some((i) => i)
-              ? (e.ui?.notify("Sand\u0131k bo\u015F olmal\u0131.", null), !1)
+              ? (e.ui?.notify("Sandık boş olmalı.", null), !1)
               : t.type === "doorway" &&
                   this.list.some((i) => i.type === "door" && i.pos.distanceTo(t.pos) < 0.2)
-                ? (e.ui?.notify("\xD6nce kap\u0131y\u0131 s\xF6k.", null), !1)
+                ? (e.ui?.notify("Önce kapıyı sök.", null), !1)
                 : (t.type === "foundation" || t.type === "floor") &&
                     this.list.some(
                       (s) =>
@@ -59181,10 +59195,10 @@ uniform float uWet; uniform float uNight;`,
                         s.pos.distanceTo(t.pos) < 2.2 &&
                         s.pos.y >= t.pos.y - 0.1,
                     )
-                  ? (e.ui?.notify("\xDCzerindeki par\xE7alar\u0131 \xF6nce s\xF6k.", null), !1)
+                  ? (e.ui?.notify("Üzerindeki parçaları önce sök.", null), !1)
                   : (e.inventory.add(t.type, 1) && e.dropItem(t.type, 1),
                     this.remove(t),
-                    e.ui?.notify(`${t.def.name} topland\u0131.`, t.type),
+                    e.ui?.notify(`${t.def.name} toplandı.`, t.type),
                     e.audio?.build(t.pos),
                     !0);
       }
@@ -59334,17 +59348,17 @@ uniform float uWet; uniform float uNight;`,
               ((u = Math.max(u, x)), (f = Math.min(f, x)));
             }
             ((i.pos.y = Math.max(u + 0.18, 0 + 0.3)),
-              i.pos.y - f > 2.6 && ((s = !1), (o = "Zemin \xE7ok e\u011Fimli")));
+              i.pos.y - f > 2.6 && ((s = !1), (o = "Zemin çok eğimli")));
           } else
             (i.pos.copy(n),
               (i.rot = l),
               (s = !1),
               (o =
                 e === "door"
-                  ? "Kap\u0131 \xE7er\xE7evesine yerle\u015Ftir"
+                  ? "Kapı çerçevesine yerleştir"
                   : e === "floor"
-                    ? "Duvarlar\u0131n \xFCst\xFCne ya da temelin \xFCst\xFCne yerle\u015Ftir"
-                    : "Bir temelin kenar\u0131na yerle\u015Ftir"));
+                    ? "Duvarların üstüne ya da temelin üstüne yerleştir"
+                    : "Bir temelin kenarına yerleştir"));
           if (
             (s &&
               e === "foundation" &&
@@ -59355,11 +59369,11 @@ uniform float uWet; uniform float uNight;`,
                   (([f, p] = zi(f, p, -i.rot)),
                     Math.abs(f) < 1.5 + u.cr &&
                       Math.abs(p) < 1.5 + u.cr &&
-                      ((s = !1), (o = "A\u011Fa\xE7 veya kaya engel oluyor")));
+                      ((s = !1), (o = "Ağaç veya kaya engel oluyor")));
                 }
               }),
               a.list.some((u) => u.type === "foundation" && u.pos.distanceTo(i.pos) < 2.5) &&
-                ((s = !1), (o = "Ba\u015Fka bir temelle \xE7ak\u0131\u015F\u0131yor"))),
+                ((s = !1), (o = "Başka bir temelle çakışıyor"))),
             s && (e === "wall" || e === "doorway" || e === "door" || e === "foundation"))
           ) {
             let u = t.player.pos,
@@ -59371,14 +59385,14 @@ uniform float uWet; uniform float uNight;`,
                 Math.abs(y) < f[5] + 0.3 &&
                 u.y < i.pos.y + f[1] + f[4] &&
                 u.y > i.pos.y - 1 &&
-                ((s = !1), (o = "\xD6n\xFCnden \xE7ekil")));
+                ((s = !1), (o = "Önünden çekil")));
           }
         } else {
           (i.pos.copy(n), (i.rot = l));
           let c = nu[e] || 0.6;
           (n.onStructure ||
             (0 - t.gen.heightAt(n.x, n.z) > 0.1 && ((s = !1), (o = "Suya kurulamaz")),
-            t.gen.normalAt(n.x, n.z).y < 0.78 && ((s = !1), (o = "Zemin \xE7ok e\u011Fimli"))),
+            t.gen.normalAt(n.x, n.z).y < 0.78 && ((s = !1), (o = "Zemin çok eğimli"))),
             t.world.forEachObject(n.x, n.z, c + 0.5, (h) => {
               (De(h.t) && h.rm & 2) ||
                 (!De(h.t) && h.rm & 1) ||
@@ -59389,7 +59403,7 @@ uniform float uWet; uniform float uNight;`,
           for (let h of a.list)
             ec.includes(h.type) ||
               (h.pos.distanceTo(n) < c + (nu[h.type] || 0.6) * 0.8 &&
-                ((s = !1), (o = "Ba\u015Fka bir yap\u0131yla \xE7ak\u0131\u015F\u0131yor")));
+                ((s = !1), (o = "Başka bir yapıyla çakışıyor")));
         }
         if (((this.valid = s), (this.reason = o), this.ghost)) {
           (this.ghost.position.copy(i.pos), (this.ghost.rotation.y = i.rot));
@@ -59450,7 +59464,7 @@ uniform float uWet; uniform float uNight;`,
       place() {
         let t = this.G;
         if (!this.valid) {
-          (t.ui?.notify(this.reason || "Buraya yerle\u015Ftirilemez.", null, "bad"), t.audio?.ui("error"));
+          (t.ui?.notify(this.reason || "Buraya yerleştirilemez.", null, "bad"), t.audio?.ui("error"));
           return;
         }
         let e = this.item,
@@ -59465,8 +59479,8 @@ uniform float uWet; uniform float uNight;`,
           t.audio?.build(this.pose.pos),
           n === "sleepbag" &&
             ((t.player.spawn = { x: o.pos.x, z: o.pos.z }),
-            t.ui?.notify("Do\u011Fma noktas\u0131 ayarland\u0131.", "sleepbag", "good")),
-          n === "campfire" && t.ui?.notify("Kamp ate\u015Fini yakmak i\xE7in E ile a\xE7.", null),
+            t.ui?.notify("Doğma noktası ayarlandı.", "sleepbag", "good")),
+          n === "campfire" && t.ui?.notify("Kamp ateşini yakmak için E ile aç.", null),
           t.quests?.event("place", n),
           t.inventory.slots[i] || this.clearGhost());
       }
@@ -59477,7 +59491,7 @@ uniform float uWet; uniform float uNight;`,
   cn();
   var Fv = [
     {
-      name: "Alabal\u0131k",
+      name: "Alabalık",
       body: 10467750,
       back: 6258538,
       belly: 15919326,
@@ -59497,7 +59511,7 @@ uniform float uWet; uniform float uNight;`,
       n: 1,
     },
     {
-      name: "Yay\u0131n Bal\u0131\u011F\u0131",
+      name: "Yayın Balığı",
       body: 7236190,
       back: 4538939,
       belly: 14209732,
@@ -59660,7 +59674,7 @@ uniform float uWet; uniform float uNight;`,
           n.particles.splash(new R(t.pos.x, 0, t.pos.z), 1),
           n.audio?.splash(t.pos, 0.8),
           n.ui?.notify(
-            `${t.ft.name} yakalad\u0131n! (${Math.round(t.len * 100)} cm)${e ? " \u2014 M\u0131zrakla!" : ""}`,
+            `${t.ft.name} yakaladın! (${Math.round(t.len * 100)} cm)${e ? " — Mızrakla!" : ""}`,
             "fish_raw",
             "good",
           ),
@@ -59762,7 +59776,7 @@ uniform float uWet; uniform float uNight;`,
                 n.particles.splash(this.bpos, 0.35),
                 n.audio?.plop(this.bpos),
                 n.animals?.noise(this.bpos, 5, "splash"))
-              : this.bpos.y <= i && (n.ui?.notify("Olta suya ula\u015Fmad\u0131.", null), this.cancel()),
+              : this.bpos.y <= i && (n.ui?.notify("Olta suya ulaşmadı.", null), this.cancel()),
               t.mpressed(2) && this.cancel());
             break;
           }
@@ -59790,7 +59804,7 @@ uniform float uWet; uniform float uNight;`,
                 n.audio?.bite(this.bpos),
                 n.ui?.fishingBar({ mode: "bite" })),
               (t.mpressed(0) || t.mpressed(2)) &&
-                (t.mpressed(0) && n.ui?.notify("Erken \xE7ektin, bal\u0131k ka\xE7t\u0131.", null),
+                (t.mpressed(0) && n.ui?.notify("Erken çektin, balık kaçtı.", null),
                 this.cancel()));
             break;
           }
@@ -59806,7 +59820,7 @@ uniform float uWet; uniform float uNight;`,
                   (this.fishType = n.fish ? n.fish.pickType() : null),
                   n.audio?.reelStart())
                 : this.biteT <= 0 &&
-                  (n.ui?.notify("Bal\u0131k yemi al\u0131p ka\xE7t\u0131!", null),
+                  (n.ui?.notify("Balık yemi alıp kaçtı!", null),
                   (this.state = "wait"),
                   (this.waitT = 5 + Math.random() * 8),
                   (this.nibbles = 2),
@@ -59842,7 +59856,7 @@ uniform float uWet; uniform float uNight;`,
                   n.ui?.refreshHotbar(),
                   this.cancel())
                 : this.progress <= 0
-                  ? (n.ui?.notify("Bal\u0131k kurtuldu...", null), this.cancel())
+                  ? (n.ui?.notify("Balık kurtuldu...", null), this.cancel())
                   : this.progress >= 1 && this.landFish(),
               t.mpressed(2) && this.cancel());
             break;
@@ -59854,7 +59868,7 @@ uniform float uWet; uniform float uNight;`,
       }
       landFish() {
         let t = this.G,
-          e = this.fishType || { name: "Bal\u0131k", n: 1, size: [0.3, 0.4] },
+          e = this.fishType || { name: "Balık", n: 1, size: [0.3, 0.4] },
           n = Dt(e.size[0], e.size[1], Math.random());
         this.fish && t.fish.remove(this.fish);
         let i = t.player;
@@ -59865,7 +59879,7 @@ uniform float uWet; uniform float uNight;`,
         }),
           t.particles.splash(this.bpos, 1),
           t.audio?.splash(this.bpos, 0.8),
-          t.ui?.notify(`${e.name} yakalad\u0131n! (${Math.round(n * 100)} cm)`, "fish_raw", "good"),
+          t.ui?.notify(`${e.name} yakaladın! (${Math.round(n * 100)} cm)`, "fish_raw", "good"),
           t.quests?.event("fish"),
           t.inventory.useDurability(t.player.selected, 1),
           t.ui?.refreshHotbar(),
@@ -59890,78 +59904,78 @@ uniform float uWet; uniform float uNight;`,
   var nc = [
       {
         id: "gather",
-        title: "Yerden 3 dal ve 3 ta\u015F topla",
-        hint: "Yerdeki dal ve ta\u015Flara bak\u0131p [E] ile topla.",
+        title: "Yerden 3 dal ve 3 taş topla",
+        hint: "Yerdeki dal ve taşlara bakıp [E] ile topla.",
         need: { stick: 3, stone: 3 },
       },
       {
         id: "fiber",
         title: "6 bitki lifi topla",
-        hint: "Uzun otlar, e\u011Frelti ve sazlara [E]. \xC7al\u0131lardan da lif \xE7\u0131kar.",
+        hint: "Uzun otlar, eğrelti ve sazlara [E]. Çalılardan da lif çıkar.",
         need: { fiber: 6 },
       },
       {
         id: "axe",
-        title: "Ta\u015F Balta \xFCret",
-        hint: "[Tab] ile envanteri a\xE7, \xDCretim b\xF6l\xFCm\xFCnden Ta\u015F Balta se\xE7.",
+        title: "Taş Balta üret",
+        hint: "[Tab] ile envanteri aç, Üretim bölümünden Taş Balta seç.",
         craft: "axe",
       },
       {
         id: "fell",
-        title: "Bir a\u011Fa\xE7 devir",
-        hint: "Baltay\u0131 k\u0131sayoldan se\xE7 ([1\u20136]) ve bir a\u011Faca sol t\u0131kla vur. D\xFC\u015Ferken alt\u0131nda durma!",
+        title: "Bir ağaç devir",
+        hint: "Baltayı kısayoldan seç ([1–6]) ve bir ağaca sol tıkla vur. Düşerken altında durma!",
         count: "fell",
         n: 1,
       },
       {
         id: "fire",
-        title: "Kamp ate\u015Fi kur ve yak",
-        hint: "Kamp Ate\u015Fi \xFCret (5 ta\u015F, 3 odun), yerle\u015Ftir, [E] ile a\xE7; yak\u0131t koy ve yak. \xC7akmakta\u015F\u0131 laz\u0131m.",
+        title: "Kamp ateşi kur ve yak",
+        hint: "Kamp Ateşi üret (5 taş, 3 odun), yerleştir, [E] ile aç; yakıt koy ve yak. Çakmaktaşı lazım.",
         count: "ignite",
         n: 1,
       },
       {
         id: "spear",
-        title: "Bir m\u0131zrak yap",
-        hint: "Ah\u015Fap M\u0131zrak: 2 odun. Sa\u011F t\u0131k ile ni\u015Fan al\u0131p f\u0131rlatabilirsin.",
+        title: "Bir mızrak yap",
+        hint: "Ahşap Mızrak: 2 odun. Sağ tık ile nişan alıp fırlatabilirsin.",
         craft: "spear",
       },
       {
         id: "food",
-        title: "Bir hayvan avla ya da bal\u0131k tut",
-        hint: "\xC7\xF6melerek ([C]) sessizce yakla\u015F. Ya da Olta yap\u0131p suya at.",
+        title: "Bir hayvan avla ya da balık tut",
+        hint: "Çömelerek ([C]) sessizce yaklaş. Ya da Olta yapıp suya at.",
         any: ["hunt", "fish"],
         n: 1,
       },
       {
         id: "cook",
-        title: "Et ya da bal\u0131k pi\u015Firip ye",
-        hint: "Le\u015Fi Ta\u015F B\u0131\xE7ak ile y\xFCz. \xC7i\u011F eti ate\u015Fin pi\u015Firme yuvas\u0131na koy.",
+        title: "Et ya da balık pişirip ye",
+        hint: "Leşi Taş Bıçak ile yüz. Çiğ eti ateşin pişirme yuvasına koy.",
         count: "eatCooked",
         n: 1,
       },
       {
         id: "bench",
-        title: "\xC7al\u0131\u015Fma tezgah\u0131 kur",
-        hint: "12 odun + 6 ta\u015F. Geli\u015Fmi\u015F tarifler tezgah yak\u0131n\u0131nda a\xE7\u0131l\u0131r.",
+        title: "Çalışma tezgahı kur",
+        hint: "12 odun + 6 taş. Gelişmiş tarifler tezgah yakınında açılır.",
         place: "workbench",
       },
       {
         id: "bag",
-        title: "Uyku tulumu yap ve yerle\u015Ftir",
-        hint: "Do\u011Fma noktan olur. Gece \xFCzerinde [E] ile uyuyup sabah\u0131 getirebilirsin.",
+        title: "Uyku tulumu yap ve yerleştir",
+        hint: "Doğma noktan olur. Gece üzerinde [E] ile uyuyup sabahı getirebilirsin.",
         place: "sleepbag",
       },
       {
         id: "shelter",
-        title: "Bar\u0131nak kur: temel, 3 duvar, kap\u0131 \xE7er\xE7evesi, kap\u0131 ve tavan",
-        hint: "Duvarlar temelin kenarlar\u0131na, tavan duvarlar\u0131n \xFCst\xFCne kenetlenir.",
+        title: "Barınak kur: temel, 3 duvar, kapı çerçevesi, kapı ve tavan",
+        hint: "Duvarlar temelin kenarlarına, tavan duvarların üstüne kenetlenir.",
         places: { foundation: 1, wall: 3, doorway: 1, door: 1, floor: 1 },
       },
       {
         id: "night",
         title: "Bir geceyi hayatta atlat",
-        hint: "Ate\u015Fini canl\u0131 tut. Kurtlar me\u015Fale \u0131\u015F\u0131\u011F\u0131ndan korkar.",
+        hint: "Ateşini canlı tut. Kurtlar meşale ışığından korkar.",
         count: "sleepOrDay",
         n: 1,
       },
@@ -60031,12 +60045,12 @@ uniform float uWet; uniform float uNight;`,
         let t = 0;
         for (; this.step && this.progress() >= 1 && t++ < 20; ) {
           let e = this.step;
-          (this.G.ui?.notify(`G\xF6rev tamam: ${e.title}`, null, "good"),
+          (this.G.ui?.notify(`Görev tamam: ${e.title}`, null, "good"),
             this.G.audio?.ui("quest"),
             this.i++,
             this.step ||
               ((this.done = !0),
-              this.G.ui?.notify("Rehber tamamland\u0131! Bu orman art\u0131k senin evin.", null, "good")));
+              this.G.ui?.notify("Rehber tamamlandı! Bu orman artık senin evin.", null, "good")));
         }
       }
       update(t) {
@@ -60059,8 +60073,8 @@ uniform float uWet; uniform float uNight;`,
         e.hidden = !1;
         let n = this.step;
         if (!n) {
-          (t.set("questTitle", "text", "Rehber tamamland\u0131"),
-            t.set("questHint", "text", "Ke\u015Ffet, avlan, in\u015Fa et. Orman sonsuz."),
+          (t.set("questTitle", "text", "Rehber tamamlandı"),
+            t.set("questHint", "text", "Keşfet, avlan, inşa et. Orman sonsuz."),
             t.set("questCount", "text", `${nc.length}/${nc.length}`),
             t.set("questFill", "width", "100%"),
             e.classList.add("done"));
@@ -60095,309 +60109,327 @@ uniform float uWet; uniform float uNight;`,
     sz = (r) => r.charAt(0).toLocaleUpperCase("tr") + r.slice(1),
     oz = (r) => r * r * (3 - 2 * r),
     au = {
-      elder: "k\xF6y\xFCn muhtar\u0131",
-      merchant: "t\xFCccar",
+      elder: "köyün muhtarı",
+      merchant: "tüccar",
       innkeeper: "han sahibi",
-      smith: "k\xF6y\xFCn demircisi",
-      farmer: "\xE7ift\xE7i",
-      hunter: "avc\u0131",
-      healer: "\u015Fifac\u0131, otlardan ila\xE7 yapar",
-      guard: "k\xF6y bek\xE7isi",
+      smith: "köyün demircisi",
+      farmer: "çiftçi",
+      hunter: "avcı",
+      healer: "şifacı, otlardan ilaç yapar",
+      guard: "köy bekçisi",
       woodcutter: "oduncu",
-      child: "k\xF6y\xFCn yaramaz \xE7ocuklar\u0131ndan biri",
+      child: "köyün yaramaz çocuklarından biri",
     },
     rz = {
       neşeli: [
-        "Ooo, yeni bir y\xFCz! Ho\u015F geldin yolcu!",
-        "Selam sana! Ne g\xFCzel bir g\xFCn, de\u011Fil mi?",
-        "Gel gel, \xE7ekinme! {village} k\xF6y\xFCnde kimse yabanc\u0131 kalmaz.",
-        "Ho\u015F geldin! G\xFCler y\xFCzl\xFC bir dost bulursun burada.",
+        "Aa, sen buralı değilsin! Yabancı yüzleri hemen tanırım. {village} köyüne hoş geldin.",
+        "Selam! Seni daha önce görmedim, yoldan mı geçiyorsun?",
+        "Bak sen, yeni bir yüz! Buralarda pek yabancı görmeyiz.",
       ],
       huysuz: [
-        "Ne var? \xC7abuk s\xF6yle, i\u015Fim g\xFCc\xFCm var.",
-        "Hm. Ne istiyorsun?",
-        "\xC7amurlu \xE7izmelerinle yakla\u015Fma da ne istersen sor.",
-        "Of... Yine mi yabanc\u0131? Peki, dinliyorum.",
+        "Sen kimsin? Buralı olmadığın belli. Ne istiyorsun?",
+        "Hm. Yabancı... Ne arıyorsun bu köyde?",
+        "Tanımadığım insanlarla pek konuşmam. Çabuk söyle.",
       ],
       utangaç: [
-        "Ah... m-merhaba. Bir \u015Fey mi laz\u0131m?",
-        "Kusura bakma, pek konu\u015Fkan biri de\u011Filimdir...",
-        "S-selam. Ormandan m\u0131 geldin?",
-        "Merhaba... Pek misafirimiz olmaz da.",
+        "Ş-şey... seni daha önce görmedim. Buralı değilsin galiba?",
+        "Merhaba... Yabancı birini görmeyeli uzun zaman oldu.",
+        "Ah... merhaba. Yeni mi geldin?",
       ],
       geveze: [
-        "Aaa, sen \u015Fu ormandan gelen yolcusun de\u011Fil mi? Herkes senden bahsediyor!",
-        "Duydun mu, de\u011Firmencinin ke\xE7isi yine ka\xE7m\u0131\u015F! Neyse, sen nas\u0131ls\u0131n?",
-        "Ho\u015F geldin! Bak sana bir \u015Fey diyece\u011Fim ama aram\u0131zda kals\u0131n...",
-        "Gel otur \u015F\xF6yle! Ormanda neler g\xF6rd\xFCn, anlat bakal\u0131m!",
+        "Dur dur, seni daha önce görmedim! Yabancısın, değil mi? Nereden geldin bakayım?",
+        "Vay, bir yabancı! Bu köye yeni yüz pek uğramaz, hemen anlarım.",
+        "Sen yeni gelen yabancı olmalısın. Köyde şimdiden seni konuşuyorlar!",
       ],
       bilge: [
-        "Ho\u015F geldin evlat. Orman seni bize getirdi demek.",
-        "Selam olsun. Yorgun g\xF6r\xFCn\xFCyorsun, soluklan biraz.",
-        "Her yolcunun bir hik\xE2yesi vard\u0131r. Seninki ne?",
-        "Gel bakal\u0131m. G\xF6zlerinde orman\u0131n izi var.",
+        "Yabancı birisin, belli. Yolun buraya nasıl düştü?",
+        "Bu köyde herkesi tanırım, seni tanımıyorum. Hoş geldin, yolcu.",
+        "Uzaklardan geldiğin yüzünden belli. Buyur, dinliyorum.",
       ],
     },
-    az = {
-      neşeli: [
-        "Yine geldin! Seni g\xF6rmek ne g\xFCzel!",
-        "Hah, en sevdi\u011Fim yolcu! Nas\u0131l gidiyor?",
-      ],
-      huysuz: [
-        "Sen yine mi geldin... Peki, ne var?",
-        "H\u0131h. Bari bu sefer i\u015Fe yarar bir \u015Fey s\xF6yle.",
-      ],
-      utangaç: ["Ah, sen... merhaba yine.", "Tekrar geldi\u011Fine sevindim... san\u0131r\u0131m."],
-      geveze: [
-        "Geldin mi! Sana anlataca\u011F\u0131m o kadar \u015Fey birikti ki!",
-        "Ooo kimler gelmi\u015F! Otur otur, yeni dedikodular var!",
-      ],
-      bilge: [
-        "Yine yollar seni buraya \xE7\u0131kard\u0131.",
-        "Ho\u015F geldin evlat. Orman sana iyi davran\u0131yor mu?",
-      ],
-    },
+    az = [
+      {
+        neşeli: ["Yine sen! Hâlâ buralardasın demek.", "Hah, bizim yabancı. Nasıl gidiyor?"],
+        huysuz: ["Yine mi sen? Ne var?", "Hâlâ gitmedin mi? Peki, ne istiyorsun?"],
+        utangaç: ["Ah, sen... yine merhaba.", "Ş-şey, merhaba yine."],
+        geveze: ["Yine geldin! Hâlâ seni tam çözemedim, kimsin sen?", "Ooo, bizim yabancı yine buralarda!"],
+        bilge: ["Yine karşılaştık, yolcu.", "Hâlâ buradasın. Köyümüzü sevdin galiba."],
+      },
+      {
+        neşeli: ["Yine geldin! Seni görmek güzel.", "Hah, gel bakalım! Nasıl gidiyor?"],
+        huysuz: ["Sen yine mi geldin... Peki, ne var?", "Hıh. Bu sefer işe yarar bir şey söyle bari."],
+        utangaç: ["Ah, sen... merhaba yine.", "Tekrar geldiğine sevindim... sanırım."],
+        geveze: ["Geldin mi! Sana anlatacağım o kadar şey birikti ki!", "Ooo kimler gelmiş! Otur, yeni haberler var!"],
+        bilge: ["Yine yollar seni buraya çıkardı.", "Hoş geldin. Orman sana iyi davranıyor mu?"],
+      },
+      {
+        neşeli: ["Gel gel, tam da seni düşünüyordum!", "Hoş geldin! Artık sen de bizden sayılırsın."],
+        huysuz: ["Sen misin? İyi, seninle konuşmak başkalarıyla konuşmaktan iyidir.", "Hıh, gelmişsin. Otur bakalım."],
+        utangaç: ["Merhaba! Seni görünce sevindim, gerçekten.", "Ah, sen gelmişsin. İyi oldu."],
+        geveze: ["Neredesin sen? Sensiz köy sessiz kalıyor!", "Gel otur, sana anlatacaklarım var!"],
+        bilge: ["Hoş geldin. Seninle konuşmak iyi geliyor.", "Gel bakalım. Yüzünü görmek güzel."],
+      },
+    ],
     lz = [
-      "Merhaba! Sen kimsin? Ormandan m\u0131 geldin? Vaay!",
-      "Abi! Abla! Bak, ben buraday\u0131m!",
-      "Annem yabanc\u0131larla konu\u015Fma diyor... ama sen iyi birine benziyorsun.",
-      "K\u0131l\u0131c\u0131n var m\u0131? G\xF6ster, g\xF6ster!",
+      "Sen kimsin? Buralı değilsin! Ormandan mı geldin? Vaay!",
+      "Annem yabancılarla konuşma diyor... ama sen iyi birine benziyorsun.",
+      "Hey, yabancı! Kılıcın var mı? Göster, göster!",
+      "Seni hiç görmedim! Nereden geldin?",
     ],
     cz = [
-      "Dostum! Gel, seni g\xF6rmek ne iyi oldu!",
-      "\u0130\u015Fte k\xF6y\xFCn kahraman\u0131! Ho\u015F geldin!",
-      "Senin gibi birini g\xF6rmek i\xE7imi \u0131s\u0131t\u0131yor. Ho\u015F geldin!",
+      "Dostum! Gel, seni görmek ne iyi oldu!",
+      "İşte benim dostum! Hoş geldin!",
+      "Seni görünce keyfim yerine geldi. Gel otur!",
     ],
     hz = [
-      "Yolun a\xE7\u0131k olsun.",
-      "Kendine dikkat et, ormanda gece ba\u015Fkad\u0131r.",
-      "U\u011Fra yine!",
-      "Hadi bakal\u0131m, ho\u015F\xE7a kal.",
-      "Allah'a emanet ol.",
+      "Yolun açık olsun.",
+      "Kendine dikkat et, ormanda gece başkadır.",
+      "Uğra yine!",
+      "Hadi bakalım, hoşça kal.",
+      "Görüşürüz.",
+    ],
+    sgz = [
+      "Hâlâ kafam bozuk, haberin olsun. Ne istiyorsun?",
+      "Bana vurduğunu unuttum mu sandın? Söyle bakalım, ne var?",
+      "Seninle konuşmak istemiyorum ama... peki, kısa kes.",
+      "Yine mi sen? Bu sefer elini kolunu bağla da konuşalım.",
+    ],
+    sgc = [
+      "Sana anlatacak bir şeyim yok. Daha az önce bana saldırdın.",
+      "Sohbet mi? Önce yaptığını bir düşün.",
+      "Bugün seninle laf etmeye hiç niyetim yok.",
+      "Hıh. Konuşacak bir şey kalmadı.",
+    ],
+    jbz = [
+      "Bu sefer yumruk atmayacaksın değil mi?",
+      "Ellerini görebileceğim yerde tut, olur mu?",
+      "Geçen seferki gibi olmasın da...",
+      "Seni gördükçe hâlâ çenem sızlıyor.",
+      "Neyse ki bugün sakinsin.",
     ],
     qi = {
       any: [
         "Merhaba yolcu!",
-        "Hava ne g\xFCzel bug\xFCn...",
-        "Ho\u015F geldin!",
+        "Hava ne güzel bugün...",
+        "Hoş geldin!",
         "Kurtlardan uzak dur, duydun mu?",
         "Selam!",
-        "\u0130yi g\xFCnler!",
+        "İyi günler!",
       ],
-      morning: ["Hay\u0131rl\u0131 sabahlar!", "Erkenci ku\u015F solucan\u0131 kapar!", "G\xFCnayd\u0131n!"],
+      morning: ["Günaydın!", "Erkenci kuş solucanı kapar!", "İyi sabahlar!"],
       evening: [
-        "\u0130yi ak\u015Famlar!",
-        "Ak\u015Fam oldu, ate\u015F yakma vakti.",
-        "G\xFCn bitti, \u015F\xFCk\xFCr.",
+        "İyi akşamlar!",
+        "Akşam oldu, ateş yakma vakti.",
+        "Gün bitti, yoruldum.",
       ],
       night: [
-        "Gece d\u0131\u015Far\u0131da ne i\u015Fin var?",
-        "Fenerin yan\u0131ndan ayr\u0131lma...",
+        "Gece dışarıda ne işin var?",
+        "Fenerin yanından ayrılma...",
         "Esneme... uykum geldi.",
       ],
-      rain: ["\u015Eu ya\u011Fmura bak!", "Islanaca\u011F\u0131z, ko\u015F!", "Toprak suya doydu."],
-      hurt: ["Aman, kan\u0131yorsun!", "Yaralanm\u0131\u015Fs\u0131n! \u015Eifac\u0131ya git."],
+      rain: ["Şu yağmura bak!", "Islanacağız, koş!", "Toprak suya doydu."],
+      hurt: ["Aman, kanıyorsun!", "Yaralanmışsın! Şifacıya git."],
       farmer: [
-        "Bu y\u0131l bu\u011Fday iyi olacak.",
-        "\u015Eu toprak beni \xF6ld\xFCrecek...",
+        "Bu yıl buğday iyi olacak.",
+        "Şu toprak beni öldürecek...",
         "Kargalar yine tarlada!",
       ],
       smith: [
-        "Demir s\u0131cakken d\xF6v\xFCl\xFCr!",
-        "\xC7eki\xE7 a\u011F\u0131r, i\u015F a\u011F\u0131r...",
-        "K\u0131l\u0131\xE7 m\u0131 laz\u0131m? Bende var!",
+        "Demir sıcakken dövülür!",
+        "Çekiç ağır, iş ağır...",
+        "Kılıç mı lazım? Bende var!",
       ],
       merchant: [
-        "Gel gel, her \u015Fey taze!",
-        "Ucuz ve kaliteli, sadece bug\xFCn!",
+        "Gel gel, her şey taze!",
+        "Ucuz ve kaliteli, sadece bugün!",
         "Deri getirene iyi para veririm!",
       ],
       hunter: [
-        "Kurt izleri g\xF6rd\xFCm kuzeyde.",
-        "Sessiz y\xFCr\xFC, r\xFCzg\xE2r\u0131 arkana alma.",
-        "Bug\xFCn av bereketli.",
+        "Kurt izleri gördüm kuzeyde.",
+        "Sessiz yürü, rüzgârı arkana alma.",
+        "Bugün av bereketli.",
       ],
       guard: [
-        "G\xF6z\xFCm \xFCzerinde, yabanc\u0131.",
-        "K\xF6yde sorun \xE7\u0131karma.",
-        "Her \u015Fey yolunda m\u0131?",
+        "Gözüm üzerinde, yabancı.",
+        "Köyde sorun çıkarma.",
+        "Her şey yolunda mı?",
       ],
       child: ["Yakala beni!", "Ebe sensin!", "Abi abi, bak ne buldum!", "Hihi!"],
-      innkeeper: ["Han\u0131m\u0131zda s\u0131cak g\xFCve\xE7 var!", "Yorgunsan yatak haz\u0131r!"],
-      healer: ["K\u0131rm\u0131z\u0131 benekli mantar yeme sak\u0131n!", "Otlar bug\xFCn g\xFCzel kokuyor."],
-      elder: ["K\xF6y\xFCm\xFCz huzurlu, \u015F\xFCk\xFCr.", "Gen\xE7ler \xE7al\u0131\u015Fkan bu sene."],
-      woodcutter: ["Odun laz\u0131m m\u0131?", "Baltam k\xF6relmi\u015F..."],
+      innkeeper: ["Hanımızda sıcak güveç var!", "Yorgunsan yatak hazır!"],
+      healer: ["Kırmızı benekli mantar yeme sakın!", "Otlar bugün güzel kokuyor."],
+      elder: ["Köyümüz huzurlu.", "Gençler çalışkan bu sene."],
+      woodcutter: ["Odun lazım mı?", "Baltam körelmiş..."],
       angry: [
         "Hayvan katili!",
         "Uzak dur bizden!",
-        "Senin y\xFCz\xFCnden a\u011F\u0131l bo\u015F kald\u0131!",
+        "Senin yüzünden ağıl boş kaldı!",
       ],
-      friend: ["Ho\u015F geldin dostum!", "Kahraman\u0131m\u0131z geldi!", "Selam olsun sana!"],
+      friend: ["Hoş geldin dostum!", "Kahramanımız geldi!", "Selam dostum!"],
     },
     $a = {
       any: [
-        "Bu ak\u015Fam yemekte ne var?",
-        "Ha ha ha! Olur mu \xF6yle \u015Fey!",
-        "Vallahi bilmem...",
-        "\xD6yle mi dersin?",
-        "D\xFCn gece kurtlar yine uludu.",
-        "\u015Eu yolcuyu g\xF6rd\xFCn m\xFC?",
+        "Bu akşam yemekte ne var?",
+        "Ha ha ha! Olur mu öyle şey!",
+        "Bilmem ki...",
+        "Öyle mi dersin?",
+        "Dün gece kurtlar yine uludu.",
+        "Şu yolcuyu gördün mü?",
         "Hava bozacak gibi.",
-        "Yar\u0131n pazara inelim mi?",
-        "\xC7ocuklar yine nerede kald\u0131?",
-        "Benim ke\xE7i yine ka\xE7t\u0131!",
-        "Hasat iyi ge\xE7erse d\xFC\u011F\xFCn yapar\u0131z.",
+        "Yarın pazara inelim mi?",
+        "Çocuklar yine nerede kaldı?",
+        "Benim keçi yine kaçtı!",
+        "Hasat iyi geçerse düğün yaparız.",
         "Sus, biri geliyor...",
       ],
       merchant: [
-        "Bu fiyata bulamazs\u0131n, inan bana!",
-        "Hah, bug\xFCn iyi kazand\u0131m.",
-        "Deri fiyatlar\u0131 yine d\xFC\u015Ft\xFC...",
+        "Bu fiyata bulamazsın, inan bana!",
+        "Hah, bugün iyi kazandım.",
+        "Deri fiyatları yine düştü...",
       ],
       elder: [
-        "Gen\xE7ler, birlik olun.",
-        "Eskiden k\u0131\u015Flar daha sert ge\xE7erdi.",
-        "Bu k\xF6y hepimizin.",
+        "Gençler, birlik olun.",
+        "Eskiden kışlar daha sert geçerdi.",
+        "Bu köy hepimizin.",
       ],
-      child: ["Sobe!", "Yakalayamazs\u0131n!", "Benim s\u0131ram!"],
+      child: ["Sobe!", "Yakalayamazsın!", "Benim sıram!"],
       night: [
-        "Ate\u015F ne g\xFCzel \xE7\u0131t\u0131rd\u0131yor.",
-        "Bir t\xFCrk\xFC s\xF6yle hadi!",
-        "Y\u0131ld\u0131zlara bak...",
-        "Uykum geldi, ben kalk\u0131yorum.",
+        "Ateş ne güzel çıtırdıyor.",
+        "Bir türkü söyle hadi!",
+        "Yıldızlara bak...",
+        "Uykum geldi, ben kalkıyorum.",
       ],
     },
     lu = {
       general: [
-        "\xC7i\u011F et yeme, ate\u015Fte iyice pi\u015Fir. Midesi bozulan \xE7ok yolcu g\xF6rd\xFCm.",
-        "Kurtlar ate\u015Ften korkar. Gece yolculuk yapacaksan me\u015Fale yan\u0131nda olsun.",
-        "K\u0131rm\u0131z\u0131 \u015Fapkal\u0131, beyaz benekli mantarlar zehirlidir. Kahverengi olanlar g\xFCvenli.",
-        "Ay\u0131y\u0131 g\xF6r\xFCrsen ko\u015Fma; a\u011F\u0131r a\u011F\u0131r geri \xE7ekil. Aya\u011Fa kalkarsa \xE7ok k\u0131zg\u0131n demektir.",
-        "Bir uyku tulumun varsa, ormanda ba\u015F\u0131na bir \u015Fey gelse de oraya d\xF6nersin.",
-        "Ya\u011Fmurda \u0131slan\u0131rsan \xE7abuk \xFC\u015F\xFCrs\xFCn. Bir \xE7at\u0131 ya da ate\u015F bul.",
-        "\xC7\xF6melerek y\xFCr\xFCrsen hayvanlar seni zor fark eder. Ama bir kez g\xF6rd\xFClerse i\u015F i\u015Ften ge\xE7mi\u015Ftir.",
-        "Mataray\u0131 derede doldur, susuz yola \xE7\u0131kma.",
-        "Yay tezg\xE2hta yap\u0131l\u0131r. Ok i\xE7in \xE7akmakta\u015F\u0131 laz\u0131m, dere kenarlar\u0131nda bolca bulunur.",
-        "Geceleri g\xF6ky\xFCz\xFCne bak; bazen kayan y\u0131ld\u0131z g\xF6r\xFCrs\xFCn. Dilek tutmay\u0131 unutma.",
+        "Çiğ et yeme, ateşte iyice pişir. Midesi bozulan çok yolcu gördüm.",
+        "Kurtlar ateşten korkar. Gece yolculuk yapacaksan meşale yanında olsun.",
+        "Kırmızı şapkalı, beyaz benekli mantarlar zehirlidir. Kahverengi olanlar güvenli.",
+        "Ayıyı görürsen koşma; ağır ağır geri çekil. Ayağa kalkarsa çok kızgın demektir.",
+        "Bir uyku tulumun varsa, ormanda başına bir şey gelse de oraya dönersin.",
+        "Yağmurda ıslanırsan çabuk üşürsün. Bir çatı ya da ateş bul.",
+        "Çömelerek yürürsen hayvanlar seni zor fark eder. Ama bir kez gördülerse iş işten geçmiştir.",
+        "Matarayı derede doldur, susuz yola çıkma.",
+        "Yay tezgâhta yapılır. Ok için çakmaktaşı lazım, dere kenarlarında bolca bulunur.",
+        "Geceleri gökyüzüne bak; bazen kayan yıldız görürsün. Dilek tutmayı unutma.",
       ],
       elder: [
-        "Bu k\xF6y\xFC dedemin dedesi kurmu\u015F. Ormanla bar\u0131\u015F\u0131k ya\u015Far\u0131z.",
-        "Kom\u015Fu k\xF6ylerle iyi ge\xE7iniriz. Mektupla haberle\u015Firiz; postac\u0131m\u0131z yok ama yolcular var.",
-        "Gen\xE7ken ben de ormanda kaybolmu\u015Ftum. Beni bir avc\u0131 bulmu\u015Ftu.",
+        "Bu köyü dedemin dedesi kurmuş. Ormanla barışık yaşarız.",
+        "Komşu köylerle iyi geçiniriz. Mektupla haberleşiriz; postacımız yok ama yolcular var.",
+        "Gençken ben de ormanda kaybolmuştum. Beni bir avcı bulmuştu.",
       ],
       merchant: [
-        "Deri, et, y\xFCn... Ne getirirsen al satar\u0131m. Paran\u0131n kokusu olmaz!",
-        "Uzak k\xF6ylerden mal getiririm. Yollar tehlikeli ama kazan\xE7 iyi.",
-        "Ak\xE7eyi biriktir; demircinin k\u0131l\u0131\xE7lar\u0131 pahal\u0131d\u0131r ama de\u011Fer.",
+        "Deri, et, yün... Ne getirirsen al satarım. Paranın kokusu olmaz!",
+        "Uzak köylerden mal getiririm. Yollar tehlikeli ama kazanç iyi.",
+        "Akçeyi biriktir; demircinin kılıçları pahalıdır ama değer.",
       ],
       innkeeper: [
-        "Han\u0131m\u0131z\u0131n g\xFCveci \xFC\xE7 k\xF6yde me\u015Fhurdur!",
-        "Geceyi burada ge\xE7irmek istersen yatak haz\u0131r. Ucuz da.",
-        "Ak\u015Famlar\u0131 meydanda ate\u015F yakar\u0131z; herkes toplan\u0131r, t\xFCrk\xFCler s\xF6ylenir.",
+        "Hanımızın güveci üç köyde meşhurdur!",
+        "Geceyi burada geçirmek istersen yatak hazır. Ucuz da.",
+        "Akşamları meydanda ateş yakarız; herkes toplanır, türküler söylenir.",
       ],
       smith: [
-        "Ta\u015F balta da i\u015F g\xF6r\xFCr ama demirin yerini tutmaz.",
-        "Demir baltayla bir a\u011Fac\u0131 yar\u0131 s\xFCrede devirirsin.",
-        "Oca\u011F\u0131m hi\xE7 s\xF6nmez. S\xF6nerse k\xF6y\xFCn kalbi durur derler.",
+        "Taş balta da iş görür ama demirin yerini tutmaz.",
+        "Demir baltayla bir ağacı yarı sürede devirirsin.",
+        "Ocağım hiç sönmez. Sönerse köyün kalbi durur derler.",
       ],
       farmer: [
-        "Bu\u011Fday bu y\u0131l bereketli. Ama yaban domuzlar\u0131 tarlaya dadan\u0131yor.",
-        "Ya\u011Fmur ya\u011F\u0131nca sevinirim, toprak doyar.",
-        "Koyunlar\u0131n y\xFCn\xFCn\xFC b\u0131\xE7akla k\u0131rkabilirsin; canlar\u0131 yanmaz, merak etme.",
+        "Buğday bu yıl bereketli. Ama yaban domuzları tarlaya dadanıyor.",
+        "Yağmur yağınca sevinirim, toprak doyar.",
+        "Koyunların yününü bıçakla kırkabilirsin; canları yanmaz, merak etme.",
       ],
       hunter: [
-        "Geyikler sabah ve ak\u015Fam \xE7ay\u0131rlara iner. R\xFCzg\xE2r\u0131 arkana alma, kokunu al\u0131rlar.",
-        "Kurt s\xFCr\xFCleri geceleri cesurla\u015F\u0131r. G\xFCnd\xFCz pek yana\u015Fmazlar.",
-        "Ay\u0131n\u0131n izi kocamand\u0131r, be\u015F parmakl\u0131. G\xF6r\xFCrsen yolunu de\u011Fi\u015Ftir.",
+        "Geyikler sabah ve akşam çayırlara iner. Rüzgârı arkana alma, kokunu alırlar.",
+        "Kurt sürüleri geceleri cesurlaşır. Gündüz pek yanaşmazlar.",
+        "Ayının izi kocamandır, beş parmaklı. Görürsen yolunu değiştir.",
       ],
       healer: [
-        "Bandaj i\xE7in bitki lifi yeter. Kanamay\u0131 durdurur.",
-        "\u015Eifal\u0131 \xE7ay\u0131m zehri s\xF6ker. Mantar zehirlenmesine birebir.",
-        "Ahududu ve yaban mersini hem doyurur hem susuzlu\u011Fu giderir.",
+        "Bandaj için bitki lifi yeter. Kanamayı durdurur.",
+        "Şifalı çayım zehri söker. Mantar zehirlenmesine birebir.",
+        "Ahududu ve yaban mersini hem doyurur hem susuzluğu giderir.",
       ],
       guard: [
-        "Geceleri k\xF6y\xFCn etraf\u0131n\u0131 dola\u015F\u0131r\u0131m. Fenerler s\xF6nmesin diye.",
-        "Kurtlar a\u011F\u0131llara yana\u015F\u0131rsa uyar\u0131 borusunu \xE7alar\u0131m.",
-        "K\u0131l\u0131c\u0131m\u0131 demirci yapt\u0131. Keskindir.",
+        "Geceleri köyün etrafını dolaşırım. Fenerler sönmesin diye.",
+        "Kurtlar ağıllara yanaşırsa uyarı borusunu çalarım.",
+        "Kılıcımı demirci yaptı. Keskindir.",
       ],
       woodcutter: [
-        "A\u011Fa\xE7 devrilirken alt\u0131nda durma! Ka\xE7 ki\u015Fi ezildi bilsen...",
-        "K\xFCt\xFCkleri baltayla par\xE7alarsan bol odun \xE7\u0131kar.",
-        "\xC7am odunu \xE7abuk yanar, me\u015Fe uzun.",
+        "Ağaç devrilirken altında durma! Kaç kişi ezildi bilsen...",
+        "Kütükleri baltayla parçalarsan bol odun çıkar.",
+        "Çam odunu çabuk yanar, meşe uzun.",
       ],
       child: [
-        "Ben b\xFCy\xFCy\xFCnce avc\u0131 olaca\u011F\u0131m!",
-        "Annem ormana yaln\u0131z gitme diyor. Ama sen gidiyorsun, de\u011Fil mi?",
-        "D\xFCn a\u011F\u0131lda bir kuzu do\u011Fdu! \xC7ok tatl\u0131!",
-        "K\xF6pe\u011Fimizi seversen pe\u015Finden gelir, bak g\xF6r\xFCrs\xFCn!",
+        "Ben büyüyünce avcı olacağım!",
+        "Annem ormana yalnız gitme diyor. Ama sen gidiyorsun, değil mi?",
+        "Dün ağılda bir kuzu doğdu! Çok tatlı!",
+        "Köpeğimizi seversen peşinden gelir, bak görürsün!",
       ],
     },
     dz = {
       elder: [
-        "K\u0131rk y\u0131ld\u0131r bu k\xF6y\xFCn derdini dinlerim. Bazen geceleri uyuyamam, k\xF6y\xFCn y\xFCk\xFC a\u011F\u0131r.",
-        "E\u015Fim rahmetli olal\u0131 on k\u0131\u015F oldu. \u015Eimdi b\xFCt\xFCn k\xF6y benim ailem.",
+        "Kırk yıldır bu köyün derdini dinlerim. Bazen geceleri uyuyamam, köyün yükü ağır.",
+        "Eşimi kaybedeli on kış oldu. Şimdi bütün köy benim ailem.",
       ],
       merchant: [
-        "Bir zamanlar b\xFCy\xFCk bir kervan\u0131m vard\u0131. Bir f\u0131rt\u0131nada her \u015Feyi kaybettim, s\u0131f\u0131rdan ba\u015Flad\u0131m.",
-        "Hi\xE7 evlenmedim; yollar benim evim. Ama bu k\xF6ye her geli\u015Fimde i\xE7im \u0131s\u0131n\u0131r.",
+        "Bir zamanlar büyük bir kervanım vardı. Bir fırtınada her şeyi kaybettim, sıfırdan başladım.",
+        "Hiç evlenmedim; yollar benim evim. Ama bu köye her gelişimde içim ısınır.",
       ],
       innkeeper: [
-        "Bu han\u0131 babamdan devrald\u0131m. Tahtas\u0131ndaki her \xE7izik bir hik\xE2ye.",
-        "En sevdi\u011Fim \u015Fey, yorgun yolcular\u0131n s\u0131cak \xE7orbayla y\xFCz\xFCn\xFCn g\xFClmesi.",
+        "Bu hanı babamdan devraldım. Tahtasındaki her çizik bir hikâye.",
+        "En sevdiğim şey, yorgun yolcuların sıcak çorbayla yüzünün gülmesi.",
       ],
       smith: [
-        "\xC7\u0131rakken parma\u011F\u0131m\u0131 \xF6rs\xFCn alt\u0131nda ezdim. Bak, h\xE2l\xE2 e\u011Fri duruyor.",
-        "Babam da demirciydi, dedem de. Oca\u011F\u0131n sesi ninni gibidir bana.",
+        "Çırakken parmağımı örsün altında ezdim. Bak, hâlâ eğri duruyor.",
+        "Babam da demirciydi, dedem de. Ocağın sesi ninni gibidir bana.",
       ],
       farmer: [
-        "Toprak insana sabr\u0131 \xF6\u011Fretir. Ekti\u011Fini bi\xE7ersin, ama vakti gelince.",
-        "Ge\xE7en k\u0131\u015F k\u0131tl\u0131k oldu, hepimiz zor g\xFCnler ge\xE7irdik. Bu y\u0131l daha iyi olacak.",
+        "Toprak insana sabrı öğretir. Ektiğini biçersin, ama vakti gelince.",
+        "Geçen kış kıtlık oldu, hepimiz zor günler geçirdik. Bu yıl daha iyi olacak.",
       ],
       hunter: [
-        "\u0130lk av\u0131m\u0131 on iki ya\u015F\u0131nda yapt\u0131m. Bir tav\u015Fan. A\u011Flam\u0131\u015Ft\u0131m, inan\u0131r m\u0131s\u0131n?",
-        "Ormana sayg\u0131 duymayan\u0131 orman yutar. Babam hep b\xF6yle derdi.",
+        "İlk avımı on iki yaşında yaptım. Bir tavşan. Ağlamıştım, inanır mısın?",
+        "Ormana saygı duymayanı orman yutar. Babam hep böyle derdi.",
       ],
       healer: [
-        "Annem de \u015Fifac\u0131yd\u0131. B\xFCt\xFCn bildiklerimi ondan \xF6\u011Frendim.",
-        "Bir keresinde ay\u0131n\u0131n pen\xE7eledi\u011Fi bir avc\u0131y\u0131 iyile\u015Ftirdim. H\xE2l\xE2 bana bal getirir.",
+        "Annem de şifacıydı. Bütün bildiklerimi ondan öğrendim.",
+        "Bir keresinde ayının pençelediği bir avcıyı iyileştirdim. Hâlâ bana bal getirir.",
       ],
       guard: [
-        "Bir zamanlar \u015Fehirde askerdim. Sava\u015Ftan b\u0131kt\u0131m, buraya s\u0131\u011F\u0131nd\u0131m.",
-        "N\xF6bet tutarken y\u0131ld\u0131zlar\u0131 sayar\u0131m. Ka\xE7 tane olduklar\u0131n\u0131 h\xE2l\xE2 bilmiyorum.",
+        "Bir zamanlar şehirde askerdim. Savaştan bıktım, buraya sığındım.",
+        "Nöbet tutarken yıldızları sayarım. Kaç tane olduklarını hâlâ bilmiyorum.",
       ],
       woodcutter: [
-        "Ormanda yaln\u0131z \xE7al\u0131\u015Fmay\u0131 severim. A\u011Fa\xE7lar konu\u015Fmaz, dedikodu yapmaz.",
-        "Bir a\u011Fac\u0131 keserken hep bir fidan dikerim. Orman borcunu unutmaz.",
+        "Ormanda yalnız çalışmayı severim. Ağaçlar konuşmaz, dedikodu yapmaz.",
+        "Bir ağacı keserken hep bir fidan dikerim. Orman borcunu unutmaz.",
       ],
       child: [
-        "Gizli bir s\u0131\u011F\u0131na\u011F\u0131m var! Kimseye s\xF6ylemezsen g\xF6steririm... belki.",
-        "D\xFCn bir tilki g\xF6rd\xFCm! K\u0131rm\u0131z\u0131 kuyru\u011Fu vard\u0131! Kimse inanmad\u0131.",
+        "Gizli bir sığınağım var! Kimseye söylemezsen gösteririm... belki.",
+        "Dün bir tilki gördüm! Kırmızı kuyruğu vardı! Kimse inanmadı.",
       ],
     },
     uz = {
       huysuz: "{n} biraz huysuzdur, ama kalbi iyidir. Sen ona bakma.",
-      geveze: "{n} ile konu\u015Facaksan vaktin bol olsun, \xE7enesi hi\xE7 durmaz!",
-      utangaç: "{n} \xE7ok utanga\xE7t\u0131r. \xD6nce sen selam ver, a\xE7\u0131l\u0131r.",
-      neşeli: "{n} k\xF6y\xFCn ne\u015Fesidir. Onu hep g\xFClerken g\xF6r\xFCrs\xFCn.",
-      bilge: "Bir derdin olursa {n} sana yol g\xF6sterir. \xC7ok bilgilidir.",
+      geveze: "{n} ile konuşacaksan vaktin bol olsun, çenesi hiç durmaz!",
+      utangaç: "{n} çok utangaçtır. Önce sen selam ver, açılır.",
+      neşeli: "{n} köyün neşesidir. Onu hep gülerken görürsün.",
+      bilge: "Bir derdin olursa {n} sana yol gösterir. Çok bilgilidir.",
     },
     fz = [
-      "Asl\u0131nda... bir derdim var. Yard\u0131m edebilir misin?",
-      "Bak, madem buradas\u0131n, bir i\u015F var sana.",
-      "Senin gibi becerikli birine ihtiyac\u0131m vard\u0131.",
+      "Aslında... bir derdim var. Yardım edebilir misin?",
+      "Bak, madem buradasın, bir iş var sana.",
+      "Senin gibi becerikli birine ihtiyacım vardı.",
     ],
     pz = [
-      '{n} bir dertten bahsediyordu: "{t}". Bir u\u011Frasan iyi olur.',
-      'Duydun mu, {n} birine ihtiya\xE7 duyuyormu\u015F. "{t}" gibi bir \u015Fey... Git bir sor istersen.',
-      '{n} yard\u0131m ar\u0131yor. Konu "{t}" diye duydum.',
+      '{n} bir dertten bahsediyordu: "{t}". Bir uğrasan iyi olur.',
+      'Duydun mu, {n} birine ihtiyaç duyuyormuş. "{t}" gibi bir şey... Git bir sor istersen.',
+      '{n} yardım arıyor. Konu "{t}" diye duydum.',
     ],
     Bv = {
       elder: [
         {
           type: "deliver",
-          title: "{target} k\xF6y\xFCne mektup",
+          title: "{target} köyüne mektup",
           offer:
-            "Bu mektubu {target} k\xF6y\xFCn\xFCn muhtar\u0131na g\xF6t\xFCr\xFCr m\xFCs\xFCn? {dir} taraf\u0131nda, yakla\u015F\u0131k {dist} ad\u0131m \xF6tede. Yolda oyalanma.",
+            "Bu mektubu {target} köyünün muhtarına götürür müsün? {dir} tarafında, yaklaşık {dist} adım ötede. Yolda oyalanma.",
           reward: { coins: 40, rep: 15 },
         },
         {
@@ -60405,7 +60437,7 @@ uniform float uWet; uniform float uNight;`,
           item: "amulet",
           title: "Annemin kolyesi",
           offer:
-            "Rahmetli annemin kolyesini ormanda d\xFC\u015F\xFCrd\xFCm. Son gitti\u011Fim yer k\xF6y\xFCn {dir} taraf\u0131yd\u0131, {dist} ad\u0131m kadar. Bulursan sana minnettar kal\u0131r\u0131m.",
+            "Annemden kalan kolyeyi ormanda düşürdüm. Son gittiğim yer köyün {dir} tarafıydı, {dist} adım kadar. Bulursan sana minnettar kalırım.",
           reward: { coins: 35, rep: 15, items: { bread: 2 } },
         },
       ],
@@ -60413,23 +60445,23 @@ uniform float uWet; uniform float uNight;`,
         {
           type: "fetch",
           need: { hide: 3 },
-          title: "Deri sipari\u015Fi",
-          offer: "Bir m\xFC\u015Fterim deri istiyor. Bana {n} deri getirirsen hakk\u0131n\u0131 veririm.",
+          title: "Deri siparişi",
+          offer: "Bir müşterim deri istiyor. Bana {n} deri getirirsen hakkını veririm.",
           reward: { coins: 30, rep: 8 },
         },
         {
           type: "fetch",
           need: { wool: 4 },
-          title: "Y\xFCn sipari\u015Fi",
+          title: "Yün siparişi",
           offer:
-            "K\u0131\u015F geliyor, y\xFCn kap\u0131\u015F\u0131l\u0131yor. {n} y\xFCn bulabilir misin? A\u011F\u0131ldaki koyunlar\u0131 b\u0131\xE7akla k\u0131rkabilirsin, \xE7ift\xE7iler k\u0131zmaz.",
+            "Kış geliyor, yün kapışılıyor. {n} yün bulabilir misin? Ağıldaki koyunları bıçakla kırkabilirsin, çiftçiler kızmaz.",
           reward: { coins: 22, rep: 6 },
         },
         {
           type: "deliver",
-          title: "{target} k\xF6y\xFCne paket",
+          title: "{target} köyüne paket",
           offer:
-            "Bu paketi {target} k\xF6y\xFCndeki t\xFCccara ula\u015Ft\u0131rman laz\u0131m. {dir} y\xF6n\xFCnde, {dist} ad\u0131m kadar.",
+            "Bu paketi {target} köyündeki tüccara ulaştırman lazım. {dir} yönünde, {dist} adım kadar.",
           reward: { coins: 45, rep: 10 },
         },
       ],
@@ -60437,22 +60469,22 @@ uniform float uWet; uniform float uNight;`,
         {
           type: "fetch",
           need: { fish_cooked: 3 },
-          title: "Han\u0131n ak\u015Fam yeme\u011Fi",
-          offer: "Ak\u015Fama misafir \xE7ok. {n} pi\u015Fmi\u015F bal\u0131k getirirsen g\xFCveci benden!",
+          title: "Hanın akşam yemeği",
+          offer: "Akşama misafir çok. {n} pişmiş balık getirirsen güveci benden!",
           reward: { coins: 20, rep: 8, items: { stew: 1 } },
         },
         {
           type: "fetch",
           need: { wood: 10 },
-          title: "Ocak i\xE7in odun",
-          offer: "Oca\u011F\u0131n odunu bitmek \xFCzere. {n} odun getirebilir misin?",
+          title: "Ocak için odun",
+          offer: "Ocağın odunu bitmek üzere. {n} odun getirebilir misin?",
           reward: { coins: 18, rep: 6 },
         },
         {
           type: "fetch",
           need: { meat_cooked: 3 },
           title: "Kebap gecesi",
-          offer: "Bu ak\u015Fam kebap gecesi var ama et yok! {n} pi\u015Fmi\u015F et laz\u0131m.",
+          offer: "Bu akşam kebap gecesi var ama et yok! {n} pişmiş et lazım.",
           reward: { coins: 26, rep: 8 },
         },
       ],
@@ -60460,24 +60492,24 @@ uniform float uWet; uniform float uNight;`,
         {
           type: "fetch",
           need: { stone: 10 },
-          title: "Ocak ta\u015F\u0131",
+          title: "Ocak taşı",
           offer:
-            "Oca\u011F\u0131n duvar\u0131 \xE7atlad\u0131. {n} ta\u015F laz\u0131m; dere kenar\u0131nda bolca var.",
+            "Ocağın duvarı çatladı. {n} taş lazım; dere kenarında bolca var.",
           reward: { coins: 16, rep: 6 },
         },
         {
           type: "fetch",
           need: { flint: 4 },
-          title: "\xC7akmakta\u015F\u0131",
+          title: "Çakmaktaşı",
           offer:
-            "Ok u\xE7lar\u0131 i\xE7in {n} \xE7akmakta\u015F\u0131 getirir misin? Kayal\u0131k yerlerde ve dere yataklar\u0131nda bulunur.",
+            "Ok uçları için {n} çakmaktaşı getirir misin? Kayalık yerlerde ve dere yataklarında bulunur.",
           reward: { coins: 20, rep: 6, items: { arrow: 6 } },
         },
         {
           type: "fetch",
           need: { wood: 12 },
-          title: "K\xF6m\xFCr i\xE7in odun",
-          offer: "K\xF6m\xFCr yakaca\u011F\u0131m. {n} odun laz\u0131m.",
+          title: "Kömür için odun",
+          offer: "Kömür yakacağım. {n} odun lazım.",
           reward: { coins: 22, rep: 6 },
         },
       ],
@@ -60485,9 +60517,9 @@ uniform float uWet; uniform float uNight;`,
         {
           type: "fetch",
           need: { stick: 8 },
-          title: "\xC7it tamiri",
+          title: "Çit tamiri",
           offer:
-            "A\u011F\u0131l\u0131n \xE7iti k\u0131r\u0131ld\u0131, hayvanlar ka\xE7acak diye \xF6d\xFCm kopuyor. Bana {n} dal getirebilir misin?",
+            "Ağılın çiti kırıldı, hayvanlar kaçacak diye ödüm kopuyor. Bana {n} dal getirebilir misin?",
           reward: { coins: 12, rep: 6, items: { bread: 1 } },
         },
         {
@@ -60496,22 +60528,22 @@ uniform float uWet; uniform float uNight;`,
           n: 1,
           title: "Tarla bozan domuz",
           offer:
-            "Bir yaban domuzu her gece tarlam\u0131 e\u015Feliyor. Onu avlarsan \xF6mr\xFCm boyunca unutmam.",
+            "Bir yaban domuzu her gece tarlamı eşeliyor. Onu avlarsan ömrüm boyunca unutmam.",
           reward: { coins: 30, rep: 10, items: { cheese: 1 } },
         },
         {
           type: "fetch",
           need: { rope: 2 },
           title: "Demet ipi",
-          offer: "Ekinleri ba\u011Flamak i\xE7in {n} ip laz\u0131m. Bitki lifinden \xF6r\xFCl\xFCyor.",
+          offer: "Ekinleri bağlamak için {n} ip lazım. Bitki lifinden örülüyor.",
           reward: { coins: 14, rep: 6 },
         },
         {
           type: "hunt",
           kill: "fox",
           n: 1,
-          title: "Tavuk h\u0131rs\u0131z\u0131 tilki",
-          offer: "Bir tilki k\xFCmesimizi bas\u0131yor. Onu ortadan kald\u0131r\u0131r m\u0131s\u0131n?",
+          title: "Tavuk hırsızı tilki",
+          offer: "Bir tilki kümesimizi basıyor. Onu ortadan kaldırır mısın?",
           reward: { coins: 20, rep: 8 },
         },
       ],
@@ -60520,33 +60552,33 @@ uniform float uWet; uniform float uNight;`,
           type: "hunt",
           kill: "wolf",
           n: 2,
-          title: "Kurt s\xFCr\xFCs\xFC",
+          title: "Kurt sürüsü",
           offer:
-            "Bir kurt s\xFCr\xFCs\xFC a\u011F\u0131llara di\u015F biliyor. {n} kurt avla, s\xFCr\xFC da\u011F\u0131ls\u0131n.",
+            "Bir kurt sürüsü ağıllara diş biliyor. {n} kurt avla, sürü dağılsın.",
           reward: { coins: 55, rep: 15, items: { arrow: 8 } },
         },
         {
           type: "fetch",
           need: { hide: 3 },
-          title: "Tabakl\u0131k deri",
-          offer: "K\u0131\u015Fl\u0131k i\xE7in deri laz\u0131m. {n} deri getir, sana ok yapay\u0131m.",
+          title: "Tabaklık deri",
+          offer: "Kışlık için deri lazım. {n} deri getir, sana ok yapayım.",
           reward: { coins: 15, rep: 6, items: { arrow: 10 } },
         },
         {
           type: "hunt",
           kill: "deer",
           n: 1,
-          title: "Bayram i\xE7in geyik",
-          offer: "K\xF6y bayram\u0131na bir geyik laz\u0131m. Avlarsan herkes sana dua eder.",
+          title: "Şenlik için geyik",
+          offer: "Köy şenliğine bir geyik lazım. Avlarsan herkes sana minnettar kalır.",
           reward: { coins: 30, rep: 10 },
         },
         {
           type: "hunt",
           kill: "bear",
           n: 1,
-          title: "Boz Ay\u0131",
+          title: "Boz Ayı",
           offer:
-            "Koca bir boz ay\u0131 k\xF6y\xFCn \xE7evresinde dola\u015F\u0131yor. Cesaretin varsa onu avla... ama dikkatli ol.",
+            "Koca bir boz ayı köyün çevresinde dolaşıyor. Cesaretin varsa onu avla... ama dikkatli ol.",
           reward: { coins: 120, rep: 25 },
         },
       ],
@@ -60556,21 +60588,21 @@ uniform float uWet; uniform float uNight;`,
           need: { mushroom: 5 },
           title: "Mantar toplama",
           offer:
-            "{n} kahverengi \xE7ay\u0131r mantar\u0131 laz\u0131m. K\u0131rm\u0131z\u0131 benekli olanlar\u0131 sak\u0131n getirme!",
+            "{n} kahverengi çayır mantarı lazım. Kırmızı benekli olanları sakın getirme!",
           reward: { coins: 15, rep: 6, items: { herb_tea: 1 } },
         },
         {
           type: "fetch",
           need: { berry_red: 8 },
           title: "Ahududu",
-          offer: "\u015Eurup yapaca\u011F\u0131m. {n} ahududu toplar m\u0131s\u0131n?",
+          offer: "Şurup yapacağım. {n} ahududu toplar mısın?",
           reward: { coins: 14, rep: 6, items: { bandage: 2 } },
         },
         {
           type: "fetch",
           need: { berry_blue: 8 },
           title: "Yaban mersini",
-          offer: "G\xF6z merhemi i\xE7in {n} yaban mersini laz\u0131m.",
+          offer: "Göz merhemi için {n} yaban mersini lazım.",
           reward: { coins: 14, rep: 6, items: { herb_tea: 1 } },
         },
       ],
@@ -60581,14 +60613,14 @@ uniform float uWet; uniform float uNight;`,
           n: 3,
           title: "Gece devriyesi",
           offer:
-            "Geceleri kurtlar k\xF6y\xFCn etraf\u0131nda uluyor. {n} tanesini avlarsan n\xF6betim rahatlar.",
+            "Geceleri kurtlar köyün etrafında uluyor. {n} tanesini avlarsan nöbetim rahatlar.",
           reward: { coins: 60, rep: 15 },
         },
         {
           type: "fetch",
           need: { torch: 2 },
-          title: "Fener i\xE7in me\u015Fale",
-          offer: "N\xF6bet fenerleri i\xE7in {n} me\u015Fale laz\u0131m.",
+          title: "Fener için meşale",
+          offer: "Nöbet fenerleri için {n} meşale lazım.",
           reward: { coins: 12, rep: 6 },
         },
       ],
@@ -60596,15 +60628,15 @@ uniform float uWet; uniform float uNight;`,
         {
           type: "fetch",
           need: { rope: 2 },
-          title: "K\xFCt\xFCk ipi",
-          offer: "K\xFCt\xFCkleri s\xFCr\xFCklemek i\xE7in {n} ip laz\u0131m.",
+          title: "Kütük ipi",
+          offer: "Kütükleri sürüklemek için {n} ip lazım.",
           reward: { coins: 14, rep: 6 },
         },
         {
           type: "fetch",
           need: { fiber: 10 },
-          title: "Sap sarg\u0131s\u0131",
-          offer: "Baltalar\u0131n sap\u0131n\u0131 sarmak i\xE7in {n} bitki lifi getir.",
+          title: "Sap sargısı",
+          offer: "Baltaların sapını sarmak için {n} bitki lifi getir.",
           reward: { coins: 10, rep: 5 },
         },
       ],
@@ -60612,25 +60644,25 @@ uniform float uWet; uniform float uNight;`,
         {
           type: "find",
           item: "toy",
-          title: "Kay\u0131p tahta at",
+          title: "Kayıp tahta at",
           offer:
-            "Tahta at\u0131m\u0131 ormanda kaybettim... {dir} taraflar\u0131nda, {dist} ad\u0131m kadar \xF6tede oynuyordum. Bulur musun? L\xFCtfeeen!",
+            "Tahta atımı ormanda kaybettim... {dir} taraflarında, {dist} adım kadar ötede oynuyordum. Bulur musun? Lütfeeen!",
           reward: { coins: 8, rep: 12, items: { apple: 2 } },
         },
       ],
     },
     mz = [
-      "Harikas\u0131n! Al bakal\u0131m, hak ettin.",
-      "Eline sa\u011Fl\u0131k! Bunu unutmayaca\u011F\u0131m.",
-      "Vay be, sana g\xFCvenebilece\u011Fimi biliyordum!",
-      "Te\u015Fekk\xFCrler yolcu, s\xF6z\xFCm\xFC tutar\u0131m: al.",
+      "Harikasın! Al bakalım, hak ettin.",
+      "Eline sağlık! Bunu unutmayacağım.",
+      "Vay be, sana güvenebileceğimi biliyordum!",
+      "Teşekkürler yolcu, sözümü tutarım: al.",
     ],
     gz = [
-      "H\xE2l\xE2 bekliyorum... {need}",
-      "Unutmad\u0131n de\u011Fil mi? {need}",
+      "Hâlâ bekliyorum... {need}",
+      "Unutmadın değil mi? {need}",
       "Acele etme ama gecikme de. {need}",
     ],
-    yz = { wolf: "kurt", boar: "yaban domuzu", fox: "tilki", deer: "geyik", bear: "boz ay\u0131" },
+    yz = { wolf: "kurt", boar: "yaban domuzu", fox: "tilki", deer: "geyik", bear: "boz ayı" },
     xz = {
       wood: 1,
       stick: 0.5,
@@ -60700,13 +60732,13 @@ uniform float uWet; uniform float uNight;`,
     },
     wz = [
       "kuzey",
-      "kuzeydo\u011Fu",
-      "do\u011Fu",
-      "g\xFCneydo\u011Fu",
-      "g\xFCney",
-      "g\xFCneybat\u0131",
-      "bat\u0131",
-      "kuzeybat\u0131",
+      "kuzeydoğu",
+      "doğu",
+      "güneydoğu",
+      "güney",
+      "güneybatı",
+      "batı",
+      "kuzeybatı",
     ];
   function cu(r, t) {
     let e = (Math.atan2(r, -t) * 180) / Math.PI;
@@ -60728,29 +60760,11 @@ uniform float uWet; uniform float uNight;`,
           (this.bubbles = []),
           (this.marks = new Map()),
           (this.history = []),
-          (this.sampler = null),
-          (this.toolsOk = !1),
-          (this.llmOff = !1),
           (this.busy = null),
           (this.camK = 0),
           (this.camNpc = null),
           (this.baseCam = { p: new R(), q: new ce(), fov: 70 }),
           this.buildDOM());
-        try {
-          let e = window.claude?.use?.("sample");
-          e &&
-            e.then &&
-            e
-              .then((n) => {
-                n &&
-                  ((this.sampler = n),
-                  n
-                    .limits?.()
-                    .then((i) => (this.toolsOk = !!i?.tools))
-                    .catch(() => {}));
-              })
-              .catch(() => {});
-        } catch {}
       }
       reset() {
         this.npc && this.close();
@@ -60777,24 +60791,16 @@ uniform float uWet; uniform float uNight;`,
       addRep(t, e) {
         let n = this.rep(t);
         this.S.rep[t.site.id] = yt(n + e, -100, 100);
-        let i = this.S.rep[t.site.id];
-        this.repLabel(i) !== this.repLabel(n) &&
-          i > n &&
-          this.G.ui?.notify(
-            `${t.site.name} k\xF6y\xFCnde art\u0131k "${this.repLabel(i)}" olarak biliniyorsun.`,
-            null,
-            "good",
-          );
       }
       repLabel(t) {
         return t < -25
-          ? "D\xFC\u015Fman"
+          ? "Düşman"
           : t < 0
-            ? "\u015E\xFCpheli"
+            ? "Şüpheli"
             : t < 12
-              ? "Yabanc\u0131"
+              ? "Yabancı"
               : t < 35
-                ? "Tan\u0131d\u0131k"
+                ? "Tanıdık"
                 : t < 70
                   ? "Dost"
                   : "Kahraman";
@@ -60855,7 +60861,7 @@ uniform float uWet; uniform float uNight;`,
             f = d.z - c.site.z;
           ((h.text = ho(l.offer, { target: d.name, dir: cu(u, f), dist: hu(Math.hypot(u, f), 50) })),
             (h.title = ho(l.title, { target: d.name })),
-            (h.goal = `${h.targetRole === "merchant" ? "Paketi" : "Mektubu"} ${d.name} k\xF6y\xFCn\xFCn ${h.targetRole === "merchant" ? "t\xFCccar\u0131na" : "muhtar\u0131na"} g\xF6t\xFCr`),
+            (h.goal = `${h.targetRole === "merchant" ? "Paketi" : "Mektubu"} ${d.name} köyünün ${h.targetRole === "merchant" ? "tüccarına" : "muhtarına"} götür`),
             (h.item = "letter"));
         } else if (l.type === "find") {
           let d = 0,
@@ -60874,7 +60880,7 @@ uniform float uWet; uniform float uNight;`,
           let f = d - c.site.x,
             p = u - c.site.z;
           ((h.text = ho(l.offer, { dir: cu(f, p), dist: hu(Math.hypot(f, p), 10) })),
-            (h.goal = `Kay\u0131p e\u015Fyay\u0131 bul: ${kt[l.item].name}`));
+            (h.goal = `Kayıp eşyayı bul: ${kt[l.item].name}`));
         }
         return (n.n++, (n.quests[h.id] = h), h);
       }
@@ -60901,11 +60907,11 @@ uniform float uWet; uniform float uNight;`,
             ? `${t.progress}/${t.n}`
             : t.type === "find"
               ? e.count(t.item)
-                ? "Buldun! Sahibine g\xF6t\xFCr."
-                : "Hen\xFCz bulunamad\u0131"
+                ? "Buldun! Sahibine götür."
+                : "Henüz bulunamadı"
               : t.type === "deliver"
                 ? e.count("letter")
-                  ? `${t.targetName} k\xF6y\xFCne g\xF6t\xFCr`
+                  ? `${t.targetName} köyüne götür`
                   : "Mektubu kaybettin!"
                 : "";
       }
@@ -60925,7 +60931,7 @@ uniform float uWet; uniform float uNight;`,
           let n = e.inventory.add("letter", 1);
           (n && e.dropItem("letter", n), e.ui?.notify(`+1 ${kt.letter.name}`, "letter"));
         }
-        (e.ui?.notify(`Yeni yan g\xF6rev: ${t.title}`, null, "good"),
+        (e.ui?.notify(`Yeni yan görev: ${t.title}`, null, "good"),
           e.audio?.ui("quest"),
           this.npc?.emote("Yes", { mask: "head" }),
           this.renderTracker());
@@ -60950,9 +60956,9 @@ uniform float uWet; uniform float uNight;`,
           : (this.S.rep[t.village] = yt((this.S.rep[t.village] || 0) + (s.rep || 5), -100, 100)),
           e && e.v.site.id !== t.village && this.addRep(e.v, 8));
         let a = this.S.npc[t.giver];
-        (a && (a.done++, (a.cool = n.env.day + 1), (a.rumored = !1)),
+        (a && (a.done++, (a.cool = n.env.day + 1), (a.rumored = !1), (a.fam = yt((a.fam || 0) + 20, -100, 100))),
           this.S.track === t.id && (this.S.track = null),
-          n.ui?.notify(`G\xF6rev tamamland\u0131: ${t.title}  (+${s.coins || 0} ak\xE7e)`, null, "good"),
+          n.ui?.notify(`Görev tamamlandı: ${t.title}  (+${s.coins || 0} akçe)`, null, "good"),
           n.ui?.stamp?.("TAMAM!", t.title),
           n.audio?.ui("quest"),
           n.audio?.ui("coin"),
@@ -60967,7 +60973,7 @@ uniform float uWet; uniform float uNight;`,
         (e && (e.cool = this.G.env.day + 1),
           t.type === "deliver" && this.G.inventory.remove("letter", 1),
           this.S.track === t.id && (this.S.track = null),
-          this.G.ui?.notify(`G\xF6rev b\u0131rak\u0131ld\u0131: ${t.title}`, null, "bad"),
+          this.G.ui?.notify(`Görev bırakıldı: ${t.title}`, null, "bad"),
           this.renderTracker());
       }
       findNpc(t) {
@@ -60987,7 +60993,7 @@ uniform float uWet; uniform float uNight;`,
           for (let n of this.activeQuests())
             n.type === "find" &&
               e === n.item &&
-              (this.G.ui?.notify(`Buldun! ${n.giverName} \xE7ok sevinecek.`, null, "good"),
+              (this.G.ui?.notify(`Buldun! ${n.giverName} çok sevinecek.`, null, "good"),
               this.G.audio?.ui("quest"));
         this.renderTracker();
       }
@@ -60998,7 +61004,7 @@ uniform float uWet; uniform float uNight;`,
       }
       subtitle(t) {
         let e = this.questOf(t, ["active"]);
-        if (e) return this.ready(e) ? "\u2605 G\xF6revi teslim et" : `G\xF6rev: ${e.title}`;
+        if (e) return this.ready(e) ? "\u2605 Görevi teslim et" : `Görev: ${e.title}`;
         if (this.deliveryFor(t)) return "\u2709 Teslimat var";
         let n = this.npcState(t),
           i = Ar[t.def.role] ? " \xB7 ticaret" : t.def.role === "innkeeper" ? " \xB7 konaklama" : "";
@@ -61024,41 +61030,75 @@ uniform float uWet; uniform float uNight;`,
           n = this.G,
           i = n.player,
           s = t.def.personality,
-          o = this.rep(t.v);
+          o = this.rep(t.v),
+          g = this.grudgeStage(t);
+        if (g === 2) return Ne(sgz);
         if (o < -25)
           return Ne([
-            "Seninle konu\u015Facak bir \u015Feyim yok, hayvan katili!",
-            "Git buradan. A\u011F\u0131ldaki hayvanlar\u0131m\u0131z\u0131 sen \xF6ld\xFCrd\xFCn!",
+            "Seninle konuşacak bir şeyim yok, hayvan katili!",
+            "Git buradan. Ağıldaki hayvanlarımızı sen öldürdün!",
           ]);
         if (i.stats.hp < 35)
           return Ne([
-            "Aman Allah'\u0131m, kan revan i\xE7indesin! Otur \u015Furaya, nefeslen!",
-            "H\xE2line bak! Kurtlar m\u0131 sald\u0131rd\u0131?",
+            "Aman, kan revan içindesin! Otur şuraya, nefeslen!",
+            "Hâline bak! Kurtlar mı saldırdı?",
           ]);
-        if (i.bleed > 0) return "Kan\u0131yorsun! Hemen bir bandaj sar, bekletme!";
+        if (i.bleed > 0) return "Kanıyorsun! Hemen bir bandaj sar, bekletme!";
         if (i.poison > 0)
-          return "Rengin sapsar\u0131... Yedi\u011Fin bir \u015Fey mi dokundu? \u015Eifac\u0131n\u0131n \xE7ay\u0131 iyi gelir.";
+          return "Rengin sapsarı... Yediğin bir şey mi dokundu? Şifacının çayı iyi gelir.";
         if (i.wet > 0.6 && (i.cold || 0) > 0.2)
-          return "S\u0131r\u0131ls\u0131klams\u0131n, titriyorsun! Bir ate\u015Fin ba\u015F\u0131na ge\xE7.";
-        let a;
-        if (
-          (e.met && o >= 35
+          return "Sırılsıklamsın, titriyorsun! Bir ateşin başına geç.";
+        let a,
+          f = this.famTier(t);
+        if (!e.met)
+          ((a = t.def.child ? Ne(lz) : ho(Ne(rz[s]), { village: t.v.site.name })),
+            (a += t.def.child ? ` Benim adım ${t.def.name}!` : ` Ben ${t.def.name}, ${au[t.def.role]}.`));
+        else {
+          f >= 3 || (o >= 70 && f >= 2)
             ? (a = Ne(cz))
             : t.def.child
-              ? (a = e.met
-                  ? Ne(["Yine sen! Oyun oynayal\u0131m m\u0131?", "Hey! Bana bir \u015Fey getirdin mi?"])
-                  : Ne(lz))
-              : (a = e.met ? Ne(az[s]) : ho(Ne(rz[s]), { village: t.v.site.name })),
-          !e.met)
-        )
-          a += t.def.child ? ` Benim ad\u0131m ${t.def.name}!` : ` Ben ${t.def.name}, ${au[t.def.role]}.`;
-        else {
+              ? (a =
+                  f === 0
+                    ? Ne(["Yine sen! Yabancı, oyun oynar mısın?", "Hey yabancı! Yine mi geldin?"])
+                    : Ne(["Yine sen! Oyun oynayalım mı?", "Hey! Bana bir şey getirdin mi?"]))
+              : (a = Ne(az[Math.min(2, f)][s]));
           let l = this.timeOfDay();
           l === "night"
             ? (a = "Gecenin bu saatinde mi? " + a)
-            : l === "morning" && Math.random() < 0.5 && (a = "Hay\u0131rl\u0131 sabahlar! " + a);
+            : l === "morning" && Math.random() < 0.5 && (a = "Günaydın! " + a);
         }
-        return a;
+        return (g === 1 && Math.random() < 0.3 && (a += " " + Ne(jbz)), a);
+      }
+      nowH() {
+        let t = this.G.env;
+        return ((t.day || 0) + (t.time || 0)) * 24;
+      }
+      fam(t) {
+        return this.npcState(t).fam || 0;
+      }
+      famTier(t) {
+        let e = this.fam(t);
+        return e < 10 ? 0 : e < 30 ? 1 : e < 60 ? 2 : 3;
+      }
+      addFam(t, e) {
+        let n = this.npcState(t);
+        n.fam = yt((n.fam || 0) + e, -100, 100);
+      }
+      grudgeHours(t) {
+        return 2 + ((t.def.seed >>> 5) % 100) / 100;
+      }
+      grudgeStage(t) {
+        let e = this.npcState(t);
+        if (e.grudgeH == null) return 0;
+        let n = this.nowH() - e.grudgeH;
+        return n < this.grudgeHours(t) ? 3 : n < 24 ? 2 : e.hits ? 1 : 0;
+      }
+      onHit(t, e) {
+        let n = this.npcState(t);
+        ((n.hits = (n.hits || 0) + 1), (n.grudgeH = this.nowH()), this.addFam(t, e === "ko" ? -40 : -20));
+      }
+      holdGrudge(t) {
+        this.npcState(t).grudgeH = this.nowH();
       }
       voiceOf(t) {
         let e = t.def,
@@ -61115,7 +61155,7 @@ uniform float uWet; uniform float uNight;`,
         let n = this.npc;
         n &&
           ((this.nameEl.textContent = n.name),
-          (this.roleEl.textContent = `${n.v.site.name} \xB7 ${this.repLabel(this.rep(n.v))}`),
+          (this.roleEl.textContent = `${n.v.site.name} \xB7 ${um[n.def.role] || "Köylü"}`),
           this.textEl.classList.toggle("thinking", !!e.thinking),
           (this.typeTarget = t),
           (this.typeI = e.instant ? t.length : 0),
@@ -61130,7 +61170,7 @@ uniform float uWet; uniform float uNight;`,
           n = [],
           i = this.questOf(t, ["active"]),
           s = this.deliveryFor(t),
-          o = this.rep(t.v) < -25;
+          o = this.rep(t.v) < -25 || this.grudgeStage(t) === 2;
         if (
           (s &&
             n.push({
@@ -61140,7 +61180,7 @@ uniform float uWet; uniform float uNight;`,
             }),
           i &&
             (this.ready(i)
-              ? n.push({ t: `\u2605 "${i.title}" \u2014 Getirdim!`, fn: () => this.turnIn(i), hl: !0 })
+              ? n.push({ t: `\u2605 "${i.title}" — Getirdim!`, fn: () => this.turnIn(i), hl: !0 })
               : n.push({
                   t: `"${i.title}" ne durumda?`,
                   fn: () => this.say(ho(Ne(gz), { need: this.needText(i) })),
@@ -61150,15 +61190,15 @@ uniform float uWet; uniform float uNight;`,
         ) {
           let a = this.canHaveQuest(t) || this.questOf(t, ["offered"]);
           n.push({
-            t: "Bir derdin var m\u0131? Yard\u0131m edebilirim.",
+            t: "Bir derdin var mı? Yardım edebilirim.",
             fn: () => this.askQuest(),
             hl: !!a,
           });
         }
-        (Ar[t.def.role] && !o && n.push({ t: "Ticaret yapal\u0131m", fn: () => this.openTrade() }),
+        (Ar[t.def.role] && !o && n.push({ t: "Ticaret yapalım", fn: () => this.openTrade() }),
           t.def.role === "innkeeper" &&
             !o &&
-            n.push({ t: `Bir gece kal (${this.innPrice()} ak\xE7e)`, fn: () => this.rest() }),
+            n.push({ t: `Bir gece kal (${this.innPrice()} akçe)`, fn: () => this.rest() }),
           !o &&
             !t.def.child &&
             (t.order && t.order.kind !== "come"
@@ -61166,18 +61206,15 @@ uniform float uWet; uniform float uNight;`,
                   ? n.push({ t: "Burada bekle.", fn: () => this.orderBye(this.order(t, "wait")) })
                   : n.push({ t: "Benimle gel.", fn: () => this.orderBye(this.order(t, "follow")) }),
                 n.push({
-                  t: "Tamam, i\u015Fine d\xF6nebilirsin.",
+                  t: "Tamam, işine dönebilirsin.",
                   fn: () => this.orderBye(this.order(t, "release")),
                 }))
               : (n.push({ t: "Benimle gel.", fn: () => this.orderBye(this.order(t, "follow")) }),
                 n.push({
-                  t: "Bana yard\u0131m eder misin?",
+                  t: "Bana yardım eder misin?",
                   fn: () => this.orderBye(this.order(t, "help")),
                 }))),
-          this.sampler &&
-            !this.llmOff &&
-            n.push({ t: "Kendi s\xF6zlerinle konu\u015F\u2026", fn: () => this.freeTalk(), llm: !0 }),
-          n.push({ t: "Ho\u015F\xE7a kal", fn: () => this.bye() }),
+          n.push({ t: "Hoşça kal", fn: () => this.bye() }),
           this.renderOptions(n));
       }
       renderOptions(t) {
@@ -61185,7 +61222,7 @@ uniform float uWet; uniform float uNight;`,
           (this.opts = t),
           t.forEach((e, n) => {
             let i = document.createElement("button");
-            ((i.className = "dlg-opt" + (e.hl ? " hl" : "") + (e.llm ? " llm" : "")),
+            ((i.className = "dlg-opt" + (e.hl ? " hl" : "")),
               (i.innerHTML = `<span class="k">${n + 1}</span>`));
             let s = document.createElement("span");
             ((s.textContent = e.t),
@@ -61211,8 +61248,18 @@ uniform float uWet; uniform float uNight;`,
           n = this.G,
           i = n.player,
           s = t.v;
+        if (this.grudgeStage(t) === 2) {
+          (this.say(Ne(sgc)), this.menu());
+          return;
+        }
         (e.talks++, this.addRep(s, e.talks <= 4 ? 1 : 0));
-        let o = ["ne\u015Feli", "bilge", "geveze"].includes(t.def.personality),
+        {
+          let p = n.env.day | 0;
+          (e.famDay !== p && ((e.famDay = p), (e.famN = 0)),
+            e.famN < 3 && (e.famN++, this.addFam(t, e.famN === 1 ? 5 : 3)));
+        }
+        let F = this.famTier(t),
+          o = ["neşeli", "bilge", "geveze"].includes(t.def.personality) && F >= 1,
           a = (this.S.gift = this.S.gift || {});
         if (i.stats.food < 35 && o && a[s.site.id] !== n.env.day && this.rep(s) > -10) {
           a[s.site.id] = n.env.day;
@@ -61220,7 +61267,7 @@ uniform float uWet; uniform float uNight;`,
             y = n.inventory.add(p, 1);
           (y && n.dropItem(p, y),
             this.say(
-              `A\xE7 g\xF6r\xFCn\xFCyorsun, y\xFCz\xFCn solmu\u015F. Al \u015Fu ${kt[p].name.toLocaleLowerCase("tr")} senin olsun, benden.`,
+              `Aç görünüyorsun, yüzün solmuş. Al şu ${kt[p].name.toLocaleLowerCase("tr")} senin olsun, benden.`,
             ),
             t.emote("Interact"),
             n.ui?.notify(`+1 ${kt[p].name}`, p),
@@ -61251,24 +61298,24 @@ uniform float uWet; uniform float uNight;`,
           }
         }
         let c = [...(lu[t.def.role] || [])];
-        (c.push(...lu.general), e.talks >= 3 && c.push(...(dz[t.def.role] || [])));
+        (c.push(...lu.general), F >= 2 && c.push(...(dz[t.def.role] || [])));
         let h = this.otherVillage(s);
         if (h) {
           let p = h.x - s.site.x,
             y = h.z - s.site.z;
           c.push(
-            `${sz(cu(p, y))} taraf\u0131nda, ${hu(Math.hypot(p, y), 50)} ad\u0131m kadar \xF6tede ${h.name} k\xF6y\xFC var. Oran\u0131n insanlar\u0131 da iyidir.`,
+            `${sz(cu(p, y))} tarafında, ${hu(Math.hypot(p, y), 50)} adım kadar ötede ${h.name} köyü var. Oranın insanları da iyidir.`,
           );
         }
         let d = s.npcs.filter((p) => p !== t && !p.def.child);
-        if (d.length) {
+        if (d.length && F >= 1) {
           let p = d[(t.def.seed + e.topics) % d.length];
           c.push(ho(uz[p.def.personality], { n: p.name }));
         }
         (this.timeOfDay() === "night" &&
-          c.push("Geceleri kurt ulumalar\u0131n\u0131 duyuyor musun? T\xFCylerim diken diken oluyor."),
+          c.push("Geceleri kurt ulumalarını duyuyor musun? Tüylerim diken diken oluyor."),
           (n.env.rainAmount || 0) > 0.3 &&
-            c.push("Bu ya\u011Fmur tarlaya iyi gelir ama \u0131slanmaktan hi\xE7 ho\u015Flanmam."));
+            c.push("Bu yağmur tarlaya iyi gelir ama ıslanmaktan hiç hoşlanmam."));
         let f = c[(e.topics * 7 + t.def.seed) % c.length];
         (e.topics++,
           t.def.personality === "geveze" &&
@@ -61276,18 +61323,24 @@ uniform float uWet; uniform float uNight;`,
             (f +=
               " " +
               Ne([
-                "Bunu kimseye s\xF6yleme ama...",
-                "Neyse, uzatmayay\u0131m...",
-                "Aman, yine \xE7ok konu\u015Ftum!",
+                "Bunu kimseye söyleme ama...",
+                "Neyse, uzatmayayım...",
+                "Aman, yine çok konuştum!",
               ])),
           t.def.personality === "huysuz" &&
             Math.random() < 0.4 &&
             (f +=
               " " +
               Ne([
-                "Hadi, ba\u015Fka sorun var m\u0131?",
-                "\u015Eimdi b\u0131rak da i\u015Fime bakay\u0131m.",
+                "Hadi, başka sorun var mı?",
+                "Şimdi bırak da işime bakayım.",
               ])),
+          F === 0 &&
+            !t.def.child &&
+            (t.def.personality === "huysuz" || t.def.personality === "utangaç") &&
+            Math.random() < 0.5 &&
+            (f = Ne(["Seni pek tanımıyorum ama...", "Yabancı birine ne kadar anlatılır bilmem ama..."]) + " " + f),
+          this.grudgeStage(t) === 1 && Math.random() < 0.2 && (f += " " + Ne(jbz)),
           this.say(f),
           this.menu());
       }
@@ -61297,9 +61350,9 @@ uniform float uWet; uniform float uNight;`,
         if (!e) {
           (this.say(
             Ne([
-              "\u015Eimdilik bir \u015Fey yok, sa\u011F ol. Sonra u\u011Fra.",
-              "Bug\xFCn i\u015Fler yolunda. Yar\u0131n belki.",
-              "Te\u015Fekk\xFCrler ama \u015Fu an ihtiyac\u0131m yok.",
+              "Şimdilik bir şey yok, sağ ol. Sonra uğra.",
+              "Bugün işler yolunda. Yarın belki.",
+              "Teşekkürler ama şu an ihtiyacım yok.",
             ]),
           ),
             t.emote("Idle_No_Loop", { mask: "head", dur: 1.6 }),
@@ -61312,7 +61365,7 @@ uniform float uWet; uniform float uNight;`,
               .map(([i, s]) => `${s} ${kt[i].name}`)
               .join(", ")
           : "";
-        (this.say(`${e.text}  (\xD6d\xFCl: ${e.reward.coins} ak\xE7e${n})`),
+        (this.say(`${e.text}  (Ödül: ${e.reward.coins} akçe${n})`),
           this.renderOptions([
             {
               t: "Kabul ediyorum.",
@@ -61321,18 +61374,18 @@ uniform float uWet; uniform float uNight;`,
                 (this.accept(e),
                   this.say(
                     Ne([
-                      "Sa\u011F ol! Sana g\xFCveniyorum.",
-                      "Biliyordum! Yolun a\xE7\u0131k olsun.",
-                      "\xC7ok makbule ge\xE7er.",
+                      "Sağ ol! Sana güveniyorum.",
+                      "Biliyordum! Yolun açık olsun.",
+                      "Çok makbule geçer.",
                     ]),
                   ),
                   this.menu());
               },
             },
             {
-              t: "\u015Eimdi olmaz.",
+              t: "Şimdi olmaz.",
               fn: () => {
-                (this.say("Anl\u0131yorum. Fikrini de\u011Fi\u015Ftirirsen buraday\u0131m."), this.menu());
+                (this.say("Anlıyorum. Fikrini değiştirirsen buradayım."), this.menu());
               },
             },
           ]));
@@ -61343,7 +61396,7 @@ uniform float uWet; uniform float uNight;`,
       deliver(t) {
         (this.complete(t, this.npc),
           this.say(
-            `${t.targetRole === "merchant" ? "Paket" : "Mektup"} mu? ${t.villageName} k\xF6y\xFCnden... Haberleri bekliyorduk. Sa\u011F ol yolcu, al bu da yol har\xE7l\u0131\u011F\u0131n.`,
+            `${t.targetRole === "merchant" ? "Paket" : "Mektup"} mu? ${t.villageName} köyünden... Haberleri bekliyorduk. Sağ ol yolcu, al bu da yol harçlığın.`,
           ),
           this.menu());
       }
@@ -61355,13 +61408,13 @@ uniform float uWet; uniform float uNight;`,
           e = t.player,
           n = this.innPrice();
         if (e.coins < n) {
-          this.say(`Bir gece ${n} ak\xE7e. Paran yetmiyor gibi... Biraz i\u015F yap, gel.`);
+          this.say(`Bir gece ${n} akçe. Paran yetmiyor gibi... Biraz iş yap, gel.`);
           return;
         }
         let i = this.npc.v;
         if (i.rented?.()) {
           this.say(
-            "Odan zaten haz\u0131r, yukar\u0131da. Hava karar\u0131nca yata\u011F\u0131na uzan, sabaha kadar deliksiz uyu.",
+            "Odan zaten hazır, yukarıda. Hava kararınca yatağına uzan, sabaha kadar deliksiz uyu.",
           );
           return;
         }
@@ -61369,10 +61422,10 @@ uniform float uWet; uniform float uNight;`,
           t.audio?.ui("coin"),
           i.rent?.(),
           this.say(
-            "Anla\u015Ft\u0131k! Yukar\u0131daki misafir odalar\u0131 senin, hangisi bo\u015Fsa. Hava karar\u0131nca yata\u011Fa uzan; kahvalt\u0131 da bizden.",
+            "Anlaştık! Yukarıdaki misafir odaları senin, hangisi boşsa. Hava kararınca yatağa uzan; kahvaltı da bizden.",
           ),
           t.ui?.notify(
-            "Han odas\u0131 tutuldu: yukar\u0131daki misafir yataklar\u0131nda uyuyabilirsin.",
+            "Han odası tutuldu: yukarıdaki misafir yataklarında uyuyabilirsin.",
             null,
             "good",
           ));
@@ -61389,9 +61442,9 @@ uniform float uWet; uniform float uNight;`,
           this.G.audio?.ui("page"),
           this.say(
             Ne([
-              "Bak bakal\u0131m, be\u011Fendi\u011Fin bir \u015Fey var m\u0131?",
+              "Bak bakalım, beğendiğin bir şey var mı?",
               "Hepsi kaliteli mal!",
-              "Pazarl\u0131k yok ama d\xFCr\xFCst\xFCm.",
+              "Pazarlık yok ama dürüstüm.",
             ]),
           ),
           this.renderOptions([
@@ -61444,7 +61497,7 @@ uniform float uWet; uniform float uNight;`,
             s.appendChild(d));
         }
         s.children.length ||
-          (s.innerHTML = `<div class="tr-empty">${o ? "Bu tezg\xE2h senin e\u015Fyalar\u0131ndan hi\xE7birini alm\u0131yor." : "Satacak bir \u015Feyin yok."}</div>`);
+          (s.innerHTML = `<div class="tr-empty">${o ? "Bu tezgâh senin eşyalarından hiçbirini almıyor." : "Satacak bir şeyin yok."}</div>`);
       }
       buy(t, e) {
         let n = this.G,
@@ -61453,11 +61506,11 @@ uniform float uWet; uniform float uNight;`,
           let o = this.price(t, !0);
           if (n.player.coins < o) {
             i ||
-              this.say(Ne(["Paran yetmiyor, yolcu.", "Kesende o kadar ak\xE7e yok gibi."]), { instant: !0 });
+              this.say(Ne(["Paran yetmiyor, yolcu.", "Kesende o kadar akçe yok gibi."]), { instant: !0 });
             break;
           }
           if (!n.inventory.canAdd(t, 1)) {
-            this.say("\xC7antan dolu!", { instant: !0 });
+            this.say("Çantan dolu!", { instant: !0 });
             break;
           }
           (n.inventory.add(t, 1), (n.player.coins -= o), i++);
@@ -61471,52 +61524,11 @@ uniform float uWet; uniform float uNight;`,
           (n.inventory.remove(t, 1), (n.player.coins += this.price(t, !1)), i++);
         (i && n.audio?.ui("coin"), this.renderTrade(), n.ui.refreshHotbar());
       }
-      persona(t) {
-        let e = this.G,
-          n = t.v,
-          i = this.npcState(t),
-          s = n.npcs
-            .filter((y) => y !== t)
-            .map((y) => `${y.name} (${au[y.def.role]}, ${y.def.personality})`)
-            .slice(0, 12)
-            .join(", "),
-          o = this.otherVillage(n),
-          l = this.questOf(t) || (this.canHaveQuest(t) ? this.questFor(t) : null),
-          c = e.player,
-          h = (Po[e.env.weather]?.name || "a\xE7\u0131k").toLocaleLowerCase("tr"),
-          d = t.def.child
-            ? "bir \xE7ocuksun"
-            : t.def.gender === "m"
-              ? "bir adams\u0131n"
-              : "bir kad\u0131ns\u0131n",
-          u = [],
-          f = new Set();
-        for (let y of e.inventory.slots)
-          y && !f.has(y.id) && (f.add(y.id), u.push(`${kt[y.id].name} \xD7${e.inventory.count(y.id)}`));
-        return [
-          `Bir rol oyunu yap\u0131yoruz. Sen, "SEKAS" adl\u0131 bir orman hayatta kalma oyunundaki ${n.site.name} k\xF6y\xFCnde ya\u015Fayan ${t.def.name} adl\u0131 ${t.def.old ? "ya\u015Fl\u0131 " : ""}${d}. Mesle\u011Fin: ${au[t.def.role]}. Ki\u015Fili\u011Fin: ${t.def.personality}.`,
-          `Konu\u015Ftu\u011Fun ki\u015Fi ormandan gelen gen\xE7 bir yolcu (oyuncu). Ona "yolcu" diye hitap edebilirsin. ${i.met ? `Onu daha \xF6nce g\xF6rd\xFCn (${i.talks} kez sohbet ettiniz).` : "Onu ilk kez g\xF6r\xFCyorsun."} K\xF6ydeki itibar\u0131: ${this.repLabel(this.rep(n))}.`,
-          `\u015Eu an saat ${e.env.clockString()}, hava ${h}, ${e.env.day}. g\xFCn. Yolcunun durumu: can ${Math.round(c.stats.hp)}/100, tokluk ${Math.round(c.stats.food)}/100, su ${Math.round(c.stats.water)}/100${c.bleed > 0 ? ", kan\u0131yor" : ""}${c.poison > 0 ? ", zehirlenmi\u015F" : ""}. Kesesinde ${c.coins} ak\xE7e var.`,
-          u.length ? `Yolcunun \xE7antas\u0131nda: ${u.slice(0, 16).join(", ")}.` : "",
-          `K\xF6yde ya\u015Fayan di\u011Ferleri: ${s || "birka\xE7 kom\u015Fu"}.`,
-          o
-            ? `En yak\u0131n kom\u015Fu k\xF6y ${o.name}, ${cu(o.x - n.site.x, o.z - n.site.z)} y\xF6n\xFCnde yakla\u015F\u0131k ${hu(Math.hypot(o.x - n.site.x, o.z - n.site.z), 50)} ad\u0131m \xF6tede.`
-            : "",
-          "D\xFCnya: sonsuz bir orman; geyikler, tilkiler, yaban domuzlar\u0131, kurt s\xFCr\xFCleri ve boz ay\u0131lar var. Kurtlar ate\u015Ften korkar. K\u0131rm\u0131z\u0131 benekli mantar zehirlidir, \xE7i\u011F et mide bozar. K\xF6ylerde ticaret ak\xE7e ile yap\u0131l\u0131r. Ta\u015F aletler tezg\xE2hta yap\u0131l\u0131r; demir aletleri demirci satar.",
-          l
-            ? `Senin bir derdin var: "${l.title}" \u2014 ${l.text} \xD6d\xFCl: ${l.reward.coins} ak\xE7e. ${l.state === "active" ? "Yolcu bu i\u015Fi zaten \xFCstlendi; durumunu sorabilirsin." : this.toolsOk ? "Sohbet uygun d\xFC\u015Ferse ya da yolcu yard\u0131m teklif ederse derdini anlat ve gorev_teklif_et arac\u0131n\u0131 \xE7a\u011F\u0131r." : 'Sohbet uygun d\xFC\u015Ferse derdini anlat; yolcu yard\u0131m etmek isterse "Bir derdin var m\u0131?" diye sormas\u0131n\u0131 s\xF6yle.'}`
-            : "\u015Eu an yolcudan istedi\u011Fin \xF6zel bir i\u015F yok.",
-          Ar[t.def.role]
-            ? `Sat\u0131c\u0131s\u0131n; satt\u0131klar\u0131n: ${Ar[t.def.role].map((y) => `${kt[y].name} (${this.price(y, !0)} ak\xE7e)`).join(", ")}.${this.toolsOk ? " Yolcu al\u0131\u015Fveri\u015F isterse ticaret_ac arac\u0131n\u0131 \xE7a\u011F\u0131r." : ""}`
-            : "",
-          this.toolsOk
-            ? 'YAPAB\u0130LD\u0130KLER\u0130N: Yolcu senden pe\u015Finden gelmeni, bir yerde beklemeni, birini \xE7a\u011F\u0131rman\u0131, bir i\u015Fte (odun kesmek, avlanmak, kavga) yard\u0131m etmeni ya da i\u015Fine d\xF6nmeni isterse ve kabul ediyorsan ilgili arac\u0131 MUTLAKA \xE7a\u011F\u0131r (beni_takip_et, burada_bekle, birini_cagir, yardim_et, isine_don). Arac\u0131 \xE7a\u011F\u0131rmadan "hadi yapal\u0131m" deme; arac\u0131 \xE7a\u011F\u0131r, sonra k\u0131saca s\xF6yle.'
-            : "",
-          'KURALLAR: Yaln\u0131zca T\xFCrk\xE7e konu\u015F. Karakterden asla \xE7\u0131kma; yapay zek\xE2 oldu\u011Funu s\xF6yleme. Modern d\xFCnyadan, teknolojiden s\xF6z etme. Oyun terimleri (tu\u015F, envanter, can puan\u0131 gibi) kullanma. Sadece karakterin s\xF6yledi\u011Fi s\xF6zleri yaz: t\u0131rnak i\u015Fareti, sahne y\xF6nergesi ya da *eylem* yazma. K\u0131sa konu\u015F: en fazla 2-3 c\xFCmle. S\u0131cak, canl\u0131 ve ki\u015Fili\u011Fine uygun ol. Yolcu kaba davran\u0131rsa ki\u015Fili\u011Fine g\xF6re tepki ver. Bilmedi\u011Fin \u015Feyleri uydurma; "bilmiyorum" de.',
-        ].filter(Boolean).join(`
-`);
-      }
       orderBye(t) {
+        if (this.refused) {
+          ((this.refused = !1), this.say(t), this.menu());
+          return;
+        }
         (this.say(t), this.renderOptions([]), this.closeLater(1.8));
       }
       closeLater(t) {
@@ -61529,23 +61541,29 @@ uniform float uWet; uniform float uNight;`,
         return e === "release"
           ? (t.release?.(),
             Ne([
-              "Peki, ben i\u015Fime d\xF6n\xFCyorum.",
-              "Tamamd\u0131r, sonra g\xF6r\xFC\u015F\xFCr\xFCz.",
+              "Peki, ben işime dönüyorum.",
+              "Tamamdır, sonra görüşürüz.",
               "Olur, kolay gelsin yolcu.",
             ]))
-          : this.rep(t.v) < -25
-            ? "Senin pe\u015Finden mi gelece\u011Fim? Hayatta olmaz!"
-            : (t.giveOrder?.({ kind: e }),
+          : this.rep(t.v) < -25 || this.grudgeStage(t) >= 2
+            ? ((this.refused = !0), "Senin peşinden mi geleceğim? Hayatta olmaz!")
+            : (e === "follow" || e === "help") && this.famTier(t) < 2 && this.rep(t.v) < 35
+              ? ((this.refused = !0), Ne([
+                  "Seni daha doğru dürüst tanımıyorum bile. Peşinden gelemem.",
+                  "Tanımadığım birinin peşine takılmam, kusura bakma.",
+                  "Önce biraz tanışalım, sonra bakarız.",
+                ]))
+              : (t.giveOrder?.({ kind: e }),
               Ne(
                 e === "wait"
-                  ? ["Burada bekliyorum.", "Tamam, buraday\u0131m.", "Peki, k\u0131m\u0131ldamam."]
+                  ? ["Burada bekliyorum.", "Tamam, buradayım.", "Peki, kımıldamam."]
                   : e === "help"
                     ? [
-                        "Yard\u0131m ederim tabii, d\xFC\u015F \xF6n\xFCme!",
-                        "Elimden geleni yapar\u0131m, gidelim.",
-                        "A\u011Fa\xE7 m\u0131 kesilecek, kurt mu kovalanacak? Haz\u0131r\u0131m!",
+                        "Yardım ederim tabii, düş önüme!",
+                        "Elimden geleni yaparım, gidelim.",
+                        "Ağaç mı kesilecek, kurt mu kovalanacak? Hazırım!",
                       ]
-                    : ["Peki, pe\u015Findeyim.", "Tamam, d\xFC\u015F \xF6n\xFCme.", "Gidelim bakal\u0131m!"],
+                    : ["Peki, peşindeyim.", "Tamam, düş önüme.", "Gidelim bakalım!"],
               ));
       }
       callSomeone(t, e) {
@@ -61572,216 +61590,15 @@ uniform float uWet; uniform float uNight;`,
                 s,
                 Ne([
                   "Geliyorum!",
-                  "Beni mi \xE7a\u011F\u0131rd\u0131n\u0131z? Geliyorum!",
+                  "Beni mi çağırdınız? Geliyorum!",
                   "Tamam tamam, geliyorum.",
                 ]),
               ),
             `${s.name} geliyor.`)
-          : "\xD6yle birini bulamad\u0131m.";
-      }
-      actOnWords(t, e, n) {
-        let i = e.toLocaleLowerCase("tr"),
-          s = (n || "").toLocaleLowerCase("tr");
-        if (!/\b(hayır|olmaz|yapamam|istemem|gelemem|gelmem)\b/.test(s)) {
-          if (/(işine dön|serbestsin|takibi bırak|takip etme|gidebilirsin|evine git)/.test(i))
-            return this.order(t, "release");
-          if (/(çağır|cagir|getir|seslen)/.test(i)) {
-            let o = i
-              .replace(/(çağır|cagir|getir|seslen)\w*/g, " ")
-              .replace(/(buraya|bana|lütfen|hemen|bir|şu|bu|i|ı|yı|yi)\b/g, " ")
-              .trim();
-            return this.callSomeone(t, o);
-          }
-          if (/(yardım|yardim|destek|el ver)/.test(i)) return this.order(t, "help");
-          if (
-            /(takip|peşimden|pesimden|benimle gel|arkamdan gel|eşlik|eslik|benimle yürü|gel benimle)/.test(i)
-          )
-            return this.order(t, "follow");
-          if (/(bekle|burada kal|dur orada|burda kal)/.test(i)) return this.order(t, "wait");
-        }
-      }
-      freeTalk() {
-        ((this.inputMode = !0),
-          (this.inputWrap.hidden = !1),
-          this.optsEl.classList.add("dim"),
-          (this.inputEl.value = ""),
-          setTimeout(() => this.inputEl.focus(), 30));
+          : "Öyle birini bulamadım.";
       }
       endInput() {
-        ((this.inputMode = !1), (this.inputWrap.hidden = !0), this.optsEl.classList.remove("dim"));
-      }
-      async sendFree(t) {
-        let e = this.npc,
-          n = (t || "").trim();
-        if (!e || !this.sampler || !n) return;
-        (this.endInput(),
-          this.history.push({ role: "user", content: n.slice(0, 400) }),
-          (this.youEl.textContent = n),
-          (this.youEl.hidden = !1),
-          this.say("", { thinking: !0, instant: !0 }),
-          this.renderOptions([{ t: "Vazge\xE7", fn: () => this.busy?.abort() }]));
-        let i = new AbortController();
-        this.busy = i;
-        let s = null,
-          o = !1,
-          a = [],
-          l = this.questOf(e, ["offered"]) || (this.canHaveQuest(e) ? this.questFor(e) : null);
-        (this.toolsOk &&
-          l &&
-          l.state === "offered" &&
-          a.push({
-            name: "gorev_teklif_et",
-            description:
-              "Yolcuya kendi derdini/i\u015Fini resmen teklif eder; ekranda Kabul/Reddet se\xE7enekleri \xE7\u0131kar. Derdinden bahsetti\u011Fin anda \xE7a\u011F\u0131r. G\xF6revin \xF6zetini d\xF6nd\xFCr\xFCr.",
-            execute: () => ((s = l), { gorev: l.title, aciklama: l.text, odul_akce: l.reward.coins }),
-          }),
-          this.toolsOk &&
-            Ar[e.def.role] &&
-            a.push({
-              name: "ticaret_ac",
-              description:
-                "Al\u0131\u015Fveri\u015F tezg\xE2h\u0131n\u0131 a\xE7ar (yolcu bir \u015Fey almak ya da satmak isterse). Sat\u0131lan mallar\u0131 ve fiyatlar\u0131n\u0131 d\xF6nd\xFCr\xFCr.",
-              execute: () => (
-                (o = !0),
-                { satilanlar: Ar[e.def.role].map((h) => `${kt[h].name} (${this.price(h, !0)} ak\xE7e)`) }
-              ),
-            }));
-        let c = null;
-        if (this.toolsOk) {
-          let h = (d, u) => ((c = d), u);
-          (a.push({
-            name: "beni_takip_et",
-            description:
-              'Yolcunun pe\u015Finden gelirsin (o nereye giderse). Yolcu "beni takip et / benimle gel" derse ve kabul edersen \xE7a\u011F\u0131r.',
-            execute: () => h("follow", this.order(e, "follow")),
-          }),
-            a.push({
-              name: "burada_bekle",
-              description:
-                'Oldu\u011Fun yerde beklersin. Yolcu "burada bekle / dur" derse \xE7a\u011F\u0131r.',
-              execute: () => h("wait", this.order(e, "wait")),
-            }),
-            a.push({
-              name: "isine_don",
-              description: "Takip etmeyi/beklemeyi b\u0131rak\u0131p kendi i\u015Fine d\xF6nersin.",
-              execute: () => h("release", this.order(e, "release")),
-            }),
-            a.push({
-              name: "yardim_et",
-              description:
-                "Yolcuya yard\u0131m edersin: pe\u015Finden gelir, onun kesti\u011Fi a\u011Fac\u0131 birlikte keser, ona sald\u0131ran hayvanlarla d\xF6v\xFC\u015F\xFCrs\xFCn.",
-              inputSchema: {
-                type: "object",
-                properties: {
-                  is: { type: "string", description: "hangi i\u015F: odun, av, kavga ya da genel" },
-                },
-              },
-              execute: () => h("help", this.order(e, "help")),
-            }),
-            a.push({
-              name: "birini_cagir",
-              description:
-                "K\xF6yden birini (ad\u0131yla ya da mesle\u011Fiyle) yolcunun yan\u0131na \xE7a\u011F\u0131r\u0131rs\u0131n. Kimi \xE7a\u011F\u0131rd\u0131\u011F\u0131n\u0131 d\xF6nd\xFCr\xFCr.",
-              inputSchema: {
-                type: "object",
-                properties: {
-                  kim: {
-                    type: "string",
-                    description:
-                      '\xE7a\u011Fr\u0131lacak ki\u015Finin ad\u0131 ya da mesle\u011Fi, \xF6r. "Bek\xE7i", "Demirci Ali"',
-                  },
-                },
-                required: ["kim"],
-              },
-              execute: (d) => h("call", this.callSomeone(e, d?.kim || "")),
-            }));
-        }
-        try {
-          let h = [
-              {
-                role: "user",
-                content:
-                  this.persona(e) +
-                  `
-
-(Sohbet ba\u015Fl\u0131yor. Bundan sonraki mesajlar yolcunun s\xF6zleri; sen yaln\u0131zca ` +
-                  e.def.name +
-                  " olarak cevap ver.)",
-              },
-              ...this.history.slice(-12),
-            ],
-            d = {
-              modelTier: "quick",
-              cache: !1,
-              signal: i.signal,
-              onText: ({ text: p }) => {
-                this.npc === e && this.say(p.trim(), { instant: !0 });
-              },
-            };
-          a.length && (d.tools = a);
-          let u = await this.sampler(h, d);
-          if (this.npc !== e) return;
-          let f = u.text.trim();
-          (this.history.push({ role: "assistant", content: f }),
-            !c && this.actOnWords(e, n, f) && (c = "words"),
-            this.say(f, { instant: !0 }),
-            c && c !== "call" && this.closeLater(3.4),
-            (e.speaking = !0),
-            (this.speakHold = 1.2 + f.length * 0.02));
-          for (let p = 0; p < Math.min(14, 3 + f.length / 8); p++)
-            this.G.audio?.voice(this.voiceOf(e), null, p * 0.08, 1);
-          (this.npcState(e).talks++, this.addRep(e.v, this.npcState(e).talks <= 6 ? 1 : 0));
-        } catch (h) {
-          if (this.npc !== e) return;
-          let d = h && h.code;
-          (this.history.pop(),
-            [
-              "not_granted",
-              "sampling_disabled",
-              "not_declared",
-              "capability_disabled",
-              "capability_removed",
-              "session_expired",
-            ].includes(d)
-              ? ((this.llmOff = !0),
-                this.say(
-                  Ne([
-                    "H\u0131? Kusura bakma, dalm\u0131\u015F\u0131m... Ne diyordun?",
-                    "\u015Eu an akl\u0131m ba\u015Fka yerde, sonra konu\u015Fal\u0131m m\u0131?",
-                  ]),
-                  { instant: !0 },
-                ))
-              : d === "tools_unavailable"
-                ? ((this.toolsOk = !1), this.say("Ne diyordun? Bir daha s\xF6yler misin?", { instant: !0 }))
-                : d === "rate_limited"
-                  ? this.say(
-                      "\xC7ok konu\u015Ftuk bug\xFCn, dilim dama\u011F\u0131m kurudu. Biraz sonra yine gel.",
-                      { instant: !0 },
-                    )
-                  : d === "cancelled"
-                    ? this.say(h.text || "Neyse, bo\u015F ver.", { instant: !0 })
-                    : this.say(h?.text || "Hmm... Ne diyecektim, unuttum gitti.", { instant: !0 }));
-          let u = d !== "cancelled" && this.actOnWords(e, n, "");
-          u && (this.say(u, { instant: !0 }), this.closeLater(2.8));
-        } finally {
-          this.busy === i && (this.busy = null);
-        }
-        if (this.npc === e) {
-          if (s && s.state === "offered") {
-            this.renderOptions([
-              {
-                t: `"${s.title}" \u2014 Kabul ediyorum.`,
-                hl: !0,
-                fn: () => {
-                  (this.accept(s), this.menu());
-                },
-              },
-              { t: "\u015Eimdi olmaz.", fn: () => this.menu() },
-            ]);
-            return;
-          }
-          (o && ((this.tradeEl.hidden = !1), this.renderTrade()), this.menu());
-        }
+        this.inputMode = !1;
       }
       bark(t, e) {
         let n = this.G;
@@ -61805,7 +61622,7 @@ uniform float uWet; uniform float uNight;`,
             : this.npcState(t).rumored &&
               !u &&
               Math.random() < 0.5 &&
-              (i = Ne(["Yolcu! Bir dakika gelir misin?", "Hey, sana bir \u015Fey soraca\u011F\u0131m!"]));
+              (i = Ne(["Yolcu! Bir dakika gelir misin?", "Hey, sana bir şey soracağım!"]));
         }
         for (let c of this.bubbles) c.npc === t && (c.t = 0);
         let s = document.createElement("div");
@@ -61833,9 +61650,9 @@ uniform float uWet; uniform float uNight;`,
           this.bark(
             e[0],
             Ne([
-              "Hey! Hayvanlar\u0131m\u0131za dokunma!",
-              "Ne yap\u0131yorsun sen?!",
-              "Defol a\u011F\u0131l\u0131m\u0131zdan!",
+              "Hey! Hayvanlarımıza dokunma!",
+              "Ne yapıyorsun sen?!",
+              "Defol ağılımızdan!",
             ]),
           );
       }
@@ -61843,7 +61660,7 @@ uniform float uWet; uniform float uNight;`,
         this.addRep(t, -12);
         let e = (t.npcs || []).filter((n) => !n.inside && n.playerDist < 40);
         for (let n of e.slice(0, 2)) this.bark(n, Ne(qi.angry));
-        this.G.ui?.notify(`${t.site.name} k\xF6y\xFC bunu unutmayacak...`, null, "bad");
+        this.G.ui?.notify(`${t.site.name} köyü bunu unutmayacak...`, null, "bad");
       }
       update(t) {
         let e = this.G,
@@ -62012,7 +61829,7 @@ uniform float uWet; uniform float uNight;`,
               let h = document.createElement("div");
               (this.bubbleLayer.appendChild(h), (c = { el: h, npc: l.n }), this.marks.set(a, c));
             }
-            ((c.el.textContent = l.kind === "new" ? "!" : l.kind === "ready" ? "?" : "\u2026"),
+            ((c.el.textContent = l.kind === "new" ? "!" : l.kind === "ready" ? "?" : "…"),
               (c.el.className = "qmark " + l.kind));
           }
         }
@@ -62088,11 +61905,11 @@ uniform float uWet; uniform float uNight;`,
         let i = this.ready(n);
         ((t.querySelector(".tq-title").textContent = n.title),
           (t.querySelector(".tq-goal").textContent = i
-            ? `${n.giverName} seni bekliyor \u2014 geri d\xF6n!`
+            ? `${n.giverName} seni bekliyor — geri dön!`
             : `${n.goal} \xB7 ${this.needText(n)}`),
           (t.querySelector(".tq-from").textContent =
             `${n.giverName} \xB7 ${n.villageName}` +
-            (e.length > 1 ? `   (+${e.length - 1} g\xF6rev \xB7 [L])` : "   [L] g\xF6rev defteri")),
+            (e.length > 1 ? `   (+${e.length - 1} görev \xB7 [L])` : "   [L] görev defteri")),
           t.classList.toggle("ready", i));
       }
       questTargets() {
@@ -62145,14 +61962,14 @@ uniform float uWet; uniform float uNight;`,
           let a = document.createElement("p");
           ((a.className = "ql-empty"),
             (a.textContent =
-              "Hen\xFCz bir yan g\xF6revin yok. K\xF6yl\xFClerle sohbet et; dertlerini anlatt\u0131k\xE7a i\u015Fler a\xE7\u0131l\u0131r!"),
+              "Henüz bir yan görevin yok. Köylülerle sohbet et; dertlerini anlattıkça işler açılır!"),
             t.appendChild(a));
         }
         for (let a of n) {
           let l = document.createElement("div");
           ((l.className = "ql-item" + (a.id === this.S.track ? " on" : "") + (this.ready(a) ? " ready" : "")),
             (l.innerHTML =
-              '<h4></h4><p class="g"></p><p class="f"></p><div class="ql-row"><button class="ql-track"></button><button class="ql-drop">B\u0131rak</button></div>'),
+              '<h4></h4><p class="g"></p><p class="f"></p><div class="ql-row"><button class="ql-track"></button><button class="ql-drop">Bırak</button></div>'),
             (l.querySelector("h4").textContent = a.title),
             (l.querySelector(".g").textContent = `${a.goal} \xB7 ${this.needText(a)}`));
           let c = a.reward.items
@@ -62162,9 +61979,9 @@ uniform float uWet; uniform float uNight;`,
                 .join(", ")
             : "";
           l.querySelector(".f").textContent =
-            `${a.giverName}, ${a.villageName} \xB7 \xD6d\xFCl: ${a.reward.coins} ak\xE7e${c}`;
+            `${a.giverName}, ${a.villageName} \xB7 Ödül: ${a.reward.coins} akçe${c}`;
           let h = l.querySelector(".ql-track");
-          ((h.textContent = a.id === this.S.track ? "\u0130zleniyor" : "\u0130zle"),
+          ((h.textContent = a.id === this.S.track ? "İzleniyor" : "İzle"),
             (h.onclick = () => {
               ((this.S.track = a.id), this.renderLog(), this.renderTracker());
             }),
@@ -62173,15 +61990,8 @@ uniform float uWet; uniform float uNight;`,
             }),
             t.appendChild(l));
         }
-        let s = this.G.villages.known.size,
-          o = Object.entries(this.S.rep)
-            .map(([a, l]) => {
-              let c = this.villageSite(a);
-              return c ? `${c.name}: ${this.repLabel(l)}` : null;
-            })
-            .filter(Boolean);
-        this.logEl.querySelector(".ql-foot").textContent =
-          `Tamamlanan: ${i.length} \xB7 Bilinen k\xF6y: ${s}${o.length ? " \xB7 " + o.join(" \xB7 ") : ""}`;
+        let s = this.G.villages.known.size;
+        this.logEl.querySelector(".ql-foot").textContent = `Tamamlanan: ${i.length} \xB7 Bilinen köy: ${s}`;
       }
       buildDOM() {
         let t = document.createElement("div");
@@ -62195,7 +62005,6 @@ uniform float uWet; uniform float uNight;`,
       </div>
       <div class="dlg-you" hidden></div>
       <div class="dlg-bottom">
-        <div class="dlg-input" hidden><input maxlength="300" placeholder="Ne s\xF6ylemek istersin?  (Enter: s\xF6yle \xB7 Esc: vazge\xE7)"><button>S\xF6yle</button></div>
         <div class="dlg-opts"></div>
       </div>`),
           document.body.appendChild(t),
@@ -62208,15 +62017,6 @@ uniform float uWet; uniform float uNight;`,
           (this.optsEl = t.querySelector(".dlg-opts")),
           (this.bottomEl = t.querySelector(".dlg-bottom")),
           (this.youEl = t.querySelector(".dlg-you")),
-          (this.inputWrap = t.querySelector(".dlg-input")),
-          (this.inputEl = this.inputWrap.querySelector("input")),
-          (this.inputWrap.querySelector("button").onclick = () => this.sendFree(this.inputEl.value)),
-          this.inputEl.addEventListener("keydown", (o) => {
-            (o.stopPropagation(),
-              o.key === "Enter" && this.sendFree(this.inputEl.value),
-              o.key === "Escape" && (o.preventDefault(), this.endInput()));
-          }),
-          this.inputEl.addEventListener("keyup", (o) => o.stopPropagation()),
           (this.balloon.onclick = () => {
             this.typeTarget && this.typeI < this.typeTarget.length && (this.typeI = this.typeTarget.length);
           }));
@@ -62224,8 +62024,8 @@ uniform float uWet; uniform float uNight;`,
         ((e.id = "trade"),
           (e.hidden = !0),
           (e.innerHTML = `<div class="tr-head"><b>PAZAR</b><span id="tradeWho"></span></div>
-      <div class="tr-purse">Kesende <em id="tradeCoins">0</em> ak\xE7e <small>\xB7 Shift+t\u0131k: 5 adet</small></div>
-      <div class="tr-cols"><div><h4>Sat\u0131n al</h4><div id="tradeBuy" class="tr-list"></div></div><div><h4>Sat</h4><div id="tradeSell" class="tr-list"></div></div></div>`),
+      <div class="tr-purse">Kesende <em id="tradeCoins">0</em> akçe <small>\xB7 Shift+tık: 5 adet</small></div>
+      <div class="tr-cols"><div><h4>Satın al</h4><div id="tradeBuy" class="tr-list"></div></div><div><h4>Sat</h4><div id="tradeSell" class="tr-list"></div></div></div>`),
           document.body.appendChild(e),
           (this.tradeEl = e));
         let n = document.createElement("div");
@@ -62234,7 +62034,7 @@ uniform float uWet; uniform float uNight;`,
         ((i.id = "questTrack"),
           (i.hidden = !0),
           (i.innerHTML =
-            '<div class="tq-tag">YAN G\xD6REV</div><div class="tq-title"></div><div class="tq-goal"></div><div class="tq-from"></div>'),
+            '<div class="tq-tag">YAN GÖREV</div><div class="tq-title"></div><div class="tq-goal"></div><div class="tq-from"></div>'),
           (co("rightCol") || co("hud") || document.body).appendChild(i),
           (this.trackEl = i));
         let s = document.createElement("div");
@@ -62242,7 +62042,7 @@ uniform float uWet; uniform float uNight;`,
           (s.className = "screen panel-screen"),
           (s.hidden = !0),
           (s.innerHTML =
-            '<div class="ql-page"><h2>G\xD6REV DEFTER\u0130</h2><div class="ql-list"></div><p class="ql-foot"></p><p class="hint">[L] ya da [Esc] kapat</p></div>'),
+            '<div class="ql-page"><h2>GÖREV DEFTERİ</h2><div class="ql-list"></div><p class="ql-foot"></p><p class="hint">[L] ya da [Esc] kapat</p></div>'),
           s.addEventListener("mousedown", (o) => {
             o.target === s && this.closeLog();
           }),
@@ -62403,10 +62203,10 @@ uniform float uWet; uniform float uNight;`,
           e = t.player.pos,
           n = t.gen.nearestSite?.(e.x, e.z, 1);
         return n && n.d < n.site.r + 60
-          ? `${n.site.name} k\xF6y\xFCnde`
+          ? `${n.site.name} köyünde`
           : n && n.d < 420
-            ? `${n.site.name} yak\u0131n\u0131nda`
-            : "Orman\u0131n derinliklerinde";
+            ? `${n.site.name} yakınında`
+            : "Ormanın derinliklerinde";
       }
       serialize() {
         let t = this.G;
@@ -64024,7 +63824,7 @@ uniform float uWet; uniform float uNight;`,
         ((e.hidden = !1),
           (e.className = t.mode === "bite" ? "bite" : ""),
           t.mode === "charge"
-            ? ((Nt("fishLabel").textContent = "At\u0131\u015F g\xFCc\xFC \u2014 b\u0131rak!"),
+            ? ((Nt("fishLabel").textContent = "Atış gücü — bırak!"),
               (Nt("fishProg").style.width = t.v * 100 + "%"),
               (Nt("fishTens").parentElement.style.display = "none"))
             : t.mode === "bite"
@@ -64032,7 +63832,7 @@ uniform float uWet; uniform float uNight;`,
                 (Nt("fishProg").style.width = "0%"),
                 (Nt("fishTens").parentElement.style.display = "none"))
               : ((Nt("fishLabel").textContent =
-                  "Bas\u0131l\u0131 tut: sar \xB7 Gerilim k\u0131rm\u0131z\u0131ya varmas\u0131n!"),
+                  "Basılı tut: sar \xB7 Gerilim kırmızıya varmasın!"),
                 (Nt("fishProg").style.width = yt(t.progress, 0, 1) * 100 + "%"),
                 (Nt("fishTens").parentElement.style.display = "block"),
                 (Nt("fishTens").style.width = yt(t.tension, 0, 1) * 100 + "%")));
@@ -64143,8 +63943,8 @@ uniform float uWet; uniform float uNight;`,
               "placeHint",
               "text",
               e.building.valid
-                ? "[Sol T\u0131k] Yerle\u015Ftir \xB7 [R] D\xF6nd\xFCr"
-                : e.building.reason || "Buraya yerle\u015Ftirilemez",
+                ? "[Sol Tık] Yerleştir \xB7 [R] Döndür"
+                : e.building.reason || "Buraya yerleştirilemez",
             ));
         else if ((this.set("placeHint", "hidden", !0), o.prompt)) {
           this.set("prompt", "hidden", !1);
@@ -64194,16 +63994,16 @@ uniform float uWet; uniform float uNight;`,
         let y = [];
         (n.bleed > 0 && y.push('<span class="bad">Kanama</span>'),
           n.poison > 0 && y.push('<span class="bad">Zehirlenme</span>'),
-          n.cold > 0.2 && y.push('<span class="cold">\xDC\u015F\xFCyor</span>'),
-          i.temp > 39 && y.push('<span class="bad">Bunald\u0131</span>'),
+          n.cold > 0.2 && y.push('<span class="cold">Üşüyor</span>'),
+          i.temp > 39 && y.push('<span class="bad">Bunaldı</span>'),
           n.wet > 0.3 && y.push('<span class="cold">Islak</span>'),
-          n.warmth > 0.15 && y.push('<span class="good">Is\u0131n\u0131yor</span>'),
-          n.sheltered && y.push('<span class="good">Korunakl\u0131</span>'),
-          i.food < 15 && y.push('<span class="bad">A\xE7</span>'),
+          n.warmth > 0.15 && y.push('<span class="good">Isınıyor</span>'),
+          n.sheltered && y.push('<span class="good">Korunaklı</span>'),
+          i.food < 15 && y.push('<span class="bad">Aç</span>'),
           i.water < 15 && y.push('<span class="bad">Susuz</span>'),
           this.set("status", "html", y.join("")));
         let g = e.env;
-        (this.set("clockText", "text", `G\xFCn ${g.day} \xB7 ${g.clockString()}`),
+        (this.set("clockText", "text", `Gün ${g.day} \xB7 ${g.clockString()}`),
           this.set("coinText", "text", String(n.coins ?? 0)));
         let m = g.nightFactor > 0.5;
         (this.cache.night !== m &&
@@ -64292,7 +64092,7 @@ uniform float uWet; uniform float uNight;`,
           (Nt("craftSection").hidden = !(t === "inv" || t === "craft")),
           t === "chest" &&
             (Nt("chestTitle").textContent =
-              e?.type === "deathbag" ? "Kay\u0131p E\u015Fyalar\u0131n" : "Sand\u0131k"),
+              e?.type === "deathbag" ? "Kayıp Eşyaların" : "Sandık"),
           n.audio?.ui("open"),
           this.renderPanel());
       }
@@ -64353,17 +64153,17 @@ uniform float uWet; uniform float uNight;`,
         }
         let n = kt[t.id],
           i = [];
-        (n.food && i.push(`A\xE7l\u0131k +${n.food}`),
+        (n.food && i.push(`Açlık +${n.food}`),
           n.water && i.push(`Su +${n.water}`),
           n.heal && i.push(`Can +${n.heal}`),
           n.dmg && i.push(`Hasar ${n.dmg}`),
-          n.throwDmg && n.throwable && i.push(`F\u0131rlatma ${n.throwDmg}`),
-          Rr[t.id] && i.push(`Yak\u0131t ${Rr[t.id]} sn`),
-          n.cookTo && i.push(`Pi\u015Fer \u2192 ${kt[n.cookTo].name}`),
+          n.throwDmg && n.throwable && i.push(`Fırlatma ${n.throwDmg}`),
+          Rr[t.id] && i.push(`Yakıt ${Rr[t.id]} sn`),
+          n.cookTo && i.push(`Pişer \u2192 ${kt[n.cookTo].name}`),
           n.dur &&
             t.d !== void 0 &&
             i.push(
-              n.charges ? `Dolu: ${t.d}/${n.dur}` : `Dayan\u0131kl\u0131l\u0131k ${Math.ceil(t.d)}/${n.dur}`,
+              n.charges ? `Dolu: ${t.d}/${n.dur}` : `Dayanıklılık ${Math.ceil(t.d)}/${n.dur}`,
             ),
           (e.innerHTML = `<h4></h4><p></p>${i.length ? `<div class="stats">${i.map((s) => `<span>${s}</span>`).join("")}</div>` : ""}`),
           (e.querySelector("h4").textContent = n.name),
@@ -64482,14 +64282,14 @@ uniform float uWet; uniform float uNight;`,
         let t = this.panelStruct;
         if (!t) return;
         let e = t.data.lit;
-        Nt("btnFire").textContent = e ? "Ate\u015Fi S\xF6nd\xFCr" : "Ate\u015Fi Yak";
+        Nt("btnFire").textContent = e ? "Ateşi Söndür" : "Ateşi Yak";
         let n = t.inv.slots[0],
           i = Math.max(0, t.data.burn) + (n ? (Rr[n.id] || 0) * n.n : 0);
         ((Nt("fireState").textContent = e
-          ? `Yan\u0131yor \xB7 ~${Math.round(i)} sn yak\u0131t`
+          ? `Yanıyor \xB7 ~${Math.round(i)} sn yakıt`
           : i > 0
-            ? "S\xF6n\xFCk"
-            : "Yak\u0131t yok"),
+            ? "Sönük"
+            : "Yakıt yok"),
           (Nt("fireState").className = "bench" + (e ? " ok" : "")));
         let s = "";
         for (let o = 1; o <= 4; o++) {
@@ -64508,12 +64308,12 @@ uniform float uWet; uniform float uNight;`,
           if (e.data.lit) ((e.data.lit = !1), t.audio?.fizzle(e.pos));
           else {
             if (!(e.data.burn > 0 || (e.inv.slots[0] && Rr[e.inv.slots[0].id]))) {
-              (this.notify("\xD6nce yak\u0131t koy (odun, dal...).", null, "bad"), t.audio?.ui("error"));
+              (this.notify("Önce yakıt koy (odun, dal...).", null, "bad"), t.audio?.ui("error"));
               return;
             }
             if ((t.env.rainAmount || 0) > 0.5 && !t.structures.roofAbove(e.pos)) {
               this.notify(
-                "Ya\u011Fmurda ate\u015F tutu\u015Fmuyor. \xDCst\xFCne \xE7at\u0131 yap!",
+                "Yağmurda ateş tutuşmuyor. Üstüne çatı yap!",
                 null,
                 "bad",
               );
@@ -64523,9 +64323,9 @@ uniform float uWet; uniform float uNight;`,
               if (t.inventory.count("flint") > 0)
                 Math.random() < 0.3 &&
                   (t.inventory.remove("flint", 1),
-                  this.notify("\xC7akmakta\u015F\u0131 a\u015F\u0131nd\u0131 (-1)", "flint"));
+                  this.notify("Çakmaktaşı aşındı (-1)", "flint"));
               else {
-                (this.notify("Ate\u015F yakmak i\xE7in \xC7akmakta\u015F\u0131 gerekli!", "flint", "bad"),
+                (this.notify("Ateş yakmak için Çakmaktaşı gerekli!", "flint", "bad"),
                   t.audio?.ui("error"));
                 return;
               }
@@ -64542,7 +64342,7 @@ uniform float uWet; uniform float uNight;`,
         let t = this.G,
           e = t.nearBench(),
           n = Nt("benchState");
-        ((n.textContent = e ? "Tezgah yak\u0131nda" : "Tezgah yok"),
+        ((n.textContent = e ? "Tezgah yakında" : "Tezgah yok"),
           (n.className = "bench" + (e ? " ok" : "")));
         let i = Nt("craftTabs");
         if (!i.childElementCount)
@@ -64585,10 +64385,10 @@ uniform float uWet; uniform float uNight;`,
           h += `<div class="ing${y < l.in[p] ? " miss" : ""}"><img src="${this.icons[p] || ""}" alt=""><span>${kt[p].name}</span><span class="have">${y}/${l.in[p]}</span></div>`;
         }
         l.bench &&
-          (h += `<div class="ing${e ? "" : " miss"}"><span>\xC7al\u0131\u015Fma tezgah\u0131 yak\u0131n\u0131nda</span><span class="have">${e ? "\u2713" : "\u2717"}</span></div>`);
+          (h += `<div class="ing${e ? "" : " miss"}"><span>Çalışma tezgahı yakınında</span><span class="have">${e ? "\u2713" : "\u2717"}</span></div>`);
         let d = Math.min(10, t.crafting.maxTimes(l));
-        ((h += `<div class="row"><button class="btn primary small" id="btnCraft1">\xDCret${l.n > 1 ? " (" + l.n + ")" : ""}</button>${d > 1 ? `<button class="btn ghost small" id="btnCraftMax">x${d}</button>` : ""}</div>`),
-          (h += `<p style="margin-top:8px">S\xFCre: ${l.time} sn</p>`),
+        ((h += `<div class="row"><button class="btn primary small" id="btnCraft1">Üret${l.n > 1 ? " (" + l.n + ")" : ""}</button>${d > 1 ? `<button class="btn ghost small" id="btnCraftMax">x${d}</button>` : ""}</div>`),
+          (h += `<p style="margin-top:8px">Süre: ${l.time} sn</p>`),
           (a.innerHTML = h),
           (a.querySelector("h3").textContent = c.name),
           (a.querySelector("p").textContent = c.desc || ""));
@@ -64602,7 +64402,7 @@ uniform float uWet; uniform float uNight;`,
                 : (t.audio?.ui("error"),
                   this.notify(
                     l.bench && !t.nearBench()
-                      ? "Bunun i\xE7in \xE7al\u0131\u015Fma tezgah\u0131 laz\u0131m."
+                      ? "Bunun için çalışma tezgahı lazım."
                       : "Malzemen yetmiyor.",
                     null,
                     "bad",
@@ -64785,17 +64585,17 @@ uniform float uWet; uniform float uNight;`,
       A.rend = new Fh(A, t);
     } catch {
       Te("loadText").textContent =
-        "WebGL ba\u015Flat\u0131lamad\u0131. Taray\u0131c\u0131n 3D grafikleri desteklemiyor olabilir.";
+        "WebGL başlatılamadı. Tarayıcın 3D grafikleri desteklemiyor olabilir.";
       return;
     }
     ((A.input = new Jh(t)), (A.ui = new gu(A)), (A.assetProgress = 0));
     let e = l1((c) => (A.assetProgress = c)).catch((c) => {
       (console.warn("SEKAS: character assets failed, using fallback rig", c), (A.assetError = String(c)));
     });
-    (A.ui.loading(0.05, "Orman tohumlar\u0131 ekiliyor\u2026"),
+    (A.ui.loading(0.05, "Orman tohumları ekiliyor…"),
       await zr(),
       (A.flora = new Ch()),
-      A.ui.loading(0.2, "A\u011Fa\xE7lar \u015Fekilleniyor\u2026"),
+      A.ui.loading(0.2, "Ağaçlar şekilleniyor…"),
       await zr(),
       (A.gen = new Sh(1)),
       (A.water = new Oh(A)),
@@ -64834,7 +64634,7 @@ uniform float uWet; uniform float uNight;`,
     for (; !i; ) {
       let c = Math.min(1, A.assetProgress || 0);
       if (
-        (A.ui.loading(0.22 + 0.06 * c, `Karakterler haz\u0131rlan\u0131yor\u2026 %${Math.round(c * 100)}`),
+        (A.ui.loading(0.22 + 0.06 * c, `Karakterler hazırlanıyor… %${Math.round(c * 100)}`),
         await new Promise((h) => setTimeout(h, 120)),
         A.assetProgress !== s)
       )
@@ -64870,11 +64670,11 @@ uniform float uWet; uniform float uNight;`,
           ((A.intentionalUnlock = !1), A.input.lock(c));
       }),
       lg(!0),
-      A.ui.loading(0.3, "E\u015Fyalar \xE7iziliyor\u2026"),
+      A.ui.loading(0.3, "Eşyalar çiziliyor…"),
       await Promise.race([n, new Promise((c) => setTimeout(c, 8e3))]),
       await zr(),
       A.ui.setIcons(b1(A.rend.renderer)),
-      A.ui.loading(0.38, "Kay\u0131t aran\u0131yor\u2026"),
+      A.ui.loading(0.38, "Kayıt aranıyor…"),
       await zr());
     let a = r && r.save ? r.save : null;
     if (((A.pendingSlot = r?.slot ?? null), !a)) {
@@ -64884,7 +64684,7 @@ uniform float uWet; uniform float uNight;`,
     (a && !A.pendingSlot && (A.pendingSlot = A.saves.latest()?.id ?? null), (A.pendingSave = a));
     let l = a ? a.seed : (window.__seed ?? Math.floor(Math.random() * 1e9));
     (await ag(l, a, 0.38, 0.95),
-      A.ui.loading(1, "Haz\u0131r!"),
+      A.ui.loading(1, "Hazır!"),
       await zr(),
       (Te("loading").hidden = !0),
       Pz(),
@@ -64915,7 +64715,7 @@ uniform float uWet; uniform float uNight;`,
     for (; A.world.pendingCount() > 0; ) {
       A.world.processQueue(28);
       let o = 1 - A.world.pendingCount() / s;
-      (A.ui.loading(e + (n - e) * o, `Orman b\xFCy\xFCyor\u2026 %${Math.round(o * 100)}`), await zr());
+      (A.ui.loading(e + (n - e) * o, `Orman büyüyor… %${Math.round(o * 100)}`), await zr());
     }
     return ((A.menuFocus.y = A.gen.heightAt(i.x, i.z)), i);
   }
@@ -64944,7 +64744,7 @@ uniform float uWet; uniform float uNight;`,
       kr(A.settings),
       A.audio.setMusic(r),
       A.ui?.notify(
-        r ? "Piyano m\xFCzi\u011Fi a\xE7\u0131k \u266A  [N]" : "Piyano m\xFCzi\u011Fi kapal\u0131  [N]",
+        r ? "Piyano müziği açık \u266A  [N]" : "Piyano müziği kapalı  [N]",
         null,
       ));
   };
@@ -65135,7 +64935,7 @@ uniform float uWet; uniform float uNight;`,
       (Te("btnSlots").hidden = A.saves.list().length === 0));
     let t = A.pendingSlot ? A.saves.entry(A.pendingSlot) : null;
     ((Te("menuInfo").textContent = r
-      ? `Son oyun: "${t?.name || "Orman"}" \xB7 ${A.pendingSave.env?.day || 1}. g\xFCn`
+      ? `Son oyun: "${t?.name || "Orman"}" \xB7 ${A.pendingSave.env?.day || 1}. gün`
       : ""),
       (A.player.char.root.visible = !1),
       (A.menuAngle = Math.random() * Math.PI * 2),
@@ -65175,13 +64975,13 @@ uniform float uWet; uniform float uNight;`,
           s = A.saves.entry(A.saves.slot);
         Te("saveInfo").textContent = i
           ? `"${s?.name || "Oyun"}" kaydedildi.`
-          : "Kaydedilemedi (taray\u0131c\u0131 depolamas\u0131 dolu ya da kapal\u0131 olabilir).";
+          : "Kaydedilemedi (tarayıcı depolaması dolu ya da kapalı olabilir).";
       }),
       r("btnSaveAs", () => {
         let i = A.saves.saveAs();
         Te("saveInfo").textContent = i
-          ? `Ayr\u0131 bir kay\u0131t olu\u015Fturuldu: "${i.name}". Bundan sonra oyun oraya kaydedilecek.`
-          : "Kaydedilemedi (taray\u0131c\u0131 depolamas\u0131 dolu olabilir).";
+          ? `Ayrı bir kayıt oluşturuldu: "${i.name}". Bundan sonra oyun oraya kaydedilecek.`
+          : "Kaydedilemedi (tarayıcı depolaması dolu olabilir).";
       }),
       r("btnPSettings", () => qv("pause")),
       r("btnPControls", () => Xv("pause")),
@@ -65287,7 +65087,7 @@ uniform float uWet; uniform float uNight;`,
           o
             ? ((A.input.freeLook = !0),
               A.ui.notify(
-                "Fare kilidi kullan\u0131lam\u0131yor; fareyi kenara g\xF6t\xFCrerek d\xF6nebilirsin.",
+                "Fare kilidi kullanılamıyor; fareyi kenara götürerek dönebilirsin.",
                 null,
               ))
             : A.state === "playing" && !A.ui.panelOpen && !A.ui.mapOpen && Pe("clickToPlay", !0);
@@ -65357,11 +65157,11 @@ uniform float uWet; uniform float uNight;`,
   }
   var Lz = (r) => {
     let t = Math.max(0, (Date.now() - r) / 1e3);
-    if (t < 60) return "az \xF6nce";
-    if (t < 3600) return `${Math.floor(t / 60)} dk \xF6nce`;
-    if (t < 86400) return `${Math.floor(t / 3600)} saat \xF6nce`;
+    if (t < 60) return "az önce";
+    if (t < 3600) return `${Math.floor(t / 60)} dk önce`;
+    if (t < 86400) return `${Math.floor(t / 3600)} saat önce`;
     let e = Math.floor(t / 86400);
-    return e === 1 ? "d\xFCn" : `${e} g\xFCn \xF6nce`;
+    return e === 1 ? "dün" : `${e} gün önce`;
   };
   function Dz() {
     (Pe("slots", !0), xu());
@@ -65372,7 +65172,7 @@ uniform float uWet; uniform float uNight;`,
     let t = A.saves.list();
     if (!t.length) {
       let e = document.createElement("p");
-      ((e.className = "svempty"), (e.textContent = "Hen\xFCz kay\u0131tl\u0131 oyun yok."), r.append(e));
+      ((e.className = "svempty"), (e.textContent = "Henüz kayıtlı oyun yok."), r.append(e));
       return;
     }
     for (let e of t) {
@@ -65383,7 +65183,7 @@ uniform float uWet; uniform float uNight;`,
       let s = document.createElement("b");
       ((s.className = "svname"),
         (s.textContent = e.name),
-        (s.title = "Ad\u0131n\u0131 de\u011Fi\u015Ftirmek i\xE7in t\u0131kla"),
+        (s.title = "Adını değiştirmek için tıkla"),
         s.addEventListener("click", () => {
           let d = document.createElement("input");
           ((d.value = e.name), (d.maxLength = 32), (s.textContent = ""), s.append(d), d.focus(), d.select());
@@ -65396,10 +65196,10 @@ uniform float uWet; uniform float uNight;`,
       o.className = "svsub";
       let a = e.meta || {};
       ((o.textContent = [
-        `${a.day || 1}. g\xFCn ${a.clock || ""}`.trim(),
+        `${a.day || 1}. gün ${a.clock || ""}`.trim(),
         a.place,
-        a.dead ? "\xF6ld\xFCn" : `can %${a.hp ?? 100}`,
-        `${a.coins || 0} ak\xE7e`,
+        a.dead ? "öldün" : `can %${a.hp ?? 100}`,
+        `${a.coins || 0} akçe`,
         Lz(e.ts),
       ]
         .filter(Boolean)
@@ -65414,7 +65214,7 @@ uniform float uWet; uniform float uNight;`,
           (d.stopPropagation(), A.audio.init(), A.audio.ui("select"));
           let u = A.saves.read(e.id);
           if (!u) {
-            o.textContent = "Bu kay\u0131t okunamad\u0131.";
+            o.textContent = "Bu kayıt okunamadı.";
             return;
           }
           ((A.pendingSave = u), (A.pendingSlot = e.id), Pe("slots", !1), sc(!1));
@@ -65439,12 +65239,12 @@ uniform float uWet; uniform float uNight;`,
                 (Te("btnSlots").hidden = A.saves.list().length === 0));
               let y = A.pendingSlot ? A.saves.entry(A.pendingSlot) : null;
               Te("menuInfo").textContent = A.pendingSave
-                ? `Son oyun: "${y?.name || "Orman"}" \xB7 ${A.pendingSave.env?.day || 1}. g\xFCn`
+                ? `Son oyun: "${y?.name || "Orman"}" \xB7 ${A.pendingSave.env?.day || 1}. gün`
                 : "";
             }));
           let p = document.createElement("button");
           ((p.className = "btn ghost small"),
-            (p.textContent = "Vazge\xE7"),
+            (p.textContent = "Vazgeç"),
             p.addEventListener("click", () => xu()),
             l.append(u, f, p));
         }),
@@ -65486,7 +65286,7 @@ uniform float uWet; uniform float uNight;`,
       Pe("confirmNew", !1),
       Pe("slots", !1),
       Pe("loading", !0),
-      A.ui.loading(0.05, r ? "Yeni bir orman do\u011Fuyor\u2026" : "Ormana d\xF6n\xFCl\xFCyor\u2026"),
+      A.ui.loading(0.05, r ? "Yeni bir orman doğuyor…" : "Ormana dönülüyor…"),
       await zr());
     let n = r ? null : A.pendingSave;
     if (((A.saves.slot = r ? A.saves.create(e) : A.pendingSlot || A.saves.create()), r)) {
@@ -65564,16 +65364,16 @@ uniform float uWet; uniform float uNight;`,
       (A.pendingSave = null),
       n ||
         (setTimeout(
-          () => A.ui.notify("Ho\u015F geldin! [W A S D] y\xFCr\xFC, fareyle bak, [Tab] envanter.", null),
+          () => A.ui.notify("Hoş geldin! [W A S D] yürü, fareyle bak, [Tab] envanter.", null),
           800,
         ),
-        setTimeout(() => A.ui.notify("Sa\u011F \xFCstteki rehberi takip et. [J] gizler.", null), 3500)),
+        setTimeout(() => A.ui.notify("Sağ üstteki rehberi takip et. [J] gizler.", null), 3500)),
       n?.player?.dead && A.player.respawn(),
       A.worldRegrown &&
         ((A.worldRegrown = !1),
         setTimeout(
           () =>
-            A.ui.notify("D\xFCnya g\xFCncellendi: orman yeniden b\xFCy\xFCd\xFC, k\xF6yler yenilendi.", null),
+            A.ui.notify("Dünya güncellendi: orman yeniden büyüdü, köyler yenilendi.", null),
           1500,
         )),
       A.requestLock(),
@@ -65641,7 +65441,7 @@ uniform float uWet; uniform float uNight;`,
       lg(),
       (Te("setQuality").value = A.settings.quality),
       A.ui.notify(
-        `Ak\u0131c\u0131l\u0131k i\xE7in grafik kalitesi "${vh[A.settings.quality].name}" yap\u0131ld\u0131 (Ayarlar'dan de\u011Fi\u015Ftirebilirsin).`,
+        `Akıcılık için grafik kalitesi "${vh[A.settings.quality].name}" yapıldı (Ayarlar'dan değiştirebilirsin).`,
         null,
       ),
       (rs.done = !1),
@@ -65747,7 +65547,7 @@ uniform float uWet; uniform float uNight;`,
     Iz(r || {}).catch((t) => {
       console.error(t);
       let e = Te("loadText");
-      e && (e.textContent = "Bir hata olu\u015Ftu: " + (t && t.message ? t.message : t));
+      e && (e.textContent = "Bir hata oluştu: " + (t && t.message ? t.message : t));
     });
   }
   try {
