@@ -42288,24 +42288,42 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
               m = t.z + y;
             return [g, i.gen.heightAt(g, m), m];
           };
+          let LC = [
+              [-o, -a],
+              [o, -a],
+              [o, a],
+              [-o, a],
+            ],
+            NM = [
+              [0, 1],
+              [-1, 0],
+              [0, -1],
+              [1, 0],
+            ],
+            opp = (c + 2) % 4,
+            hayC = LC[(c + 3) % 4],
+            shC = LC[opp];
           {
-            let [u, f, p] = d(o - 1.2, 0);
-            (e.box("woodL", u, f + 0.28, p, 0.7, 0.5, 2.2, 16777215, { ry: t.yaw }),
-              e.box("plain", u, f + 0.5, p, 0.52, 0.04, 2, 4024970, { ry: t.yaw }),
+            let mx = (LC[opp][0] + LC[(opp + 1) % 4][0]) / 2 + NM[opp][0] * 1.2,
+              mz = (LC[opp][1] + LC[(opp + 1) % 4][1]) / 2 + NM[opp][1] * 1.2,
+              [u, f, p] = d(mx, mz),
+              al = opp % 2 === 0;
+            (e.box("woodL", u, f + 0.28, p, al ? 2.2 : 0.7, 0.5, al ? 0.7 : 2.2, 16777215, { ry: t.yaw }),
+              e.box("plain", u, f + 0.5, p, al ? 2 : 0.52, 0.04, al ? 0.52 : 2, 4024970, { ry: t.yaw }),
               this.boxes.push({
                 cx: u,
                 cy: f + 0.28,
                 cz: p,
-                hx: 0.36,
+                hx: al ? 1.12 : 0.36,
                 hy: 0.3,
-                hz: 1.12,
+                hz: al ? 0.36 : 1.12,
                 yaw: t.yaw,
                 noStep: !0,
               }),
               (t.trough = { x: u, y: f, z: p }));
           }
           {
-            let [u, f, p] = d(-o + 1.4, -a + 1.4);
+            let [u, f, p] = d(hayC[0] - Math.sign(hayC[0]) * 1.4, hayC[1] - Math.sign(hayC[1]) * 1.4);
             e.box("woodD", u, f + 0.7, p, 1.5, 0.08, 0.08, 16777215, { ry: t.yaw });
             for (let y of [-0.7, 0.7]) {
               let [g, m] = _n(y, 0, t.yaw);
@@ -42325,7 +42343,7 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
               (t.hay = { x: u, y: f, z: p }));
           }
           {
-            let [u, f, p] = d(o - 2.2, -a + 2);
+            let [u, f, p] = d(shC[0] - Math.sign(shC[0]) * 2.2, shC[1] - Math.sign(shC[1]) * 2);
             for (let [y, g] of [
               [-1.4, -1.2],
               [1.4, -1.2],
@@ -49882,6 +49900,22 @@ uniform float uWet; uniform float uNight;`,
         r
       );
     },
+    sword_stone() {
+      let r = new bt();
+      (r.add(dt(new $t(0.02, 0.022, 0.2, 7), Kt.woodD, 0, 0, 0)),
+        r.add(dt(new jt(0.03, 7, 5), Kt.woodD, 0, -0.105, 0)),
+        r.add(dt(new he(0.2, 0.035, 0.045), Kt.woodD, 0, 0.115, 0)),
+        r.add(dt(new en(0.032, 0.008, 5, 10), Kt.fiber, 0, 0.065, 0, Math.PI / 2)),
+        r.add(dt(new en(0.032, 0.008, 5, 10), Kt.fiber, 0, 0.035, 0, Math.PI / 2)));
+      (r.add(dt(new he(0.075, 0.38, 0.022), Kt.stone, 0, 0.35, 0, 0, 0, 0, { flat: !0, rough: 0.55 })),
+        r.add(dt(new he(0.053, 0.053, 0.022), Kt.stone, 0, 0.54, 0, 0, 0, Math.PI / 4, { flat: !0, rough: 0.55 })),
+        r.add(dt(new he(0.02, 0.36, 0.03), 8618883, 0, 0.35, 0, 0, 0, 0, { flat: !0, rough: 0.6 })));
+      for (let n of [0.22, 0.34, 0.46]) {
+        let o = n > 0.3 ? 1 : -1;
+        r.add(dt(new he(0.016, 0.05, 0.02), 7303282, 0.0385 * o, n + 0.12, 0, 0, 0, 0, { flat: !0, rough: 0.6 }));
+      }
+      return r;
+    },
     club() {
       let r = new bt();
       r.add(dt(yn(0.028, 0.065, 0.62, 8, 3, 0.02, 0, 0, 13), 9068862, 0, -0.08, 0));
@@ -50838,6 +50872,23 @@ uniform float uWet; uniform float uNight;`,
         phys: { t: "box", s: [0.04, 0.45, 0.02], m: 1.4 },
         desc: "Köy demircisinin en iyi işi. Kurtlara karşı güvencen.",
       },
+      sword_stone: {
+        name: "Taş Kılıç",
+        cat: "weapon",
+        stack: 1,
+        model: "sword_stone",
+        dur: 260,
+        dmg: 20,
+        speed: 0.58,
+        stamina: 6,
+        knock: 3.5,
+        pose: "tool",
+        act: "swing",
+        value: 30,
+        grip: pr,
+        phys: { t: "box", s: [0.05, 0.5, 0.025], m: 1.1 },
+        desc: "Keskin bir taş, sağlam bir sapa lifle bağlanmış. Taş baltadan keskin, demir kılıçtan hafif.",
+      },
       campfire: {
         name: "Kamp Ateşi",
         cat: "build",
@@ -51040,6 +51091,7 @@ uniform float uWet; uniform float uNight;`,
       { out: "snare", n: 1, in: { stick: 4, rope: 2 }, time: 2, cat: "build" },
       { out: "workbench", n: 1, in: { wood: 12, stone: 6 }, time: 3.5, cat: "build" },
       { out: "spear_stone", n: 1, in: { wood: 2, flint: 1, rope: 1 }, time: 2.5, cat: "weapon", bench: !0 },
+      { out: "sword_stone", n: 1, in: { stick: 1, stone: 3, fiber: 2 }, time: 2.8, cat: "weapon", bench: !0 },
       { out: "bow", n: 1, in: { wood: 3, rope: 2 }, time: 3, cat: "weapon", bench: !0 },
       { out: "arrow", n: 4, in: { stick: 2, flint: 1 }, time: 1.5, cat: "weapon", bench: !0 },
       { out: "waterskin", n: 1, in: { hide: 2, rope: 1 }, time: 2.5, cat: "tool", bench: !0 },
@@ -51136,6 +51188,7 @@ uniform float uWet; uniform float uNight;`,
           "iron_axe",
           "iron_knife",
           "sword",
+          "sword_stone",
         ].includes(p) && g.rotation.set(0.2, -0.4, -0.75),
         p === "bow" && g.rotation.set(0.1, -0.5, 0.2),
         kt[p]?.cat === "cloth" && g.rotation.set(1.15, 0, 0),
@@ -61924,6 +61977,7 @@ uniform float uWet; uniform float uNight;`,
       iron_axe: 60,
       iron_knife: 40,
       sword: 95,
+      sword_stone: 30,
       shirt_peasant: 14,
       jacket_ranger: 34,
       jacket_hide: 48,
@@ -61957,7 +62011,7 @@ uniform float uWet; uniform float uNight;`,
         "scarf_wool",
       ],
       innkeeper: ["stew", "bread", "cheese", "herb_tea"],
-      smith: ["iron_axe", "iron_knife", "sword", "arrow"],
+      smith: ["sword_stone", "iron_axe", "iron_knife", "sword", "arrow"],
       hunter: ["bow", "arrow", "spear_stone", "meat_cooked", "jacket_ranger", "pants_ranger", "boots_ranger", "hood_ranger", "jacket_hide"],
       healer: ["herb_tea", "bandage", "robe_wizard"],
     },
@@ -61974,8 +62028,8 @@ uniform float uWet; uniform float uNight;`,
         "mushroom",
         "wood",
       ],
-      smith: ["stone", "flint", "wood", "bone", "axe", "pickaxe", "knife"],
-      hunter: ["hide", "meat_raw", "bone", "fat", "arrow", "bow", "spear", "spear_stone"],
+      smith: ["stone", "flint", "wood", "bone", "axe", "pickaxe", "knife", "sword_stone"],
+      hunter: ["hide", "meat_raw", "bone", "fat", "arrow", "bow", "spear", "spear_stone", "sword_stone"],
       healer: ["mushroom", "mushroom_red", "berry_red", "berry_blue", "fiber", "fat"],
     },
     wz = [
@@ -62060,10 +62114,20 @@ uniform float uWet; uniform float uNight;`,
         for (let n of Object.values(this.S.quests)) if (n.giver === t.id && e.includes(n.state)) return n;
         return null;
       }
+      hasProblem(t) {
+        let e = this.npcState(t);
+        if (e.prob !== void 0) return e.prob;
+        let n = (t.v.npcs || []).slice(),
+          i = (a) => ((Math.imul(a.def.seed | 0, 2654435761) >>> 0) % 1000) + (a.def.role === "elder" ? -150 : 0),
+          s = Math.max(2, Math.round(n.length * 0.4));
+        n.sort((a, b) => i(a) - i(b));
+        let o = n.indexOf(t);
+        return ((e.prob = o >= 0 && o < s && !!Bv[t.def.role]), e.prob);
+      }
       canHaveQuest(t) {
         let e = this.npcState(t),
           n = Bv[t.def.role];
-        return !(!n || !n.length || e.done >= 3 || (e.cool && this.G.env.day < e.cool));
+        return !(!n || !n.length || e.done >= 3 || (e.cool && this.G.env.day < e.cool) || !this.hasProblem(t));
       }
       questFor(t) {
         let e = this.questOf(t);
@@ -62437,7 +62501,7 @@ uniform float uWet; uniform float uNight;`,
                   fn: () => this.say(ho(Ne(gz), { need: this.needText(i) })),
                 })),
           n.push({ t: e.talks ? "Biraz daha sohbet edelim." : "Sohbet et", fn: () => this.chat() }),
-          !i && !o && (e.talks >= 1 || e.rumored))
+          !i && !o && (e.talks >= 3 || e.rumored) && this.hasProblem(t))
         ) {
           let a = this.canHaveQuest(t) || this.questOf(t, ["offered"]);
           n.push({
@@ -62511,11 +62575,11 @@ uniform float uWet; uniform float uNight;`,
           return;
         }
         let l = this.questOf(t, ["offered"]) || (this.canHaveQuest(t) ? this.questFor(t) : null);
-        if (e.talks === 1 && l) {
-          (this.say(Ne(lu[t.def.role] || lu.general) + " " + Ne(fz)), this.menu());
+        if (e.talks >= 3 && l && this.hasProblem(t) && !e.told) {
+          ((e.told = 1), this.say(Ne(lu[t.def.role] || lu.general) + " " + Ne(fz)), this.menu());
           return;
         }
-        if (Math.random() < 0.45) {
+        if (Math.random() < 0.2) {
           let p = s.npcs.filter(
             (y) =>
               y !== t &&
@@ -62570,6 +62634,19 @@ uniform float uWet; uniform float uNight;`,
               Ne([
                 "Hadi, başka sorun var mı?",
                 "Şimdi bırak da işime bakayım.",
+              ])),
+          this.hasProblem(t) &&
+            !e.told &&
+            e.talks >= 1 &&
+            e.talks < 3 &&
+            Math.random() < 0.6 &&
+            (f +=
+              " " +
+              Ne([
+                "Şu aralar aklım biraz başka yerde, kusura bakma.",
+                "Canımı sıkan bir şey var ama... neyse, sonra.",
+                "Bazı işler üst üste geldi, nefes alamıyorum.",
+                "Sana açılabilirim belki ama biraz daha tanışalım.",
               ])),
           F === 0 &&
             !t.def.child &&
@@ -63069,7 +63146,7 @@ uniform float uWet; uniform float uNight;`,
               ? (c = this.ready(h) ? "ready" : "wait")
               : this.deliveryFor(a)
                 ? (c = "ready")
-                : (l.rumored || l.talks >= 1) &&
+                : (l.rumored || l.talks >= 3) &&
                   this.rep(a.v) > -25 &&
                   (this.questOf(a, ["offered"]) || this.canHaveQuest(a)) &&
                   (c = "new"),
