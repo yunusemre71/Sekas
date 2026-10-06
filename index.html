@@ -190,6 +190,9 @@ kbd { font-family: var(--font-display); font-weight: 400; font-size: 15px; lette
 .status-row span.good { background: #d4f2b8; }
 
 #bottom { position: absolute; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; }
+#wearGrid { display: flex; gap: 6px; flex-wrap: wrap; }
+.wear-slot { position: relative; }
+.wear-slot.empty::after { content: attr(data-label); position: absolute; inset: 0; display: grid; place-items: center; font-size: 11px; color: var(--paper-dim); }
 #stamina { width: 220px; height: 9px; border: 2px solid var(--ink); background: var(--paper-2); overflow: hidden; transition: opacity .4s; }
 #stamina i { display: block; height: 100%; background: var(--stam); width: 100%; }
 #stamina.full { opacity: 0; }
@@ -504,6 +507,8 @@ kbd { font-family: var(--font-display); font-weight: 400; font-size: 15px; lette
       <div id="invGrid" class="grid"></div>
       <div class="grid-label">Kısayol çubuğu</div>
       <div id="hotGrid" class="grid hot"></div>
+      <div class="grid-label">Giyim <small id="wearWarm"></small> <small>· Sağ tık: giy · Tıkla: çıkar</small></div>
+      <div id="wearGrid" class="grid wear"></div>
     </section>
     <section id="craftSection" class="pane">
       <header class="pane-head"><h2>Üretim</h2><span id="benchState" class="bench"></span></header>

@@ -29934,7 +29934,38 @@ varying float vLeaf;
     } else if (r.startsWith("MI_Regular"))
       ((n = new fe({ color: ed(t.skin || "#c98d66"), roughness: 0.62, metalness: 0 })),
         Re(n, { rim: 1.15, ink: 0.55 }));
-    else if (r === "MI_Eyes")
+    else if (r === "SG_Boxer") {
+      ((n = new fe({ color: ed(t.skin || "#c98d66"), roughness: 0.62, metalness: 0 })),
+        Re(n, { rim: 1.15, ink: 0.55 }));
+      let s = n.onBeforeCompile,
+        o = n.customProgramCacheKey;
+      ((n.onBeforeCompile = (a, l) => {
+        (s && s(a, l),
+          (a.vertexShader = a.vertexShader
+            .replace(
+              "#include <common>",
+              `#include <common>
+varying float vBindY;`,
+            )
+            .replace(
+              "#include <begin_vertex>",
+              `#include <begin_vertex>
+vBindY = position.y;`,
+            )),
+          (a.fragmentShader = a.fragmentShader
+            .replace(
+              "#include <common>",
+              `#include <common>
+varying float vBindY;`,
+            )
+            .replace(
+              "#include <color_fragment>",
+              `#include <color_fragment>
+if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
+            )));
+      }),
+        (n.customProgramCacheKey = () => (o ? o() : "") + "-boxer"));
+    } else if (r === "MI_Eyes")
       ((n = new fe({ map: i.eye, roughness: 0.25, metalness: 0 })),
         Re(n, { rim: 0, ink: 0.35, silhouetteOnly: !0 }));
     else if (r === "MI_Hair_1" || r === "MI_Hair_2")
@@ -29962,9 +29993,11 @@ varying float vLeaf;
     let t = In.body[r.body],
       e = [],
       n = (o) => {
-        if (o)
-          for (let a of Object.keys(t.parts))
-            (a === o || (a.startsWith(o + "_") && /_\d+$/.test(a.slice(o.length)))) && e.push(a);
+        if (!o) return;
+        let c = "";
+        o.startsWith("!skin:") && ((c = "!skin:"), (o = o.slice(6)));
+        for (let a of Object.keys(t.parts))
+          (a === o || (a.startsWith(o + "_") && /_\d+$/.test(a.slice(o.length)))) && e.push(c + a);
       };
     (n("HeadMesh"), n("Eyes"), n("Eyebrows"));
     let i = r.outfit || {};
@@ -29983,7 +30016,12 @@ varying float vLeaf;
     if (Kp.has(e)) return Kp.get(e);
     let n = In.body[r.body],
       i = [];
-    for (let M of t) for (let T of n.parts[M]) i.push(T);
+    for (let M of t)
+      if (M.startsWith("!skin:")) {
+        let k = M.slice(6),
+          T = /Legs/.test(k) ? "SG_Boxer" : "MI_Regular_Skin";
+        for (let I of n.parts[k]) i.push({ ...I, mat: T });
+      } else for (let T of n.parts[M]) i.push(T);
     let s = [];
     for (let M of i) s.includes(M.mat) || s.push(M.mat);
     i.sort((M, T) => s.indexOf(M.mat) - s.indexOf(T.mat));
@@ -50341,6 +50379,72 @@ uniform float uWet; uniform float uNight;`,
         desc: "Temel üstüne kurulur, ikinci kata çıkarır.",
       },
     };
+  var sgCloth = {
+    shirt_peasant: { name: "Keten Gömlek", slot: "body", parts: { body: "Peasant_Body", arms: "Peasant_Arms" }, warm: 2, kind: "top", color: 13154946, desc: "İnce, hafif bir gömlek. Yazın iyidir, kışın üşütür." },
+    jacket_ranger: { name: "Avcı Ceketi", slot: "body", parts: { body: "Ranger_Body", arms: "Ranger_Arms" }, warm: 3.5, kind: "top", color: 5935150, desc: "Sağlam kumaştan avcı ceketi." },
+    jacket_hide: { name: "Deri Ceket", slot: "body", parts: { body: "Ranger_Body", arms: "Ranger_Arms", acc: ["Ranger_Acc_Pauldrons"] }, warm: 5, kind: "top", color: 9067062, desc: "Hayvan derisinden dikilmiş kalın ceket. Soğuğa karşı çok iyi korur." },
+    coat_noble: { name: "Yünlü Kaftan", slot: "body", parts: { body: "Noble_Body", arms: "Noble_Arms" }, warm: 4.5, kind: "top", color: 8405034, desc: "Kalın yünlü, gösterişli bir kaftan." },
+    robe_wizard: { name: "Uzun Cübbe", slot: "body", parts: { body: "Wizard_Body", arms: "Wizard_Arms" }, warm: 3, kind: "top", color: 4808072, desc: "Bol, uzun bir cübbe." },
+    pants_peasant: { name: "Keten Pantolon", slot: "legs", parts: { legs: "Peasant_Legs" }, warm: 1.5, kind: "pants", color: 10916442, desc: "Hafif keten pantolon." },
+    pants_ranger: { name: "Avcı Pantolonu", slot: "legs", parts: { legs: "Ranger_Legs" }, warm: 2.5, kind: "pants", color: 4996422, desc: "Dayanıklı avcı pantolonu." },
+    pants_hide: { name: "Deri Pantolon", slot: "legs", parts: { legs: "Ranger_Legs" }, warm: 3.2, kind: "pants", color: 8014378, desc: "Deriden dikilmiş sıcak pantolon." },
+    pants_noble: { name: "Yün Pantolon", slot: "legs", parts: { legs: "Noble_Legs" }, warm: 3, kind: "pants", color: 5263440, desc: "Kalın yün pantolon." },
+    shoes_peasant: { name: "Çarık", slot: "feet", parts: { feet: "Peasant_Feet" }, warm: 0.8, kind: "boots", color: 9070144, desc: "Basit deri çarık." },
+    boots_ranger: { name: "Deri Çizme", slot: "feet", parts: { feet: "Ranger_Feet" }, warm: 1.8, kind: "boots", color: 6045994, desc: "Su geçirmeyen sağlam çizme." },
+    boots_noble: { name: "Uzun Çizme", slot: "feet", parts: { feet: "Noble_Feet" }, warm: 1.6, kind: "boots", color: 3812644, desc: "Şık, uzun konçlu çizme." },
+    hood_ranger: { name: "Deri Kapüşon", slot: "head", parts: { head: "Ranger_Head_Hood" }, warm: 1.5, kind: "hood", color: 6969401, desc: "Başı ve boynu rüzgârdan korur." },
+    scarf_wool: { name: "Yün Atkı", slot: "neck", parts: { acc: ["Knight_Acc_Scarf"] }, warm: 1.5, kind: "scarf", color: 11553058, desc: "Koyun yününden örülmüş sıcak atkı." },
+  };
+  var sgSlots = [
+    ["head", "Baş"],
+    ["neck", "Boyun"],
+    ["body", "Gövde"],
+    ["legs", "Bacak"],
+    ["feet", "Ayak"],
+  ];
+  var sgDefaultOutfit = () => ({ head: null, neck: null, body: "jacket_ranger", legs: "pants_ranger", feet: "boots_ranger" });
+  function sgGarment(r, t) {
+    let e = new bt();
+    switch (r) {
+      case "top":
+        (e.add(dt(new Mn(0.34, 0.07, 0.36, 2, 0.03), t, 0, 0, 0)),
+          e.add(dt(new Mn(0.12, 0.06, 0.26, 2, 0.025), t, -0.2, -0.005, 0.03, 0, 0.35, 0)),
+          e.add(dt(new Mn(0.12, 0.06, 0.26, 2, 0.025), t, 0.2, -0.005, 0.03, 0, -0.35, 0)),
+          e.add(dt(new Mn(0.14, 0.075, 0.05, 2, 0.02), t, 0, 0.005, -0.17)));
+        break;
+      case "pants":
+        (e.add(dt(new Mn(0.3, 0.07, 0.08, 2, 0.025), t, 0, 0, -0.2)),
+          e.add(dt(new Mn(0.13, 0.06, 0.42, 2, 0.025), t, -0.075, -0.005, 0.04)),
+          e.add(dt(new Mn(0.13, 0.06, 0.42, 2, 0.025), t, 0.075, -0.005, 0.04)));
+        break;
+      case "boots":
+        for (let n of [-0.08, 0.08])
+          (e.add(dt(new Mn(0.1, 0.2, 0.12, 2, 0.03), t, n, 0.1, -0.03)),
+            e.add(dt(new Mn(0.1, 0.07, 0.24, 2, 0.03), t, n, 0.035, 0.03)));
+        break;
+      case "hood":
+        (e.add(dt(new jt(0.15, 10, 8, 0, Math.PI * 2, 0, Math.PI / 1.7), t, 0, 0, 0)),
+          e.add(dt(new Mn(0.32, 0.04, 0.18, 2, 0.02), t, 0, -0.08, 0.04)));
+        break;
+      default:
+        (e.add(dt(new en(0.12, 0.035, 6, 14), t, 0, 0, 0, Math.PI / 2, 0, 0)),
+          e.add(dt(new Mn(0.07, 0.03, 0.28, 2, 0.015), t, 0.06, 0, 0.18, 0, 0.2, 0)));
+    }
+    return e;
+  }
+  for (let [r, t] of Object.entries(sgCloth))
+    ((BA["cl_" + r] = () => sgGarment(t.kind, t.color)),
+      (kt[r] = {
+        name: t.name,
+        cat: "cloth",
+        stack: 1,
+        model: "cl_" + r,
+        slot: t.slot,
+        parts: t.parts,
+        warm: t.warm,
+        phys: { t: "box", s: [0.3, 0.08, 0.3], m: 0.5 },
+        desc: t.desc,
+      }));
   for (let r in kt) kt[r].id = r;
   var w1 = [
       { id: "all", name: "Hepsi" },
@@ -50349,6 +50453,7 @@ uniform float uWet; uniform float uNight;`,
       { id: "build", name: "Yapı" },
       { id: "res", name: "Malzeme" },
       { id: "med", name: "Bakım" },
+      { id: "cloth", name: "Giyim" },
     ],
     Wl = [
       { out: "rope", n: 1, in: { fiber: 3 }, time: 1.2, cat: "res" },
@@ -50377,6 +50482,12 @@ uniform float uWet; uniform float uNight;`,
       { out: "door", n: 1, in: { wood: 4, rope: 1 }, time: 2, cat: "build", bench: !0 },
       { out: "floor", n: 1, in: { wood: 5 }, time: 2, cat: "build", bench: !0 },
       { out: "stairs", n: 1, in: { wood: 7 }, time: 2.5, cat: "build", bench: !0 },
+      { out: "jacket_hide", n: 1, in: { hide: 4, rope: 2 }, time: 4, cat: "cloth", bench: !0 },
+      { out: "pants_hide", n: 1, in: { hide: 3, rope: 1 }, time: 3.5, cat: "cloth", bench: !0 },
+      { out: "boots_ranger", n: 1, in: { hide: 2, rope: 1 }, time: 3, cat: "cloth", bench: !0 },
+      { out: "hood_ranger", n: 1, in: { hide: 2, fiber: 2 }, time: 2.5, cat: "cloth", bench: !0 },
+      { out: "scarf_wool", n: 1, in: { wool: 3 }, time: 2.5, cat: "cloth", bench: !0 },
+      { out: "shoes_peasant", n: 1, in: { hide: 1, rope: 1 }, time: 2, cat: "cloth" },
     ],
     v1 = new Map();
   function mi(r) {
@@ -50457,6 +50568,7 @@ uniform float uWet; uniform float uNight;`,
           "sword",
         ].includes(p) && g.rotation.set(0.2, -0.4, -0.75),
         p === "bow" && g.rotation.set(0.1, -0.5, 0.2),
+        kt[p]?.cat === "cloth" && g.rotation.set(1.15, 0, 0),
         i.add(g),
         s.position.set(0, 0, (v / Math.tan((30 * Math.PI) / 360)) * 1.05),
         s.lookAt(0, 0, 0),
@@ -50651,7 +50763,8 @@ uniform float uWet; uniform float uNight;`,
     ud = class {
       constructor(t) {
         ((this.G = t),
-          (this.char = new ad()),
+          (this.outfit = sgDefaultOutfit()),
+          (this.char = new ad(this.outfitSpec())),
           t.scene.add(this.char.root),
           (this.pos = new R()),
           (this.vel = new R()),
@@ -51899,7 +52012,12 @@ uniform float uWet; uniform float uNight;`,
             ? (this.wet = Math.min(1, this.wet + t * 0.03 * o))
             : (this.wet = Math.max(0, this.wet - t * (0.008 + this.warmth * 0.04)));
         let a =
-          i.envTemp - this.wet * 7 + this.warmth * 22 + (this.torchLit ? 5 : 0) + (this.sheltered ? 3 : 0);
+          i.envTemp -
+          this.wet * 7 +
+          this.warmth * 22 +
+          (this.torchLit ? 5 : 0) +
+          (this.sheltered ? 3 : 0) +
+          (this.clothWarmth() - 7.8) * (1 - this.wet * 0.5);
         (this.sprinting && (a += 4), this.swim && (a -= 6));
         let l = 37 + yt((a - 15) * 0.13, -4.5, 2.6);
         if (
@@ -52000,8 +52118,83 @@ uniform float uWet; uniform float uNight;`,
           d.position.x = -this.draw * 0.22;
         }
       }
+      outfitSpec() {
+        let t = {
+            ...HA,
+            outfit: {
+              body: "!skin:Peasant_Body",
+              arms: "!skin:Peasant_Arms",
+              legs: "!skin:Peasant_Legs",
+              feet: "!skin:Peasant_Feet",
+              head: null,
+              acc: [],
+            },
+          },
+          e = this.outfit || {};
+        for (let [n] of sgSlots) {
+          let i = e[n] && kt[e[n]];
+          if (!i || !i.parts) continue;
+          let { acc: s, ...o } = i.parts;
+          (Object.assign(t.outfit, o), s && t.outfit.acc.push(...s));
+        }
+        return t;
+      }
+      rebuildChar() {
+        let t = this.G,
+          e = this.char,
+          n = new ad(this.outfitSpec());
+        n.root &&
+          (t.scene.remove(e.root),
+          t.scene.add(n.root),
+          n.root.position.copy(e.root.position),
+          n.root.rotation.copy(e.root.rotation),
+          (n.root.visible = e.root.visible),
+          (this.char = n),
+          n.setHeadVisible(t.cam?.mode !== "first"),
+          (this.forceHeld = !0),
+          this.refreshHeld());
+      }
+      clothWarmth() {
+        let t = 0;
+        for (let [e] of sgSlots) this.outfit?.[e] && (t += kt[this.outfit[e]]?.warm || 0);
+        return t;
+      }
+      equip(t) {
+        let e = this.G,
+          n = e.inventory,
+          i = n.slots[t],
+          s = i ? kt[i.id] : null;
+        if (!s || s.cat !== "cloth") return;
+        if (this.rest || this.dead) {
+          e.ui?.notify("Şu an üstünü değiştiremezsin.", null);
+          return;
+        }
+        let o = this.outfit[s.slot];
+        ((n.slots[t] = null), n.changed(), (this.outfit[s.slot] = i.id));
+        if (o) {
+          let a = n.add(o, 1);
+          a && e.dropItem(o, a);
+        }
+        (this.rebuildChar(), e.ui?.notify(`Giydin: ${s.name}`, i.id), e.audio?.ui("grab"), e.ui?.refreshHotbar());
+      }
+      unequip(t) {
+        let e = this.G,
+          n = this.outfit[t];
+        if (!n) return;
+        if (!e.inventory.canAdd(n, 1)) {
+          e.ui?.notify("Çantan dolu, önce yer aç.", null, "bad");
+          return;
+        }
+        (e.inventory.add(n, 1),
+          (this.outfit[t] = null),
+          this.rebuildChar(),
+          e.ui?.notify(`Çıkardın: ${kt[n].name}`, n),
+          e.audio?.ui("grab"),
+          e.ui?.refreshHotbar());
+      }
       serialize() {
         return {
+          of: { ...this.outfit },
           p: [+this.pos.x.toFixed(2), +this.pos.y.toFixed(2), +this.pos.z.toFixed(2)],
           yaw: this.yaw,
           st: this.stats,
@@ -52024,7 +52217,9 @@ uniform float uWet; uniform float uNight;`,
           (this.wet = t.wet || 0),
           (this.selected = t.sel || 0),
           (this.spawn = t.spawn || null),
-          (this.coins = t.coins || 0));
+          (this.coins = t.coins || 0),
+          (this.outfit = { ...sgDefaultOutfit(), ...(t.of || {}) }),
+          this.rebuildChar());
       }
     };
   Oo();
@@ -61073,13 +61268,42 @@ uniform float uWet; uniform float uNight;`,
       iron_axe: 60,
       iron_knife: 40,
       sword: 95,
+      shirt_peasant: 14,
+      jacket_ranger: 34,
+      jacket_hide: 48,
+      coat_noble: 70,
+      robe_wizard: 40,
+      pants_peasant: 12,
+      pants_ranger: 26,
+      pants_hide: 34,
+      pants_noble: 44,
+      shoes_peasant: 8,
+      boots_ranger: 22,
+      boots_noble: 36,
+      hood_ranger: 18,
+      scarf_wool: 16,
     },
     Ar = {
-      merchant: ["bread", "cheese", "rope", "waterskin", "bandage", "torch", "arrow"],
+      merchant: [
+        "bread",
+        "cheese",
+        "rope",
+        "waterskin",
+        "bandage",
+        "torch",
+        "arrow",
+        "shirt_peasant",
+        "pants_peasant",
+        "shoes_peasant",
+        "coat_noble",
+        "pants_noble",
+        "boots_noble",
+        "scarf_wool",
+      ],
       innkeeper: ["stew", "bread", "cheese", "herb_tea"],
       smith: ["iron_axe", "iron_knife", "sword", "arrow"],
-      hunter: ["bow", "arrow", "spear_stone", "meat_cooked"],
-      healer: ["herb_tea", "bandage"],
+      hunter: ["bow", "arrow", "spear_stone", "meat_cooked", "jacket_ranger", "pants_ranger", "boots_ranger", "hood_ranger", "jacket_hide"],
+      healer: ["herb_tea", "bandage", "robe_wizard"],
     },
     vz = {
       merchant: null,
@@ -64547,6 +64771,8 @@ uniform float uWet; uniform float uNight;`,
         (n.food && i.push(`Açlık +${n.food}`),
           n.water && i.push(`Su +${n.water}`),
           n.heal && i.push(`Can +${n.heal}`),
+          n.warm && i.push(`Sıcaklık +${n.warm}`),
+          n.cat === "cloth" && i.push("Sağ tık: giy"),
           n.dmg && i.push(`Hasar ${n.dmg}`),
           n.throwDmg && n.throwable && i.push(`Fırlatma ${n.throwDmg}`),
           Rr[t.id] && i.push(`Yakıt ${Rr[t.id]} sn`),
@@ -64618,6 +64844,10 @@ uniform float uWet; uniform float uNight;`,
               (s.player.consume(e), this.renderPanel());
               return;
             }
+            if (t === a && c.cat === "cloth") {
+              (s.player.equip(e), this.renderPanel());
+              return;
+            }
             if (o.n > 1) {
               let h = Math.ceil(o.n / 2);
               ((o.n -= h), (this.cursor = { id: o.id, n: h, d: o.d }));
@@ -64658,6 +64888,7 @@ uniform float uWet; uniform float uNight;`,
         if (
           (this.makeGrid(Nt("invGrid"), e, Ai, e.slots.length),
           this.makeGrid(Nt("hotGrid"), e, 0, Ai, { keys: !0 }),
+          this.renderWear(),
           (this.panelType === "inv" || this.panelType === "craft") && this.renderCraft(),
           this.panelType === "chest" &&
             this.makeGrid(Nt("chestGrid"), this.panelStruct.inv, 0, this.panelStruct.inv.slots.length),
@@ -64668,6 +64899,28 @@ uniform float uWet; uniform float uNight;`,
             this.makeGrid(Nt("cookSlots"), n, 1, 5),
             this.renderFireState());
         }
+      }
+      renderWear() {
+        let t = Nt("wearGrid");
+        if (!t) return;
+        let e = this.G.player;
+        t.innerHTML = "";
+        for (let [n, i] of sgSlots) {
+          let s = e.outfit?.[n],
+            o = document.createElement("div");
+          ((o.className = "slot wear-slot" + (s ? "" : " empty")),
+            (o.innerHTML = s ? `<img src="${this.icons[s] || ""}" alt="">` : ""),
+            (o.dataset.label = i),
+            (o.title = s ? `${kt[s].name} (Sıcaklık +${kt[s].warm}) · Tıkla: çıkar` : `${i}: boş`),
+            o.addEventListener("mousedown", (a) => {
+              (a.preventDefault(), a.stopPropagation(), s && (e.unequip(n), this.renderPanel()));
+            }),
+            o.addEventListener("mouseenter", () => s && this.showTooltip({ id: s, n: 1 })),
+            o.addEventListener("mouseleave", () => (Nt("tooltip").hidden = !0)),
+            t.appendChild(o));
+        }
+        let n = Nt("wearWarm");
+        n && (n.textContent = `Toplam sıcaklık: +${e.clothWarmth().toFixed(1)}`);
       }
       renderFireState() {
         let t = this.panelStruct;
@@ -65694,6 +65947,8 @@ uniform float uWet; uniform float uNight;`,
       (A.env.timeScale = 1),
       (A.player.action = null),
       (A.player.stats = { hp: 100, food: 100, water: 100, stam: 100, temp: 37 }),
+      (A.player.outfit = sgDefaultOutfit()),
+      A.player.rebuildChar(),
       (A.player.coins = 5),
       (A.player.bleed = 0),
       (A.player.poison = 0),
