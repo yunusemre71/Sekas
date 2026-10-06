@@ -48544,11 +48544,11 @@ uniform float uWet; uniform float uNight;`,
               seg: p.seg,
               dur: y,
               tag: o.type === "hurt" ? "hurt" : "act",
-              mask: p.mask || "full",
+              mask: s ? "arms" : p.mask || "full",
               weight: p.weight ?? 1,
               fadeIn: p.fadeIn ?? Math.min(0.1, y * 0.2),
               fadeOut: p.fadeOut ?? Math.min(0.22, y * 0.35),
-              lowerFollow: !0,
+              lowerFollow: !s,
             });
           }
           ((this.lastAction = o.type), (this.lastActT = o.t));
@@ -50871,6 +50871,10 @@ uniform float uWet; uniform float uNight;`,
         ((this.swim = this.waterDepth > 1.15 && this.pos.y < 0 - 0.6),
           this.swim &&
             !x &&
+            !this.swimTip &&
+            ((this.swimTip = !0), e.ui?.notify("Dalmak için [Ctrl], yükselmek için [Boşluk].", null)),
+          this.swim &&
+            !x &&
             (e.audio?.splash(this.pos.clone().setY(0), Math.min(1, Math.abs(this.vel.y) / 8 + 0.3)),
             e.particles.splash(new R(this.pos.x, 0, this.pos.z), 1)),
           this.swim ? (g = this.sprinting ? 3.1 : 2.2) : this.waterDepth > 0.45 && (g *= 0.65));
@@ -50907,11 +50911,23 @@ uniform float uWet; uniform float uNight;`,
           }
         }
         if (this.swim) {
-          let D = 0 - 1.22;
-          ((this.vel.y = Bt(this.vel.y, (D - this.pos.y) * 4, 6, t)),
-            (this.grounded = !1),
-            !d && n.down("Space") && (this.vel.y = Math.max(this.vel.y, 1.2)),
-            (this.wet = 1));
+          let D = 0 - 1.22,
+            G = !d && n.down("ControlLeft"),
+            Y = !d && n.down("Space"),
+            X = this.pos.y < D - 0.25;
+          if (G) ((this.vel.y = Bt(this.vel.y, -2.4, 5, t)), (this.diving = !0));
+          else if (X) {
+            let Z = Y ? 2.6 : 0.55;
+            if (u > 0 && n.down("KeyW") && !Y) {
+              let F = i.pitch || 0;
+              Z = Math.max(-2.2, Math.min(2.2, Math.sin(F) * g * 1.1 + 0.3));
+            }
+            this.vel.y = Bt(this.vel.y, Z, 4, t);
+          } else
+            ((this.diving = !1),
+              (this.vel.y = Bt(this.vel.y, (D - this.pos.y) * 4, 6, t)),
+              Y && (this.vel.y = Math.max(this.vel.y, 1.2)));
+          ((this.grounded = !1), (this.wet = 1));
         } else
           (!d &&
             n.pressed("Space") &&
@@ -50935,7 +50951,8 @@ uniform float uWet; uniform float uNight;`,
           S = e.gen.heightAt(this.pos.x, this.pos.z),
           k = Math.max(S, E);
         if (((this.onFloor = E > S + 0.05 && this.pos.y < E + 0.6), this.swim))
-          this.pos.y < S && (this.pos.y = S);
+          (this.pos.y < S + 0.05 && ((this.pos.y = S + 0.05), this.vel.y < 0 && (this.vel.y = 0)),
+            this.pos.y > 0 - 1.1 && this.vel.y > 0 && (this.vel.y *= 0.5));
         else {
           let D = this.grounded && this.vel.y <= 0.1 ? 0.45 : 0.02;
           if (this.pos.y <= k + D) {
@@ -51182,9 +51199,7 @@ uniform float uWet; uniform float uNight;`,
           s = yt(14 / Math.sqrt(Math.max(0.3, i)), 4, 16);
         (t.physics.release({ x: e.x * s + this.vel.x, y: e.y * s + 2.5, z: e.z * s + this.vel.z }),
           this.startAction("throw", 0.45),
-          t.audio?.whoosh(0.6),
-          (this.stats.stam -= 5),
-          (this.stamDelay = 0.6));
+          t.audio?.whoosh(0.6));
       }
       throwSelected(t) {
         let e = this.G,
@@ -51192,11 +51207,7 @@ uniform float uWet; uniform float uNight;`,
         if (!n) return;
         let i = kt[n.id];
         if (
-          (this.startAction("throw", 0.5),
-          e.audio?.whoosh(0.8),
-          (this.stats.stam -= 6),
-          (this.stamDelay = 0.6),
-          i.throwable)
+          (this.startAction("throw", 0.5), e.audio?.whoosh(0.8), i.throwable)
         ) {
           let s = e.inventory.removeAt(this.selected, 1);
           e.combat.throwSpear(s, 0.35 + t * 0.65);
@@ -51240,13 +51251,7 @@ uniform float uWet; uniform float uNight;`,
         let s = "punch",
           o = 0.42,
           a = 3;
-        if (
-          (n?.act && ((s = n.act), (o = n.speed || 0.6), (a = n.stamina || 5)), this.stats.stam < a * 0.5)
-        ) {
-          (t.ui?.notify("Çok yorgunsun...", null), (this.cooldown = 0.3));
-          return;
-        }
-        ((this.stats.stam -= a), (this.stamDelay = 0.9));
+        n?.act && ((s = n.act), (o = n.speed || 0.6));
         let l = s === "thrust" ? 0.45 : s === "punch" ? 0.42 : 0.44;
         (this.startAction(s, o, { hitAt: l, slot: this.selected, itemId: e?.id }),
           t.audio?.whoosh(s === "punch" ? 0.35 : 0.6));
@@ -51529,16 +51534,19 @@ uniform float uWet; uniform float uNight;`,
             n.water - t * (0.05 + (this.sprinting ? 0.03 : 0) + (n.temp > 38.5 ? 0.04 : 0)),
           )),
           (this.stamDelay = Math.max(0, this.stamDelay - t)),
-          this.sprinting && Math.hypot(this.vel.x, this.vel.z) > 1)
+          this.sprinting && !this.swim && Math.hypot(this.vel.x, this.vel.z) > 1)
         )
           ((n.stam = Math.max(0, n.stam - t * (this.chased ? 4.2 : 5.5))), (this.stamDelay = 0.8));
-        else if (this.swim && Math.hypot(this.vel.x, this.vel.z) > 0.5)
-          ((n.stam = Math.max(0, n.stam - t * (this.sprinting ? 9 : 2.5))), (this.stamDelay = 0.5));
         else if (this.stamDelay <= 0) {
           let c = 22;
           (n.food < 15 && (c *= 0.5), n.temp < 35.5 && (c *= 0.6), (n.stam = Math.min(100, n.stam + t * c)));
         }
-        (this.swim && n.stam <= 0 && this.damage(t * 4, "Boğuldun"),
+        ((this.underwater = this.swim && this.pos.y + 1.5 < 0 - 0.05),
+          this.breath == null && (this.breath = 100),
+          this.underwater
+            ? (this.breath = Math.max(0, this.breath - t * 4.5))
+            : (this.breath = Math.min(100, this.breath + t * 14)),
+          this.underwater && this.breath <= 0 && this.damage(t * 7, "Boğuldun"),
           (this.shelterT = (this.shelterT || 0) - t),
           this.shelterT <= 0 &&
             ((this.shelterT = 0.5),
@@ -63959,6 +63967,13 @@ uniform float uWet; uniform float uNight;`,
             : this.set("targetHp", "hidden", !0),
           (Nt("stamFill").style.width = i.stam + "%"),
           this.set("stamina", "class", i.stam > 99.5 ? "full" : ""));
+        {
+          let v = e.player.breath ?? 100;
+          (this.set("breathRow", "hidden", v > 99.5 && !e.player.underwater),
+            this.set("breathFill", "width", v + "%"),
+            this.set("breathNum", "text", Math.round(v)),
+            this.set("breathRow", "class", "vital" + (v < 25 ? " low" : "")));
+        }
         let c = 0,
           h = !1;
         for (let v of e.animals.list)
