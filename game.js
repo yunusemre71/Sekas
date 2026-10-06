@@ -48372,22 +48372,38 @@ uniform float uWet; uniform float uNight;`,
         (this.sens = 1),
         (this.invertY = !1),
         (this.lastMove = { x: null, y: null }),
-        window.addEventListener("keydown", (e) => {
-          if (e.repeat) return;
-          let n = e.target;
-          (n && (n.tagName === "INPUT" || n.tagName === "TEXTAREA" || n.isContentEditable)) ||
-            (["Tab", "Space", "ArrowUp", "ArrowDown"].includes(e.code) && this.enabled && e.preventDefault(),
-            this.keys.add(e.code),
-            this.pressedKeys.add(e.code));
-        }),
-        window.addEventListener("keyup", (e) => {
-          (this.keys.delete(e.code), this.releasedKeys.add(e.code));
-        }),
+        window.addEventListener(
+          "keydown",
+          (e) => {
+            let n = e.target;
+            if (n && (n.tagName === "INPUT" || n.tagName === "TEXTAREA" || n.isContentEditable)) return;
+            if (this.captureKey(e)) {
+              e.preventDefault();
+            }
+            e.repeat || (this.keys.add(e.code), this.pressedKeys.add(e.code));
+          },
+          { capture: !0 },
+        ),
+        window.addEventListener(
+          "keyup",
+          (e) => {
+            let n = e.target;
+            n && (n.tagName === "INPUT" || n.tagName === "TEXTAREA" || n.isContentEditable)
+              ? 0
+              : this.captureKey(e) && e.preventDefault();
+            (this.keys.delete(e.code), this.releasedKeys.add(e.code));
+          },
+          { capture: !0 },
+        ),
+        window.addEventListener("keypress", (e) => this.captureKey(e) && e.preventDefault(), { capture: !0 }),
+        window.addEventListener("auxclick", (e) => this.active() && e.preventDefault()),
+        window.addEventListener("dragstart", (e) => this.active() && e.preventDefault()),
+        window.addEventListener("selectstart", (e) => this.active() && e.preventDefault()),
         window.addEventListener("blur", () => {
           (this.keys.clear(), (this.mouse.b = [!1, !1, !1]));
         }),
         t.addEventListener("mousedown", (e) => {
-          ((this.mouse.b[e.button] = !0), (this.mouse.pressed[e.button] = !0));
+          (e.button > 0 && e.preventDefault(), (this.mouse.b[e.button] = !0), (this.mouse.pressed[e.button] = !0));
         }),
         window.addEventListener("mouseup", (e) => {
           (this.mouse.b[e.button] && (this.mouse.released[e.button] = !0), (this.mouse.b[e.button] = !1));
@@ -48403,15 +48419,53 @@ uniform float uWet; uniform float uNight;`,
         window.addEventListener(
           "wheel",
           (e) => {
-            this.mouse.wheel += Math.sign(e.deltaY);
+            ((e.ctrlKey || e.metaKey) && this.active() && e.preventDefault(), (this.mouse.wheel += Math.sign(e.deltaY)));
           },
-          { passive: !0 },
+          { passive: !1 },
         ),
         document.addEventListener("pointerlockchange", () => {
           ((this.locked = document.pointerLockElement === t),
+            this.locked ? this.keyLock() : this.keyUnlock(),
             this.onLockChange && this.onLockChange(this.locked));
         }),
         document.addEventListener("pointerlockerror", () => this.lockError()));
+    }
+    active() {
+      return this.locked || this.freeLook || (this.enabled && document.activeElement === document.body);
+    }
+    captureKey(t) {
+      if (!this.enabled && !this.locked) return !1;
+      if (!this.locked && !this.freeLook && document.activeElement && document.activeElement !== document.body) return !1;
+      let e = t.code;
+      return e === "F12" || e === "F11" || e === "Escape"
+        ? !1
+        : e === "Tab" ||
+            e === "Space" ||
+            e === "Backspace" ||
+            e.startsWith("Arrow") ||
+            e.startsWith("Alt") ||
+            e.startsWith("Meta") ||
+            /^F\d+$/.test(e) ||
+            t.ctrlKey ||
+            t.metaKey ||
+            t.altKey ||
+            (this.locked && !0);
+    }
+    keyLock() {
+      try {
+        navigator.keyboard?.lock?.([
+          "KeyW", "KeyA", "KeyS", "KeyD", "KeyQ", "KeyE", "KeyR", "KeyF", "KeyC", "KeyH", "KeyG", "KeyL", "KeyM", "KeyI", "KeyJ",
+          "KeyT", "KeyX", "KeyZ", "KeyV", "KeyB", "KeyN", "KeyK", "KeyU", "KeyO", "KeyP", "KeyY", "Space", "Tab",
+          "ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "AltLeft", "AltRight", "Digit1", "Digit2", "Digit3",
+          "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9", "Digit0", "F1", "F2", "F3", "F4", "F5", "F6", "F7",
+          "F8", "F9", "F10", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Enter", "Backquote", "Backspace",
+        ])?.catch?.(() => {});
+      } catch {}
+    }
+    keyUnlock() {
+      try {
+        navigator.keyboard?.unlock?.();
+      } catch {}
     }
     lockError() {
       if (this.locked) return;
@@ -51895,9 +51949,9 @@ uniform float uWet; uniform float uNight;`,
           n.down("KeyD") && ((c += a), (h += l)),
           n.down("KeyA") && ((c -= a), (h -= l)));
         let u = Math.hypot(c, h);
-        (u > 0 && ((c /= u), (h /= u)), !d && n.pressed("KeyC") && (this.crouch = !this.crouch));
-        let f = !d && n.down("ControlLeft"),
-          p = (this.crouch || f) && !this.swim,
+        (u > 0 && ((c /= u), (h /= u)), !d && !this.swim && n.pressed("KeyC") && (this.crouch = !this.crouch));
+        let f = !1,
+          p = this.crouch && !this.swim,
           y = !d && n.down("ShiftLeft") && u > 0 && !p && !this.aiming && !e.physics.held;
         if (
           ((this.sprinting = y && this.stats.stam > 1 && !(this.sprintLock && this.stats.stam < 25)),
@@ -51939,7 +51993,7 @@ uniform float uWet; uniform float uNight;`,
           this.swim &&
             !x &&
             !this.swimTip &&
-            ((this.swimTip = !0), e.ui?.notify("Dalmak için [Ctrl], yükselmek için [Boşluk].", null)),
+            ((this.swimTip = !0), e.ui?.notify("Dalmak için [C], yükselmek için [Boşluk].", null)),
           this.swim &&
             !x &&
             (e.audio?.splash(this.pos.clone().setY(0), Math.min(1, Math.abs(this.vel.y) / 8 + 0.3)),
@@ -51979,7 +52033,7 @@ uniform float uWet; uniform float uNight;`,
         }
         if (this.swim) {
           let D = 0 - 1.22,
-            G = !d && n.down("ControlLeft"),
+            G = !d && n.down("KeyC"),
             Y = !d && n.down("Space"),
             X = this.pos.y < D - 0.25;
           if (G) ((this.vel.y = Bt(this.vel.y, -2.4, 5, t)), (this.diving = !0));
@@ -52162,7 +52216,7 @@ uniform float uWet; uniform float uNight;`,
           !n.down("ShiftLeft") &&
           !(e.fishing && e.fishing.state === "fight") &&
           this.select((this.selected + (n.mouse.wheel > 0 ? 1 : Ai - 1)) % Ai),
-          n.pressed("KeyQ") && this.dropSelected(n.down("ControlLeft")),
+          n.pressed("KeyQ") && this.dropSelected(n.down("ShiftLeft")),
           n.pressed("KeyF") && this.toggleGrab(),
           n.pressed("KeyE") && this.interact(),
           n.pressed("KeyH") && this.useBandageQuick(),

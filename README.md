@@ -20,6 +20,6 @@ python3 -m http.server 8000
 ## Kontroller (özet)
 
 - `W A S D` yürü, `Shift` koş, `Boşluk` zıpla / tırman
-- `Ctrl` suda dal, `Boşluk` suda yüksel
+- `C` suda dal, `Boşluk` suda yüksel
 - `E` etkileşim, `Tab` envanter, `V` kamera modu, `J` rehberi gizle
 - Envanterde kıyafete **sağ tık**: giy · giyim yuvasına **tık**: çıkar
