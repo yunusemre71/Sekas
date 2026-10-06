@@ -42831,11 +42831,11 @@ varying float vLeaf;
         let n = this.n,
           i = t + n.noise2(t * 0.0021 + 31.7, e * 0.0021 - 12.3) * 36,
           s = e + n.noise2(t * 0.0021 - 71.1, e * 0.0021 + 44.9) * 36,
-          o = n.fbm2(i * 0.0019, s * 0.0019, 4) * 24 + 7.5;
-        ((o += n.fbm2(t * 0.011 + 5.2, e * 0.011 - 3.3, 3) * 2.4),
-          (o += n.noise2(t * 0.047, e * 0.047) * 0.3));
-        let a = xe(0.12, 0.6, n.noise2(t * 0.0012 + 300.5, e * 0.0012 - 200.5));
-        a > 0 && (o += n.ridged2(i * 0.0045, s * 0.0045, 4) * 36 * a);
+          o = n.fbm2(i * 0.00152, s * 0.00152, 4) * 12 + 4.6;
+        ((o += n.fbm2(t * 0.011 + 5.2, e * 0.011 - 3.3, 3) * 1),
+          (o += n.noise2(t * 0.047, e * 0.047) * 0.15));
+        let a = xe(0.35, 0.8, n.noise2(t * 0.0012 + 300.5, e * 0.0012 - 200.5));
+        a > 0 && (o += n.ridged2(i * 0.0045, s * 0.0045, 4) * 16 * a);
         let l = Math.abs(n.fbm2(i * 0.0014 + 700.3, s * 0.0014 - 300.7, 2)),
           c = 0.022;
         if (l < c * 6.5)
@@ -43854,7 +43854,8 @@ varying float vLeaf;
               E = s.next(),
               S = s.next(),
               k = n.heightAt(M, T);
-            if (k < 0 + 0.9 || (n.normalAt(M, T, c), c.y < 0.8)) continue;
+            if (k < 0 + 0.9 || (n.normalAt(M, T, c), c.y < 0.9)) continue;
+            let sl = 1 - c.y;
             let I = n.forest(M, T),
               C = 0.03 + I * I * 0.78;
             if (b > C) continue;
@@ -43880,7 +43881,7 @@ varying float vLeaf;
                   ? (D = ft.BIRCH)
                   : (D = S < H ? ft.PINE : ft.OAK);
             let G = s.range(0.85, 1.22) * (D === ft.PINE && k > 18 ? 1.12 : 1),
-              Y = d(D, M, T, { s: G, dy: -0.12 });
+              Y = d(D, M, T, { s: G, dy: -0.12 - sl * 3 });
             if (!Y) continue;
             let X = i.get(ve[D].tpl, Y.v, 0);
             ((Y.prof = X.prof),
@@ -43896,7 +43897,7 @@ varying float vLeaf;
             b = s.next();
           if (n.heightAt(v, M) < 0 + 0.6) continue;
           let E = n.forest(v, M);
-          if (T > 0.18 + E * 0.5 || (n.normalAt(v, M, c), c.y < 0.75 || f(v, M, 1))) continue;
+          if (T > 0.18 + E * 0.5 || (n.normalAt(v, M, c), c.y < 0.9 || f(v, M, 1))) continue;
           let S = ft.BUSH;
           b < 0.24 && (S = n.m.noise2(v * 0.02, M * 0.02) > 0 ? ft.BERRY_R : ft.BERRY_B);
           let k = d(S, v, M, { s: s.range(0.8, 1.3), dy: -0.08 });
@@ -43910,7 +43911,7 @@ varying float vLeaf;
           let _ = n.forest(v, M);
           T > 0.65 * (1 - _) + 0.1 ||
             (n.normalAt(v, M, c),
-            !(c.y < 0.8 || f(v, M, 0.6)) && d(ft.TALLGRASS, v, M, { s: s.range(0.85, 1.35), dy: -0.03 }));
+            !(c.y < 0.94 || f(v, M, 0.6)) && d(ft.TALLGRASS, v, M, { s: s.range(0.85, 1.35), dy: -0.03 }));
         }
         for (let w = 0; w < 44; w++) {
           let v = o + s.next() * 48,
@@ -43921,7 +43922,7 @@ varying float vLeaf;
             T > b * 0.85 ||
             n.heightAt(v, M) < 0 + 0.6 ||
             (n.normalAt(v, M, c),
-            !(c.y < 0.78 || f(v, M, 0.4)) && d(ft.FERN, v, M, { s: s.range(0.8, 1.5), dy: -0.03 }));
+            !(c.y < 0.92 || f(v, M, 0.4)) && d(ft.FERN, v, M, { s: s.range(0.8, 1.5), dy: -0.03 }));
         }
         for (let w = 0; w < 12; w++) {
           let v = o + s.next() * 48,
@@ -43931,6 +43932,7 @@ varying float vLeaf;
           n.forest(v, M) < 0.45 ||
             T > 0.55 ||
             n.heightAt(v, M) < 0 + 0.6 ||
+            (n.normalAt(v, M, c), c.y < 0.92) ||
             d(b < 0.22 ? ft.MUSH_R : ft.MUSH_B, v, M, { s: s.range(0.9, 1.4), dy: -0.01 });
         }
         let y = xe(0.1, 0.6, n.n.noise2(o * 0.0012 + 300.5, a * 0.0012 - 200.5));
@@ -43966,7 +43968,8 @@ varying float vLeaf;
             M = a + s.next() * 48,
             T = s.next();
           if (n.forest(v, M) < 0.3 || T > 0.45 || n.heightAt(v, M) < 0 + 0.5 || f(v, M, 1.2)) continue;
-          let E = d(ft.STUMP, v, M, { s: s.range(0.85, 1.2), dy: -0.05 });
+          if ((n.normalAt(v, M, c), c.y < 0.92)) continue;
+          let E = d(ft.STUMP, v, M, { s: s.range(0.85, 1.2), dy: -0.05 - (1 - c.y) * 2.5 });
           if (E) {
             let S = i.get("stump", E.v, 0);
             ((E.prof = S.prof), (E.cr = Math.max(S.r, S.maxR || 0) * E.s));
@@ -45967,17 +45970,17 @@ ${fi}
       t = [],
       e = [],
       n = [],
-      i = At(5214006),
-      s = At(12181616),
-      o = 7,
+      i = At(4091434),
+      s = At(10931298),
+      o = 10,
       a = 0;
     for (let h = 0; h < o; h++) {
       let d = (h / o) * Math.PI * 2 + Math.random() * 0.6,
         u = 0.04 + Math.random() * 0.08,
         f = Math.cos(d) * u,
         p = Math.sin(d) * u,
-        y = 0.22 + Math.random() * 0.24,
-        g = 0.05 + Math.random() * 0.025,
+        y = 0.16 + Math.random() * 0.24,
+        g = 0.024 + Math.random() * 0.014,
         m = 0.12 + Math.random() * 0.18,
         x = Math.cos(d),
         w = Math.sin(d),
@@ -46058,7 +46061,7 @@ ${fi}
   function Vx(r) {
     let t = new fe({ vertexColors: !0, roughness: 0.9, metalness: 0, side: kn });
     return (
-      (t.defines = { INK_MASK: "0.0", TOON_WRAP: "0.55" }),
+      (t.defines = { INK_MASK: "0.0", TOON_WRAP: "0.55", GRASS_H: "0.5" }),
       (t.onBeforeCompile = (e) => {
         (Object.assign(e.uniforms, r),
           (e.uniforms.uTime = Me.uTime),
@@ -46098,7 +46101,7 @@ ${fi}
         #endif
         vec4 gw = modelMatrix * mvPosition;
         vec4 gb = modelMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0);
-        float bw = clamp(position.y / 0.5, 0.0, 1.0);
+        float bw = clamp(position.y / GRASS_H, 0.0, 1.0);
         bw *= bw;
         float ph = dot(gb.xz, vec2(0.13, 0.11));
         float sway = sin(uTime * 1.9 + ph) * 0.6 + sin(uTime * 3.7 + ph * 1.7) * 0.25 + 0.35;
@@ -46136,6 +46139,216 @@ uniform float uWet; uniform float uNight;`,
       t
     );
   }
+  function sgMicroGeo(r) {
+    let t = [],
+      e = [],
+      n = [],
+      i = [],
+      s = 0x9e3779b9,
+      o = () => ((s = (Math.imul(s ^ (s >>> 15), 2246822519) + 0x6d2b79f5) | 0), ((s >>> 0) % 1e6) / 1e6);
+    for (let a = 0; a < r; a++) {
+      let l = o() - 0.5,
+        c = o() - 0.5,
+        h = 0.06 + o() * 0.1,
+        d = 0.011 + o() * 0.012,
+        u = o() * Math.PI * 2,
+        f = Math.cos(u) * d,
+        p = Math.sin(u) * d,
+        y = (o() - 0.5) * 0.05,
+        g = (o() - 0.5) * 0.05,
+        m = 0.52 + o() * 0.14,
+        x = 1.12 + o() * 0.3;
+      (t.push(l - f, 0, c - p, l + f, 0, c + p, l + y, h, c + g),
+        e.push(m, m, m, m, m, m, x, x, x),
+        n.push(0.25, 0.94, 0.2, 0.25, 0.94, 0.2, 0.25, 0.94, 0.2),
+        i.push(1, 1, 1));
+    }
+    let a = new oe();
+    return (
+      a.setAttribute("position", new se(t, 3)),
+      a.setAttribute("color", new se(e, 3)),
+      a.setAttribute("normal", new se(n, 3)),
+      a.setAttribute("aTint", new se(i, 1)),
+      a.computeBoundingSphere(),
+      a
+    );
+  }
+  var SgMicroGrass = class {
+    constructor(t, e) {
+      ((this.G = t),
+        (this.u = { uTrample: e.uTrample, uCenter: e.uCenter, uRadius: { value: 16 } }),
+        (this.geo = sgMicroGeo(80)),
+        (this.mat = Vx(this.u)),
+        (this.mat.defines.GRASS_H = "0.16"),
+        (this.mat.customProgramCacheKey = () => "grass-micro-v1"),
+        (this.cells = new Map()),
+        (this.free = []),
+        (this.pending = []),
+        (this.mesh = null),
+        (this.radius = 0),
+        (this.lastCx = null),
+        (this.lastCz = null),
+        (this.dirty = !1));
+    }
+    configure(t) {
+      if (
+        (this.mesh && (this.G.scene.remove(this.mesh), this.mesh.dispose(), (this.mesh = null)),
+        this.cells.clear(),
+        (this.pending.length = 0),
+        (this.lastCx = null),
+        (this.radius = t),
+        t <= 0)
+      )
+        return;
+      let e = Math.ceil((t * 2) / Cn) + 2;
+      ((this.maxCells = Math.ceil(e * e * 0.82) + 8), (this.free = []));
+      for (let i = this.maxCells - 1; i >= 0; i--) this.free.push(i);
+      let n = new Gt().makeScale(0, 0, 0);
+      this.mesh = new Ni(this.geo, this.mat, this.maxCells * 16);
+      for (let i = 0; i < this.mesh.count; i++) this.mesh.setMatrixAt(i, n);
+      for (let i = 0; i < this.mesh.count; i++) this.mesh.setColorAt(i, new vt(1, 1, 1));
+      ((this.mesh.frustumCulled = !1),
+        (this.mesh.receiveShadow = !0),
+        (this.mesh.castShadow = !1),
+        this.mesh.instanceMatrix.setUsage(Ei),
+        this.mesh.instanceColor.setUsage(Ei),
+        this.G.scene.add(this.mesh),
+        (this.u.uRadius.value = t));
+    }
+    blocked(t, e, n) {
+      let i = !1;
+      return (
+        this.G.world.forEachObject(t, e, 1.6, (s) => {
+          if (i || s.rm & 1) return;
+          let o = 0;
+          if (De(s.t)) o = (s.cr || 0.3) * 0.9;
+          else if (s.t === ft.ROCK || s.t === ft.BOULDER) o = (s.cr || 0.6) + 0.15;
+          else if (s.t === ft.STUMP || s.t === ft.LOG) o = (s.cr || 0.3) + 0.1;
+          else return;
+          Math.hypot(s.x - t, s.z - e) < o + n && (i = !0);
+        }),
+        i
+      );
+    }
+    fill(t, e, n) {
+      let i = this.G,
+        s = i.gen,
+        o = q0(Qn(t, e, 991)),
+        a = new Gt(),
+        l = new ce(),
+        c = new ce(),
+        h = new R(),
+        d = new R(),
+        u = new R(0, 1, 0),
+        f = new R(),
+        p = new vt(),
+        y = [0, 0, 0],
+        g = new Gt().makeScale(0, 0, 0),
+        m = t * Cn,
+        x = e * Cn,
+        w = s.villageInfluence(m + 2, x + 2, 14) > 0;
+      for (let v = 0; v < 16; v++) {
+        let M = n * 16 + v,
+          T = m + (v & 3) + 0.5 + (o() - 0.5) * 0.3,
+          b = x + (v >> 2) + 0.5 + (o() - 0.5) * 0.3,
+          _ = s.heightAt(T, b),
+          E = s.normalAt(T, b);
+        if (_ < 0 + 0.9 || E.y < 0.8 || s.trails.dist(T, b) < 0.95) {
+          this.mesh.setMatrixAt(M, g);
+          continue;
+        }
+        if (w) {
+          let [k, I] = s.villageGround(T, b);
+          if (k > 0.3 || I > 0.25 || i.villages?.blocksGrass(T, b)) {
+            this.mesh.setMatrixAt(M, g);
+            continue;
+          }
+        }
+        if (i.structures?.blocksGrass(T, b) || this.blocked(T, b, 0.35)) {
+          this.mesh.setMatrixAt(M, g);
+          continue;
+        }
+        let S = s.forest(T, b);
+        if (o() > 1 - xe(0.5, 0.95, S) * 0.7) {
+          this.mesh.setMatrixAt(M, g);
+          continue;
+        }
+        if ((s.groundColor(T, b, _, 1 - E.y, y), !(y[1] > y[0] * 1.02 && y[1] > y[2]))) {
+          this.mesh.setMatrixAt(M, g);
+          continue;
+        }
+        (f.set(E.x, E.y, E.z),
+          l.setFromUnitVectors(u, f),
+          c.setFromAxisAngle(u, o() * 6.283),
+          l.multiply(c));
+        let k = 0.75 + o() * 0.5 + s.n.noise2(T * 0.15, b * 0.15) * 0.25;
+        (h.set(1.05, Math.max(0.4, k), 1.05),
+          d.set(T, _ - 0.015, b),
+          a.compose(d, l, h),
+          this.mesh.setMatrixAt(M, a));
+        let I = 1.22 + o() * 0.16;
+        (p.setRGB(y[0] * I * 0.95, y[1] * I * 1.1, y[2] * I * 0.8), this.mesh.setColorAt(M, p));
+      }
+    }
+    clear(t) {
+      let e = new Gt().makeScale(0, 0, 0);
+      for (let n = 0; n < 16; n++) this.mesh.setMatrixAt(t * 16 + n, e);
+    }
+    reset() {
+      if (this.mesh) {
+        for (let [, t] of this.cells) (this.clear(t.block), this.free.push(t.block));
+        (this.cells.clear(), (this.pending.length = 0), (this.lastCx = null), (this.lastCz = null), (this.dirty = !0));
+      }
+    }
+    rebuildAround(t, e) {
+      let n = Math.floor(t / Cn),
+        i = Math.floor(e / Cn);
+      for (let s = -1; s <= 1; s++)
+        for (let o = -1; o <= 1; o++) {
+          let a = this.cells.get(`${n + o},${i + s}`);
+          a && this.pending.push([n + o, i + s, a]);
+        }
+    }
+    update(t) {
+      if (!this.mesh) return;
+      let e = Math.floor(t.x / Cn),
+        n = Math.floor(t.z / Cn);
+      if (e !== this.lastCx || n !== this.lastCz) {
+        ((this.lastCx = e), (this.lastCz = n));
+        let s = Math.ceil(this.radius / Cn),
+          o = new Set();
+        for (let a = -s; a <= s; a++)
+          for (let l = -s; l <= s; l++) {
+            let c = (l + 0.5) * Cn,
+              h = (a + 0.5) * Cn;
+            c * c + h * h > (this.radius + Cn) * (this.radius + Cn) || o.add(`${e + l},${n + a}`);
+          }
+        for (let [a, l] of this.cells)
+          o.has(a) || (this.clear(l.block), this.free.push(l.block), this.cells.delete(a), (this.dirty = !0));
+        for (let a of o) {
+          if (this.cells.has(a)) continue;
+          if (!this.free.length) break;
+          let [l, c] = a.split(",").map(Number),
+            h = { block: this.free.pop() };
+          (this.cells.set(a, h), this.pending.push([l, c, h]));
+        }
+        this.pending.sort((a, l) => (a[0] - e) ** 2 + (a[1] - n) ** 2 - ((l[0] - e) ** 2 + (l[1] - n) ** 2));
+      }
+      let i = 8;
+      for (; this.pending.length && i > 0; ) {
+        let [s, o, a] = this.pending.shift();
+        if (this.cells.get(`${s},${o}`) !== a) continue;
+        let l = this.G.world.chunkAt(s * Cn + 2, o * Cn + 2);
+        if (!l || !l.heights || !l.buckets) {
+          (this.pending.push([s, o, a]), i--);
+          continue;
+        }
+        (this.fill(s, o, a.block), (this.dirty = !0), i--);
+      }
+      this.dirty &&
+        ((this.mesh.instanceMatrix.needsUpdate = !0), (this.mesh.instanceColor.needsUpdate = !0), (this.dirty = !1));
+    }
+  };
   var qh = class {
     constructor(t) {
       ((this.G = t),
@@ -46156,6 +46369,7 @@ uniform float uWet; uniform float uNight;`,
         (this.tuftGeo = jS()),
         (this.flowerGeo = ZS()),
         (this.material = Vx(this.uniforms)),
+        (this.micro = new SgMicroGrass(t, this.uniforms)),
         (this.flowerMat = Vx(this.uniforms)),
         (this.flowerMat.customProgramCacheKey = () => "flower-v2"),
         (this.pending = []));
@@ -46164,6 +46378,7 @@ uniform float uWet; uniform float uNight;`,
       if (
         ((this.radius = t),
         (this.density = e),
+        this.micro.configure(t > 0 ? Math.min(26, Math.max(10, t * 0.55)) : 0),
         (this.K = Math.round(36 * e)),
         (this.KF = Math.max(1, Math.round(3 * e))),
         this.mesh &&
@@ -46281,7 +46496,7 @@ uniform float uWet; uniform float uNight;`,
       for (let n = 0; n < this.KF; n++) this.flowers.setMatrixAt(t * this.KF + n, e);
     }
     reset() {
-      if (this.mesh) {
+      if ((this.micro.reset(), this.mesh)) {
         for (let [, t] of this.cells) (this.clearBlock(t.block), this.freeBlocks.push(t.block));
         (this.cells.clear(),
           (this.pending.length = 0),
@@ -46292,6 +46507,7 @@ uniform float uWet; uniform float uNight;`,
       }
     }
     rebuildAround(t, e) {
+      this.micro.rebuildAround(t, e);
       let n = Math.floor(t / Cn),
         i = Math.floor(e / Cn);
       for (let s = -1; s <= 1; s++)
@@ -46306,7 +46522,7 @@ uniform float uWet; uniform float uNight;`,
     }
     update(t, e) {
       if (!this.mesh) return;
-      this.uniforms.uCenter.value.copy(e);
+      (this.uniforms.uCenter.value.copy(e), this.micro.update(e));
       let n = Math.floor(e.x / Cn),
         i = Math.floor(e.z / Cn);
       if (n !== this.lastCx || i !== this.lastCz) {
