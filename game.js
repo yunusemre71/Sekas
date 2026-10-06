@@ -52106,10 +52106,17 @@ uniform float uWet; uniform float uNight;`,
         (this.aimW = Bt(this.aimW, e.aiming ? 1 : 0, 10, t)));
       let l = this.dir(this.fwd);
       if (this.mode === "first" && !e.dead) {
-        let I = e.char.head
-          .getWorldPosition(new R())
-          .add(new R(l.x, 0, l.z).normalize().multiplyScalar(0.16))
-          .add(new R(0, 0.06, 0));
+        let hb = e.char.head.getWorldPosition(new R()),
+          pz = !!(e.rest || e.climb || e.sleeping),
+          I;
+        if (pz) ((I = hb.add(new R(l.x, 0, l.z).normalize().multiplyScalar(0.16)).add(new R(0, 0.06, 0))), (this.eyeY = I.y));
+        else {
+          let C = e.swim ? hb.y + 0.06 : e.pos.y + (e.crouch ? 1.2 : 1.64);
+          ((this.eyeY = this.eyeY == null || Math.abs(this.eyeY - C) > 1.5 ? C : Bt(this.eyeY, C, 10, t)),
+            (I = new R(e.pos.x, this.eyeY, e.pos.z).add(new R(l.x, 0, l.z).normalize().multiplyScalar(0.14))));
+        }
+        let sb = this.pitch < -0.62 && !pz;
+        e.char.av && e.char.av.mesh && e.char.av.mesh.visible !== sb && (e.char.av.mesh.visible = sb);
         this.trauma = Math.max(0, this.trauma - t * 1.6);
         let C = this.trauma * this.trauma;
         ((I.x += Math.sin(this.t * 37) * C * 0.05),
@@ -52125,6 +52132,7 @@ uniform float uWet; uniform float uNight;`,
           (this.underwater = I.y < 0 - 0.05 && this.G.gen.heightAt(I.x, I.z) < I.y));
         return;
       }
+      e.char?.av?.mesh && !e.char.av.mesh.visible && (e.char.av.mesh.visible = !0);
       this.right.set(-Math.cos(this.yaw), 0, Math.sin(this.yaw));
       let c = e.crouch ? 0.45 : 0,
         h = e.pos.y + 1.55 - c - (e.swim ? 0.62 : 0) - (e.dead ? 1 : 0) - (e.sleeping ? 1.1 : 0),
@@ -61484,7 +61492,10 @@ uniform float uWet; uniform float uNight;`,
             (this.baseCam.p.copy(e.camera.position),
             this.baseCam.q.copy(e.camera.quaternion),
             (this.baseCam.fov = e.camera.fov)),
-          e.cam.mode === "first" && (e.player.char.setHeadVisible?.(!0), (this.restoreHead = !0)),
+          e.cam.mode === "first" &&
+            (e.player.char.setHeadVisible?.(!0),
+            e.player.char.av?.mesh && (e.player.char.av.mesh.visible = !0),
+            (this.restoreHead = !0)),
           (this.el.hidden = !1),
           (this.youEl.hidden = !0));
         let i = co("clickToPlay");
