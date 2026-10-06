@@ -30870,6 +30870,121 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
             } else this.groundOffset = Bt(this.groundOffset, 0, 6, t);
             this.model.position.y = this.groundOffset;
           }
+          sockWorld(t, e, n, i, s = 1) {
+            let o = this.sock[t],
+              a = this.bones["hand_" + t],
+              l = new Gt().makeBasis(e, n, i),
+              c = new ce().setFromRotationMatrix(l),
+              h = c.multiply(o.quaternion.clone().invert()),
+              d = new ce();
+            (a.parent.getWorldQuaternion(d), d.invert().multiply(h), a.quaternion.slerp(d, s));
+          }
+          hammerHead(t) {
+            if (t.userData.head) return t.userData.head;
+            (t.updateWorldMatrix(!0, !0));
+            let e = t.matrixWorld.clone().invert(),
+              n = [];
+            t.traverse((c) => {
+              if (!c.isMesh) return;
+              let h = c.geometry.attributes.position,
+                d = new Gt().multiplyMatrices(e, c.matrixWorld);
+              for (let u = 0; u < h.count; u++) n.push(new R(h.getX(u), h.getY(u), h.getZ(u)).applyMatrix4(d));
+            });
+            let i = new R(1e9, 1e9, 1e9),
+              s = new R(-1e9, -1e9, -1e9);
+            for (let c of n) (i.min(c), s.max(c));
+            let o = s.clone().sub(i),
+              a = o.x >= o.y && o.x >= o.z ? "x" : o.y >= o.z ? "y" : "z",
+              l = [i[a], s[a]],
+              c = (s[a] - i[a]) * 0.22,
+              h = (f) => {
+                let p = n.filter((v) => (f ? v[a] > s[a] - c : v[a] < i[a] + c)),
+                  y = new R(1e9, 1e9, 1e9),
+                  g = new R(-1e9, -1e9, -1e9);
+                for (let v of p) (y.min(v), g.max(v));
+                let m = g.clone().sub(y),
+                  x = p.reduce((v, M) => v.add(M), new R()).multiplyScalar(1 / Math.max(1, p.length));
+                return { spread: m.x + m.y + m.z - (g[a] - y[a]), c: x };
+              },
+              d = h(!0),
+              u = h(!1);
+            return (t.userData.head = (d.spread > u.spread ? d : u).c);
+          }
+          hammerPose(t, e, n) {
+            let i = this.bones,
+              s = this.root,
+              o = this.held.r;
+            if (!o || n <= 0.001) return;
+            let a = this.hammerHead(o),
+              l = e < 0.42 ? 1 - Math.pow(e / 0.42, 2.4) : Math.pow(Math.min(1, (e - 0.42) / 0.22), 0.7),
+              c = new R().copy(t);
+            c.y += 0.05 + 0.5 * l;
+            let h = new R(1, 0, 0).transformDirection(s.matrixWorld).setY(0).normalize(),
+              d = new R(0, 0, 1).transformDirection(s.matrixWorld).setY(0).normalize();
+            c.addScaledVector(d, -0.16 * l);
+            let u = rd.clone().addScaledVector(h, 0.9),
+              Q = new ce(),
+              W = new ce(),
+              Pq = new ce(),
+              hp = new R(),
+              sh = new R();
+            for (let f = 0; f < 3; f++) {
+              s.updateMatrixWorld(!0);
+              (i.hand_r.getWorldPosition(hp), i.upperarm_r.getWorldPosition(sh));
+              let p = o.localToWorld(a.clone()),
+                L = p.distanceTo(hp),
+                dir = c.clone().sub(sh).normalize(),
+                H = c.clone().addScaledVector(dir, -L);
+              (Gl(i.upperarm_r, i.lowerarm_r, i.hand_r, H, u, n), s.updateMatrixWorld(!0));
+              i.hand_r.getWorldPosition(hp);
+              p = o.localToWorld(a.clone());
+              let v1 = p.clone().sub(hp).normalize(),
+                v2 = c.clone().sub(hp).normalize();
+              (Q.setFromUnitVectors(v1, v2), new ce().slerp(Q, n), (Q = new ce().slerp(Q, n)));
+              (i.hand_r.getWorldQuaternion(W), W.premultiply(Q), i.hand_r.parent.getWorldQuaternion(Pq), Pq.invert().multiply(W), i.hand_r.quaternion.copy(Pq));
+              s.updateMatrixWorld(!0);
+            }
+          }
+          scythePose(t, e, n) {
+            let i = this.bones,
+              s = this.root,
+              o = (u) => u * u * (3 - 2 * u),
+              a = (u, f, p) => f + (p - f) * u,
+              l,
+              c = 0.35,
+              h = 0.65;
+            t < c ? (l = a(o(t / c), 0, 1.4)) : t < h ? (l = a(o((t - c) / (h - c)), 1.4, -0.95)) : (l = a(o((t - h) / (1 - h)), -0.95, 0));
+            let d = e * o(Math.min(1, n));
+            s.updateMatrixWorld(!0);
+            let u = new R(1, 0, 0).transformDirection(s.matrixWorld).setY(0).normalize(),
+              f = new R(0, 0, 1).transformDirection(s.matrixWorld).setY(0).normalize(),
+              p = u.clone().negate(),
+              y = -l * 0.4 * d;
+            (Yn(i.spine_01, Ol, y * 0.3), Yn(i.spine_02, Ol, y * 0.35), Yn(i.spine_03, Ol, y * 0.35));
+            s.updateMatrixWorld(!0);
+            let g = new R();
+            i.upperarm_r.getWorldPosition(g);
+            let m = Math.cos(l),
+              x = Math.sin(l),
+              w = f.clone().multiplyScalar(m).addScaledVector(p, x),
+              v = g.clone().addScaledVector(w, 0.34);
+            v.y -= 0.36 - 0.06 * Math.sin(Math.min(1, Math.max(0, (t - c) / (h - c))) * Math.PI);
+            let M = new R().copy(v).sub(g),
+              T = new R().lerpVectors(new R().copy(g).add(M.clone().multiplyScalar(0)), v, 1);
+            let b = rd.clone().addScaledVector(u, -0.9);
+            (Gl(i.upperarm_r, i.lowerarm_r, i.hand_r, T, b, d));
+            let _ = w.clone();
+            _.y = -0.08;
+            _.normalize();
+            let E = f.clone().multiplyScalar(Math.sin(l)).addScaledVector(p, -Math.cos(l)),
+              S = new R().copy(_).multiplyScalar(-1),
+              k = E.clone().sub(_.clone().multiplyScalar(E.dot(_))).normalize(),
+              I = new R().crossVectors(k, S).normalize();
+            this.sockWorld("r", k, S, I, d);
+            let C = this.held.r;
+            C && (C.rotation.x = Math.PI * o(Math.min(1, d * 1.2)));
+            s.updateMatrixWorld(!0);
+          }
           footHeight(t) {
             let e = this.bones["foot_" + t].getWorldPosition(o1),
               n = this.root.worldToLocal(e).y - this.B.ankle,
@@ -34416,9 +34531,11 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
               n = P1[this.def.role] || null;
             (this.setTool(n, "r"),
               (this.weapon =
-                n === "Sword" || n === "Scythe"
-                  ? "sword"
-                  : n === "Axe"
+                n === "Scythe"
+                  ? "scythe"
+                  : n === "Sword"
+                    ? "sword"
+                    : n === "Axe"
                     ? "axe"
                     : n === "Hammer_Small"
                       ? "hammer"
@@ -35431,10 +35548,11 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
                 s = !0;
               for (
                 this.playAct("Idle_Talking_Loop", {});
-                n < e && t.chatHost === this && !t.hostile && !t.talking;
+                n < e && t.chatHost === this && !t.hostile && !t.talking && !(this.chatCapT !== void 0 && this.chatCapT <= 0);
               ) {
                 let o = (yield) || 0.016;
-                ((n += o),
+                (this.chatCapT !== void 0 && (this.chatCapT -= o),
+                  (n += o),
                   (i += o),
                   (this.yaw = pn(this.yaw, Math.atan2(t.pos.x - this.pos.x, t.pos.z - this.pos.z), 4, o)),
                   i > 3.5 + Math.random() * 2 &&
@@ -35446,7 +35564,11 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
               }
               return !0;
             } finally {
-              (t.chatHost === this && (t.chatHost = null), (this.hosting = null), this.av.stop("act", 0.3));
+              (t.chatHost === this && (t.chatHost = null),
+                (this.hosting = null),
+                (this.chatTries = 0),
+                (this.chatCapT = void 0),
+                this.av.stop("act", 0.3));
             }
           }
           updateListen(t) {
@@ -35745,7 +35867,7 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
                   })),
                 (yield* this.goTo({ node: e.gnode, x: e.x, z: e.z })) &&
                   (this.setTool("Hammer_Small"),
-                  yield* this.act("TreeChopping_Loop", 10 + this.r.next() * 8, { face: e.face, fx: "clank" }),
+                  yield* this.act("TreeChopping_Loop", 10 + this.r.next() * 8, { face: e.face, fx: "clank", anvil: new R(e.ax, e.ay, e.az) }),
                   this.setTool(null)),
                 i % 3 === 2 && this.v.stalls.length)
               ) {
@@ -36189,9 +36311,11 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
             (this.setTool(t || null, "r"),
               this.setTool(null, "l"),
               (this.weapon =
-                t === "Sword" || t === "Scythe"
-                  ? "sword"
-                  : t === "Axe"
+                t === "Scythe"
+                  ? "scythe"
+                  : t === "Sword"
+                    ? "sword"
+                    : t === "Axe"
                     ? "axe"
                     : t === "Hammer_Small"
                       ? "hammer"
@@ -36223,7 +36347,26 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
               (this.mode = null),
               (this.planT = 0));
           }
+          slapPlayer() {
+            let t = this.G,
+              e = t.player,
+              n = e.pos.x - this.pos.x,
+              i = e.pos.z - this.pos.z,
+              s = Math.hypot(n, i) || 1;
+            ((this.yaw = Math.atan2(n, i)),
+              this.av.play("Punch_Jab", { seg: [0, 0.8], dur: 0.7, tag: "atk", mask: "full", fadeIn: 0.05, fadeOut: 0.2 }),
+              s < 4 &&
+                (e.damage(6, `${this.name} seni tokatladı`, new R(n / s, 0, i / s), { knock: 3 }),
+                t.audio?.hitFlesh(e.pos.clone().setY(e.pos.y + 1.2), 0.7),
+                t.particles.hit(e.pos.clone().setY(e.pos.y + 1.2), 16774872)));
+          }
           swing() {
+            if (this.weapon === "scythe") {
+              ((this.atk = { t: 0, dur: 1.2, hitAt: 0.6, hit: !1 }),
+                (this.atkCool = 1.6 + this.r.next() * 0.7),
+                this.G.audio?.whoosh?.(0.3));
+              return;
+            }
             let t = {
                 sword: [
                   ["Sword_Regular_A", [0, 0.43], 0.55],
@@ -36251,7 +36394,7 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
               (this.atkCool = (this.def.role === "guard" ? 1 : 1.35) + this.r.next() * 0.7));
           }
           weaponDmg() {
-            return { sword: 11, axe: 10, hammer: 9, dagger: 8, fist: 5 }[this.weapon] || 5;
+            return { sword: 11, scythe: 12, axe: 10, hammer: 9, dagger: 8, fist: 5 }[this.weapon] || 5;
           }
           updateHostile(t) {
             let e = this.G,
@@ -36276,7 +36419,7 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
               )
                 if (
                   ((this.atk.hit = !0),
-                  o < 2.1 && Math.abs(zn(this.yaw, a)) < 1.1 && Math.abs(n.pos.y - this.pos.y) < 1.6)
+                  o < (this.weapon === "scythe" ? 2.5 : 2.1) && Math.abs(zn(this.yaw, a)) < (this.weapon === "scythe" ? 1.4 : 1.1) && Math.abs(n.pos.y - this.pos.y) < 1.6)
                 ) {
                   let f = new R(i / (o || 1), 0, s / (o || 1));
                   (n.damage(this.weaponDmg(), `${this.name} seni yere serdi`, f, { knock: 4 }),
@@ -36286,7 +36429,7 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
               this.atk.t >= this.atk.dur && (this.atk = null);
               return;
             }
-            if (o < 1.5) {
+            if (o < (this.weapon === "scythe" ? 2 : 1.5)) {
               ((this.yaw = pn(this.yaw, a, 8, t)),
                 this.atkCool <= 0 && Math.abs(zn(this.yaw, a)) < 0.5 && this.swing(),
                 this.groundY(t));
@@ -36463,6 +36606,24 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
               moving: this.moveV > 0.3,
               ground: !this.pose && this.down <= 0,
             }),
+              this.curAct?.o.anvil && this.av.held.r && e < 60
+                ? ((this.hamW = Math.min(1, (this.hamW || 0) + t * 5)),
+                  this.av.hammerPose(
+                    this.curAct.o.anvil,
+                    (() => {
+                      let c = this.av.layers.find((h) => h.tag === "act" && !h.stopping);
+                      return c && c.dur > 0 ? (c.t / c.dur) % 1 : 0;
+                    })(),
+                    this.hamW,
+                  ))
+                : (this.hamW = 0),
+              this.weapon === "scythe" && this.atk && e < 60
+                ? this.av.scythePose(
+                    this.atk.t / this.atk.dur,
+                    1,
+                    Math.max(0, Math.min(1, this.atk.t / 0.12, (this.atk.dur - this.atk.t) / 0.2)),
+                  )
+                : this.av.held.r && this.av.held.r.rotation.x && (this.av.held.r.rotation.x = 0),
               this.pose === "sit" && (this.av.model.position.y += 0.02),
               this.carry && e < 90 && this.placeCarry(),
               this.carry?.kind === "lantern" &&
@@ -42215,12 +42376,15 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
               yaw: 0,
               noStep: !0,
             }));
-          let M = e({ x: y.x, y: 0, z: y.z + 0.75 });
+          let M = e({ x: y.x, y: 0, z: y.z + 0.6 });
           n.work.push({
             kind: "anvil",
             x: M.x,
             y: m,
             z: M.z,
+            ax: g.x,
+            ay: m + 0.79,
+            az: g.z,
             face: Math.atan2(g.x - M.x, g.z - M.z),
             anim: "TreeChopping_Loop",
             house: n,
@@ -59791,7 +59955,8 @@ uniform float uWet; uniform float uNight;`,
             break;
           }
           case "npc":
-            ((s = "[E] Konuş"), (o = t.dialogue?.subtitle(e.npc) || null));
+            ((s = "[E] Konuş"),
+              (o = e.npc.chatHost || e.npc.hosting ? "Başkasıyla sohbet ediyor" : t.dialogue?.subtitle(e.npc) || null));
             break;
           case "rest": {
             let l = e.spot,
@@ -62817,6 +62982,8 @@ uniform float uWet; uniform float uNight;`,
           s = t.def.personality,
           o = this.rep(t.v),
           g = this.grudgeStage(t);
+        if (e.angry && !e.angry.said && this.nowH() < e.angry.till)
+          return ((e.angry.said = !0), Ne(["Geçen gün sohbetimizin ortasına dalıp bizi rahatsız ettin, hâlâ kızgınım! Neyse... ne istiyorsun?", "Sen miydin o, bizi sohbetimizde bölen? Bir daha yapma. Hadi, dinliyorum."]));
         if (g === 2) return Ne(sgz);
         if (o < -25)
           return Ne([
@@ -62895,9 +63062,26 @@ uniform float uWet; uniform float uNight;`,
           n * (0.92 + ((e.seed >>> 3) % 100) / 625)
         );
       }
+      busyChat(t) {
+        let e = this.G,
+          n = t.hosting ? t : t.chatHost,
+          i = n.hosting;
+        if (!i) return;
+        let s = ((n.chatTries = (n.chatTries || 0) + 1), n.chatTries);
+        if (s === 1) this.bark(t, Ne(["Şu an meşgulüz, biraz sonra gel.", "Görmüyor musun, konuşuyoruz. Sonra gel.", "Bir dakika, sohbet ediyoruz."]));
+        else if (s === 2)
+          this.bark(t, Ne(["Konuşuyoruz dedim! Bir daha araya girersen kötü olur.", "Son uyarım: Rahatsız etme bizi!"]));
+        else if (s === 3) {
+          (this.bark(t, Ne(["Sana söylemiştim!", "Defol git buradan!"])), t.slapPlayer?.());
+          let o = this.nowH() + 48;
+          for (let a of [n, i]) this.npcState(a).angry = { till: o, said: !1 };
+          n.chatCapT = 60;
+        } else e.ui.notify("Şu an seninle konuşmak istemiyorlar.", null);
+      }
       open(t) {
         let e = this.G;
         if (this.npc || !t || t.inside || e.player.dead) return;
+        if ((t.chatHost || t.hosting) && !t.talking) return this.busyChat(t);
         (e.ui.panelOpen && e.ui.closePanel(), (this.npc = t), (this.camNpc = t), t.startTalk());
         let n = this.npcState(t);
         ((this.history = []),
@@ -66596,6 +66780,7 @@ uniform float uWet; uniform float uNight;`,
   A.toggleMusic = () => {};
   A.debug = {
     In: () => In,
+    models: () => to,
     walk(r) {
       let t = [];
       for (let e = 0; e < r.floors.length; e++) {
