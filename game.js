@@ -27132,7 +27132,7 @@ void main() {
       t.noInk
         ? (r.defines.INK_MASK = "0.0")
         : t.leaf
-          ? (r.defines.INK_MASK = "(vLeaf > 0.5 ? 0.75 : 1.0)")
+          ? (r.defines.INK_MASK = "(vLeaf > 1.3 ? 0.18 : vLeaf > 0.5 ? 0.75 : 1.0)")
           : t.silhouetteOnly && (r.defines.INK_MASK = "0.75"),
       e > 0 && (r.defines.TOON_WRAP = e.toFixed(3)),
       (r.onBeforeCompile = (o) => {
@@ -43124,72 +43124,144 @@ varying float vLeaf;
     let h = n.build();
     return ((h.trunkR = s), (h.canopyR = c), (h.H = i), h);
   }
+  function sgClump(r, t, e, n, i, s, o, a, l, q0x) {
+    if (q0x) {
+      let Lb = Fn(i * 0.82, 0, 0.2, o.int(0, 999), 1, 0.78, 1);
+      (Lb.translate(t, e, n),
+        r.add(Lb, {
+          color: (b, _) => Co(We(a[0], a[1], 0.45), 0.8 + Math.max(0, _.y) * 0.3),
+          wind: 0.4,
+          leaf: 1,
+        }));
+    }
+    let c = [],
+      h = [],
+      d = [],
+      u = [],
+      f = 0,
+      p = new R(),
+      y = new R(),
+      g = new R(),
+      m = new R(),
+      x = new R(),
+      w = new R(),
+      v = 0.55 + o.range(0, 0.2);
+    for (let M = 0; M < s; M++) {
+      let T = o.range(0, Math.PI * 2),
+        b = Math.acos(o.range(-0.75, 1)),
+        _ = i * (0.5 + 0.5 * Math.sqrt(o.next()));
+      p.set(Math.sin(b) * Math.cos(T) * _, Math.cos(b) * _ * 0.72, Math.sin(b) * Math.sin(T) * _);
+      let E = p.length() / i;
+      (y.copy(p).normalize(),
+        g.set(y.x + o.range(-0.5, 0.5), y.y + 0.7 + o.range(-0.3, 0.3), y.z + o.range(-0.5, 0.5)).normalize(),
+        m.set(o.range(-1, 1), o.range(-1, 1), o.range(-1, 1)),
+        x.crossVectors(g, m).normalize(),
+        x.lengthSq() < 0.01 && x.set(1, 0, 0),
+        w.crossVectors(x, g).normalize());
+      let S = l * o.range(0.8, 1.2),
+        k = S * o.range(0.75, 0.95),
+        I = [
+          [0, 0],
+          [-k * 0.5, S * 0.42],
+          [0, S],
+          [k * 0.5, S * 0.42],
+        ],
+        C = We(a[0], a[1], o.next()),
+        z = 0.72 + 0.36 * E,
+        H = o.range(0.08, 0.2);
+      for (let [P, U] of I) {
+        let D = p.x + x.x * P + g.x * U + w.x * P * P * H * 3,
+          G = p.y + x.y * P + g.y * U + w.y * P * P * H * 3,
+          Y = p.z + x.z * P + g.z * U + w.z * P * P * H * 3;
+        c.push(t + D, e + G, n + Y);
+        let X = D * 0.75 + w.x * 0.25 * i,
+          Z = G * 0.75 + 0.35 * i,
+          F = Y * 0.75 + w.z * 0.25 * i,
+          q = Math.hypot(X, Z, F) || 1;
+        h.push(X / q, Z / q, F / q);
+        let V = (z + (U / S) * 0.14) * (G > 0 ? 1.04 : 0.92);
+        d.push(C[0] * V, C[1] * V, C[2] * V);
+      }
+      (u.push(f, f + 1, f + 3, f + 1, f + 2, f + 3, f, f + 3, f + 1, f + 1, f + 3, f + 2), (f += 4));
+    }
+    let M = new oe();
+    (M.setAttribute("position", new se(c, 3)), M.setAttribute("normal", new se(h, 3)), M.setIndex(u));
+    let T = a[2] || 1;
+    r.add(M, {
+      color: (b, _, E) => [d[E * 3] * T, d[E * 3 + 1] * T, d[E * 3 + 2] * T],
+      wind: (b) => 0.4 + Math.min(0.6, Math.pow(Math.max(0, b.y) / (e + i * 1.5), 2) * 0.6),
+      leaf: 1.6,
+    });
+  }
+  function sgLimb(r, t, e, n, i, s, o, a, l, c, h) {
+    let d = yn(a, l, o, h ? 4 : 6, h ? 1 : 3, 0, 0, 0, c);
+    (d.applyMatrix4(bn(t, e, n, 0, -i + Math.PI / 2, -s)), r.add(d, { color: Aa, wind: Dl(e + o + 2) }));
+    let u = new R(0, o, 0).applyMatrix4(bn(t, e, n, 0, -i + Math.PI / 2, -s));
+    return u;
+  }
   function Rh(r, t = 0, e = !1) {
     let n = new de(r * 7919 + 3),
       i = new hn(),
       s = e ? n.range(4.2, 5.2) : n.range(5.2, 7.2),
       o = e ? n.range(0.24, 0.3) : n.range(0.38, 0.5),
-      a = n.range(-0.06, 0.06),
-      l = n.range(-0.06, 0.06);
-    i.add(yn(o, o * 0.55, s, t ? 6 : 9, t ? 2 : 5, a, l, 0.4, r), {
-      color: (w) => We(ap, Aa, Math.min(1, w.y / 2.5)),
+      a = n.range(-0.05, 0.05),
+      l = n.range(-0.05, 0.05),
+      c = s * n.range(0.5, 0.6);
+    i.add(yn(o, o * 0.6, c + 0.4, t ? 6 : 9, t ? 2 : 4, a, l, 0.4, r), {
+      color: (P) => We(ap, Aa, Math.min(1, P.y / 2.5)),
       wind: Dl(s + 3),
     });
-    let c = a * s,
-      h = l * s,
-      d = t ? 0 : n.int(2, 4);
-    for (let w = 0; w < d; w++) {
-      let v = (w / d) * Math.PI * 2 + n.range(-0.4, 0.4),
-        M = n.range(1.6, 2.4),
-        T = yn(o * 0.42, o * 0.18, M, 6, 2, 0, 0, 0, r + w),
-        b = s * n.range(0.62, 0.85);
-      (T.applyMatrix4(bn(c * 0.7, b, h * 0.7, 0, -v + Math.PI / 2, -n.range(0.7, 1))),
-        i.add(T, { color: Aa, wind: Dl(s + 3) }));
+    let h = a * c,
+      d = l * c,
+      u = e ? [At(3828258), At(8170044), 1] : [At(3103263), At(7313971), 1],
+      f = t ? 16 : 62,
+      p = t ? 0.8 : 0.58,
+      y = [],
+      g = t ? 3 : n.int(3, 5),
+      m = 0;
+    for (let P = 0; P < g; P++) {
+      let U = (P / g) * Math.PI * 2 + n.range(-0.35, 0.35),
+        D = n.range(0.45, 0.8),
+        G = (s - c) * n.range(0.95, 1.3) + (e ? 0.8 : 1.4),
+        Y = c - 0.1 + P * 0.18,
+        X = sgLimb(i, h, Y, d, U, D, G, o * 0.55, o * 0.16, r + P, t);
+      ((m = Math.max(m, Math.hypot(X.x, X.z))), y.push([X.x, X.y, X.z, n.range(0.95, 1.25)]));
+      let Z = t ? 1 : n.int(2, 3);
+      for (let F = 0; F < Z; F++) {
+        let q = n.range(0.45, 0.75),
+          V = h + (X.x - h) * q,
+          $ = Y + (X.y - Y) * q,
+          K = d + (X.z - d) * q,
+          J = U + n.range(-0.9, 0.9),
+          Q = Math.min(1.25, D + n.range(0.2, 0.5)),
+          j = sgLimb(i, V, $, K, J, Q, n.range(1, 1.7), o * 0.2, o * 0.07, r + P * 7 + F, t);
+        ((m = Math.max(m, Math.hypot(j.x, j.z))), y.push([j.x, j.y, j.z, n.range(0.75, 1)]));
+      }
     }
-    let u = e ? n.range(1.9, 2.4) : n.range(2.6, 3.4),
-      f = t ? 4 : n.int(5, 8),
-      p = s + u * 0.35,
-      y = [[0, p + u * 0.25, 0, 1]];
-    for (let w = 0; w < f - 1; w++) {
-      let v = (w / (f - 1)) * Math.PI * 2 + n.range(-0.3, 0.3),
-        M = u * n.range(0.55, 0.8);
-      y.push([Math.cos(v) * M, p + n.range(-0.5, 0.4) * u * 0.6, Math.sin(v) * M, n.range(0.62, 0.82)]);
-    }
-    let g = p + u * 1.25,
-      m = p - u;
-    for (let w = 0; w < y.length; w++) {
-      let [v, M, T, b] = y[w],
-        _ = u * b,
-        E = Fn(_, t ? 1 : 2, 0.18, r + w * 3, 1, 0.85, 1);
-      (E.translate(c + v, M, h + T),
-        i.add(E, {
-          color: (S, k) => {
-            let I = Math.max(0, Math.min(1, (S.y - m) / (g - m))),
-              C = We(lS, cS, Math.min(1, I * 1.6));
-            return ((C = We(C, hS, Math.max(0, k.y) * I * 0.55)), k.y < -0.3 && (C = Co(C, 0.7)), C);
-          },
-          wind: (S) => 0.35 + Math.pow(Math.max(0, S.y) / g, 2) * 0.65,
-          leaf: 1,
-        }));
+    y.push([h + n.range(-0.3, 0.3), s + (e ? 1.3 : 1.9), d + n.range(-0.3, 0.3), 1.15]);
+    let x = e ? 1.05 : 1.25;
+    for (let P = 0; P < y.length; P++) {
+      let [U, D, G, Y] = y[P];
+      sgClump(i, U, D, G, x * Y, Math.round(f * Y), n, u, p, t);
     }
     if (e && !t) {
-      let w = n.int(7, 11);
-      for (let v = 0; v < w; v++) {
-        let M = y[n.int(0, y.length - 1)],
-          T = n.range(0, Math.PI * 2),
-          b = n.range(-0.6, 0.5),
-          _ = u * M[3] * 0.98,
-          E = c + M[0] + Math.cos(T) * Math.cos(b) * _,
-          S = M[1] + Math.sin(b) * _ * 0.85,
-          k = h + M[2] + Math.sin(T) * Math.cos(b) * _,
-          I = new jt(0.13, 7, 5);
-        (I.translate(E, S, k),
-          i.add(I, { color: (C, z) => We(fS, At(16756896), Math.max(0, z.y) * 0.35), wind: 0.6, part: 2 }));
+      let P = n.int(7, 11);
+      for (let U = 0; U < P; U++) {
+        let D = y[n.int(0, y.length - 1)],
+          G = n.range(0, Math.PI * 2),
+          Y = n.range(-0.6, 0.4),
+          X = x * D[3] * 0.85,
+          Z = D[0] + Math.cos(G) * Math.cos(Y) * X,
+          F = D[1] + Math.sin(Y) * X * 0.7,
+          q = D[2] + Math.sin(G) * Math.cos(Y) * X,
+          V = new jt(0.13, 7, 5);
+        (V.translate(Z, F, q),
+          i.add(V, { color: (k, I) => We(fS, At(16756896), Math.max(0, I.y) * 0.35), wind: 0.6, part: 2 }));
       }
     }
     t || Ih(i, o, r);
-    let x = i.build();
-    return ((x.trunkR = o), (x.canopyR = u), (x.H = s), x);
+    let w = i.build();
+    return ((w.trunkR = o), (w.canopyR = Math.max(2, m + x * 0.6)), (w.H = s), w);
   }
   function Sx(r, t = 0) {
     let e = new de(r * 6007 + 5),
@@ -43198,39 +43270,33 @@ varying float vLeaf;
       s = e.range(0.17, 0.23),
       o = e.range(-0.05, 0.05),
       a = e.range(-0.05, 0.05);
-    n.add(yn(s, s * 0.45, i, t ? 5 : 8, t ? 3 : 9, o, a, 0.25, r), {
-      color: (u) =>
-        xs.noise2(u.y * 2.3 + r, Math.atan2(u.z, u.x) * 0.8) > 0.55
+    n.add(yn(s, s * 0.35, i, t ? 5 : 8, t ? 3 : 9, o, a, 0.25, r), {
+      color: (p) =>
+        xs.noise2(p.y * 2.3 + r, Math.atan2(p.z, p.x) * 0.8) > 0.55
           ? Mx
-          : u.y < 0.4
-            ? We(Mx, bx, u.y / 0.4)
+          : p.y < 0.4
+            ? We(Mx, bx, p.y / 0.4)
             : bx,
       wind: Dl(i),
     });
-    let c = e.chance(0.25) ? uS : dS,
-      h = t ? 3 : e.int(4, 6);
-    for (let u = 0; u < h; u++) {
-      let f = u / h,
-        p = i * (0.55 + f * 0.4),
-        y = e.range(1, 1.5) * (1 - f * 0.35),
-        g = e.range(0, 6.28),
-        m = e.range(0.2, 0.7),
-        x = o * (p / i) * (p / i) * i + Math.cos(g) * m,
-        w = a * (p / i) * (p / i) * i + Math.sin(g) * m,
-        v = Fn(y, t ? 1 : 2, 0.22, r + u * 5, 1, 1.35, 1);
-      (v.translate(x, p, w),
-        n.add(v, {
-          color: (M, T) => {
-            let b = We(Co(c, 0.55), c, Math.max(0, Math.min(1, (M.y - i * 0.5) / (i * 0.6))));
-            return (T.y < -0.3 && (b = Co(b, 0.75)), b);
-          },
-          wind: (M) => 0.4 + Math.pow(Math.max(0, M.y) / (i * 1.3), 2) * 0.7,
-          leaf: 1,
-        }));
+    let l = e.chance(0.25) ? [At(9354800), At(14467147), 1] : [At(5605930), At(11060304), 1],
+      c = t ? 4 : e.int(6, 8),
+      h = [];
+    for (let p = 0; p < c; p++) {
+      let y = p / c,
+        g = i * (0.45 + y * 0.45),
+        m = o * (g / i) * (g / i) * i,
+        x = a * (g / i) * (g / i) * i,
+        w = e.range(0, 6.28) + p * 2.4,
+        v = e.range(0.9, 1.6) * (1 - y * 0.4),
+        M = sgLimb(n, m, g, x, w, e.range(0.75, 1.05), v, s * 0.3, 0.025, r + p, t);
+      h.push([M.x, M.y + 0.2, M.z, e.range(0.75, 1) * (1 - y * 0.25)]);
     }
+    h.push([o * i, i + 0.4, a * i, 0.8]);
+    for (let [p, y, g, m] of h) sgClump(n, p, y, g, 1.1 * m, Math.round((t ? 14 : 46) * m + 2), e, l, t ? 0.62 : 0.46, t);
     t || Ih(n, s, r);
     let d = n.build();
-    return ((d.trunkR = s), (d.canopyR = 1.5), (d.H = i), d);
+    return ((d.trunkR = s), (d.canopyR = 1.8), (d.H = i), d);
   }
   function Ax(r, t = 0) {
     let e = new de(r * 3001 + 9),
