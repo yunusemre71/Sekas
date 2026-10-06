@@ -62636,7 +62636,7 @@ uniform float uWet; uniform float uNight;`,
       fov: 70,
       sens: 1,
       invertY: !1,
-      vol: { master: 0.8, sfx: 1, amb: 0.8, music: 0.45 },
+      vol: { master: 0.8, sfx: 1, amb: 0.8, music: 0.35 },
       showFps: !1,
       musicOn: !0,
     };
@@ -62698,9 +62698,9 @@ uniform float uWet; uniform float uNight;`,
           (this.out.gain.value = 0),
           (this.level = 0),
           (this.dry = e.createGain()),
-          (this.dry.gain.value = 0.78),
+          (this.dry.gain.value = 0.62),
           (this.wet = e.createGain()),
-          (this.wet.gain.value = 0.42),
+          (this.wet.gain.value = 0.55),
           (this.verb = e.createConvolver()),
           (this.verb.buffer = this.hall(3.6)),
           (this.bus = e.createGain()),
@@ -62716,8 +62716,10 @@ uniform float uWet; uniform float uNight;`,
           (this.voices = []),
           (this.events = []),
           (this.piece = null),
-          (this.restT = 14 + Math.random() * 16),
-          (this.danger = 0));
+          (this.restT = 25 + Math.random() * 25),
+          (this.danger = 0),
+          (this.quiet = 0),
+          (this.calmT = 0));
       }
       hall(t) {
         let e = this.ctx,
@@ -62767,12 +62769,12 @@ uniform float uWet; uniform float uNight;`,
           c = o.createGain();
         ((c.gain.value = 0),
           c.gain.setValueAtTime(0, n),
-          c.gain.linearRampToValueAtTime(1, n + 0.004),
+          c.gain.linearRampToValueAtTime(1, n + 0.025),
           c.gain.setValueAtTime(1, n + i),
           c.gain.setTargetAtTime(0, n + i, 0.09 + Math.min(0.5, l * 0.05)));
         let h = o.createBiquadFilter();
         h.type = "lowpass";
-        let d = Math.min(14e3, a * (4 + 14 * e));
+        let d = Math.min(6e3, a * (2.2 + 5 * e));
         (h.frequency.setValueAtTime(d, n),
           h.frequency.setTargetAtTime(Math.max(a * 2.2, 500), n + 0.02, l * 0.35),
           (h.Q.value = 0.4));
@@ -62797,13 +62799,13 @@ uniform float uWet; uniform float uNight;`,
         (y("sine", a, -1.2, f, l),
           y("sine", a, 1.6, f * 0.35, l * 0.9),
           y(this.waves.body, a, 0.6, f * (0.5 + 0.35 * e), l * 0.55),
-          y(this.waves.bright, a, -0.8, f * (0.12 + 0.5 * e * e), l * 0.18));
+          y(this.waves.bright, a, -0.8, f * (0.04 + 0.12 * e * e), l * 0.18));
         let g = o.createBufferSource();
         g.buffer = this.hammerBuf;
         let m = o.createBiquadFilter();
         ((m.type = "bandpass"), (m.frequency.value = Math.min(6e3, a * 5 + 800)), (m.Q.value = 0.9));
         let x = o.createGain();
-        ((x.gain.value = f * 0.35 * e), g.connect(m).connect(x).connect(c), g.start(n));
+        ((x.gain.value = f * 0.05 * e), g.connect(m).connect(x).connect(c), g.start(n));
         let w = n + i + 1.6 + Math.min(4, l * 0.3);
         for (let v of p) v.stop(w);
         if ((this.voices.push({ end: w, out: c, start: n }), this.voices.length > 40)) {
@@ -62818,12 +62820,12 @@ uniform float uWet; uniform float uNight;`,
         }
       }
       newPiece(t) {
-        let e = t ? Math.random() < 0.7 : Math.random() < 0.22,
+        let e = t ? Math.random() < 0.3 : Math.random() < 0.06,
           n = [60, 62, 63, 65, 67, 57, 58][Math.floor(Math.random() * 7)] - 12,
           i = e ? Sz : Tz,
           s = e ? kz : Az,
           o = Math.random() < 0.28,
-          a = (t ? 52 : 58) + Math.random() * 14,
+          a = (t ? 40 : 44) + Math.random() * 8,
           l = 4 + Math.floor(Math.random() * 3),
           c = s[Math.floor(Math.random() * s.length)],
           h = s[Math.floor(Math.random() * s.length)];
@@ -62840,12 +62842,12 @@ uniform float uWet; uniform float uNight;`,
             form: d,
             bar: 0,
             bars: l * 4,
-            lh: Math.floor(Math.random() * 4),
+            lh: [1, 2, 2][Math.floor(Math.random() * 3)],
             motif: null,
             lastMel: n + 19 + i[2],
-            dyn: 0.4 + Math.random() * 0.12,
+            dyn: 0.27 + Math.random() * 0.08,
             t: this.ctx.currentTime + 0.4,
-            density: 0.55 + Math.random() * 0.35,
+            density: 0.22 + Math.random() * 0.2,
           }
         );
       }
@@ -62990,8 +62992,19 @@ uniform float uWet; uniform float uNight;`,
           s = e?.player,
           o = s && e.state === "playing" && !s.dead && (s.attackers?.(28).length || 0) > 0;
         this.danger = o ? Math.min(1, this.danger + t / 1.5) : Math.max(0, this.danger - t / 6);
-        let a = this.enabled ? 1 - this.danger : 0,
-          l = a < this.level ? Math.min(1, t / 1.2) : Math.min(1, t / 3);
+        (s &&
+          s.action &&
+          ["swing", "punch", "thrust", "throw", "chop"].includes(s.action.type) &&
+          (s.attackers?.(28).length || s.action.type !== "chop") &&
+          (this.calmT = 8),
+          (this.calmT = Math.max(0, this.calmT - t)));
+        let q =
+          s && e.state === "playing"
+            ? !!(e.dialogue?.npc || s.sleeping || s.rest?.pose === "lie" || this.calmT > 0 || s.hurtT > 0)
+            : !1;
+        this.quiet = q ? Math.min(1, this.quiet + t / 3) : Math.max(0, this.quiet - t / 6);
+        let a = this.enabled ? (1 - this.danger) * (1 - this.quiet) : 0,
+          l = a < this.level ? Math.min(1, t / 2.5) : Math.min(1, t / 4);
         if (
           ((this.level += (a - this.level) * l),
           this.out.gain.setTargetAtTime(this.level, i, 0.08),
@@ -63016,14 +63029,14 @@ uniform float uWet; uniform float uNight;`,
         c.bar >= c.bars &&
           !this.events.length &&
           i > c.t &&
-          ((this.piece = null), (this.restT = 50 + Math.random() * 110));
+          ((this.piece = null), (this.restT = 90 + Math.random() * 150));
       }
     };
   var mu = class {
     constructor() {
       ((this.ctx = null),
         (this.ready = !1),
-        (this.vol = { master: 0.8, sfx: 1, amb: 0.8, music: 0.45 }),
+        (this.vol = { master: 0.8, sfx: 1, amb: 0.8, music: 0.35 }),
         (this.fireSources = new Map()),
         (this.birdT = 2),
         (this.nightT = 1),
