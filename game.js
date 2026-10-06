@@ -33181,6 +33181,38 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
       if (no(r.obstacles, t, e, s[a[l][0]].x, s[a[l][0]].z, 0.2)) return a[l][0];
     return a.length ? a[0][0] : -1;
   }
+  function sgHouseGrid(h, f) {
+    h._wg = h._wg || {};
+    if (h._wg[f] === void 0) {
+      let P = h.P,
+        dd = sgWalkData(P, P.rooms, P.items, P.spots, f, 0.33, 0.1);
+      h._wg[f] = dd ? { d: dd, free: sgEval(P, dd, P.items, P.spots).free } : null;
+    }
+    return h._wg[f];
+  }
+  function sgSnap(h, f, wx, wz) {
+    let q = sgHouseGrid(h, f);
+    if (!q) return null;
+    let [lx, lz] = h.toLocal(wx, wz),
+      { nx, nz, x0, z0, st } = q.d,
+      ci = Math.floor((lx - x0) / st),
+      cj = Math.floor((lz - z0) / st);
+    if (ci >= 0 && cj >= 0 && ci < nx && cj < nz && q.free[ci * nz + cj]) return null;
+    let bd = 1e9,
+      bx = null,
+      bz = null;
+    for (let a = Math.max(0, ci - 20); a <= Math.min(nx - 1, ci + 20); a++)
+      for (let b = Math.max(0, cj - 20); b <= Math.min(nz - 1, cj + 20); b++)
+        if (q.free[a * nz + b]) {
+          let cx = x0 + (a + 0.5) * st,
+            cz = z0 + (b + 0.5) * st,
+            dd = Math.hypot(cx - lx, cz - lz);
+          dd < bd && ((bd = dd), (bx = cx), (bz = cz));
+        }
+    if (bx === null || bd > 2) return null;
+    let w = h.toWorld({ x: bx, y: 0, z: bz });
+    return { x: w.x, z: w.z };
+  }
   function z1(r, t, e) {
     let n = r.nav.nodes,
       i = t.startNode(),
@@ -33221,13 +33253,30 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
         a.shift();
     }
     if (e.x !== void 0) {
-      let l = a[a.length - 1];
+      let l = a[a.length - 1],
+        tx = e.x,
+        tz = e.z;
       if (Math.hypot(l.x - e.x, l.z - e.z) > 0.05) {
         let c = e.house ?? l.house ?? null,
           h = e.floor ?? l.floor ?? 0;
+        if (c && c.P && c.P.floors[h]) {
+          let sn = sgSnap(c, h, tx, tz);
+          sn && ((tx = sn.x), (tz = sn.z));
+          let q = sgHouseGrid(c, h);
+          if (q && l.house === c) {
+            let [ax, az] = c.toLocal(l.x, l.z),
+              [bx, bz] = c.toLocal(tx, tz),
+              wp = sgNavPath(q.d, q.free, { x: ax, z: az }, { x: bx, z: bz });
+            if (wp)
+              for (let w of wp) {
+                let ww = c.toWorld({ x: w.x, y: 0, z: w.z });
+                a.push({ x: ww.x, z: ww.z, y: c.y + c.P.floors[h].y, node: void 0, doors: null, house: c, floor: h });
+              }
+          }
+        }
         a.push({
-          x: e.x,
-          z: e.z,
+          x: tx,
+          z: tz,
           y: e.y ?? (c ? c.y + c.P.floors[h].y : null),
           node: void 0,
           doors: null,
@@ -33657,6 +33706,7 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
         (Vi = (r) => r[Math.floor(Math.random() * r.length)]),
         (R1 = (r) => r * r * (3 - 2 * r)));
       D1 = new Set([
+        "wp",
         "ring",
         "road",
         "out",
@@ -35953,10 +36003,7 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
             let t = this.G,
               e = t.player;
             if (
-              (!this.loc.house &&
-                !this.doorway &&
-                this.ghost <= 0 &&
-                t.villages.push2D(this.pos, this.radius, this.pos.y),
+              (!this.doorway && this.ghost <= 0 && t.villages.push2D(this.pos, this.radius, this.pos.y),
               !this.loc.house && !this.doorway)
             ) {
               for (let o of this.v.npcs) {
@@ -36336,7 +36383,7 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
         K = c / 2 + pt - j;
       if (n === "inn" && Et && Et.side !== "back") {
         let ht, et;
-        let cw = Ae(Math.max(2, Et.w + 1.1), 0.05);
+        let cw = Ae(Math.max(2.4, Et.w + 1.5), 0.05);
         Et.side === "left"
           ? ([ht, et] = Y(1, lt, L, B, K, cw, "landing", "rooms"))
           : ([et, ht] = Y(1, lt, L, B, K, B - lt - cw, "rooms", "landing"));
@@ -36625,6 +36672,343 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
     cauldron: 0.6,
     nightstand: 0.35,
   };
+  var sgKeep = new Set([
+    "fireplace",
+    "fireplace_big",
+    "fireplace_stone",
+    "oven",
+    "counter",
+    "kegs",
+    "worktable",
+    "workbench",
+    "cauldron",
+    "rtable",
+  ]);
+  var sgPrio = {
+    toys: 0,
+    basket: 0,
+    sacks: 1,
+    crates: 1,
+    barrel: 1,
+    firewood: 1,
+    shelf_jars: 2,
+    shelf: 2,
+    cupboard: 2,
+    nightstand: 2,
+    toolrack: 2,
+    weaponrack: 2,
+    bench_wall: 3,
+    chest: 3,
+    bookshelf: 3,
+    wardrobe: 3,
+    stool: 4,
+    chair: 4,
+    bench: 4,
+    haypile: 5,
+    croppile: 6,
+    table: 7,
+    desk: 7,
+    cot: 20,
+    bed1: 21,
+    bed2: 22,
+  };
+  function sgWalkData(r, rooms, items, spots, f, RR, SS) {
+    let R = RR ?? 0.37,
+      st = SS ?? 0.06,
+      D = r.D,
+      W = r.W,
+      x0 = -W / 2 - 0.5,
+      z0 = -D / 2 - 0.5,
+      nx = Math.ceil((W + 2) / st),
+      nz = Math.ceil((D + 3) / st),
+      walk = rooms.filter((q) => q.floor === f).map((q) => ({ x0: q.x0, x1: q.x1, z0: q.z0, z1: q.z1 })),
+      walls = [];
+    if (!walk.length) return null;
+    for (let w of r.iwalls)
+      if (w.floor === f) {
+        let wr = (a, b, c, d) =>
+          w.axis === "x"
+            ? walls.push({ x0: a, x1: b, z0: w.at - 0.07, z1: w.at + 0.07 })
+            : walls.push({ x0: w.at - 0.07, x1: w.at + 0.07, z0: a, z1: b });
+        if (w.solid) {
+          wr(w.from, w.to);
+          continue;
+        }
+        let g = w.gaps.slice().sort((a, b) => a.c - b.c),
+          cur = w.from;
+        for (let q of g) {
+          let a = q.c - q.w / 2,
+            b = q.c + q.w / 2;
+          (a > cur && wr(cur, a),
+            (cur = b),
+            walk.push(
+              w.axis === "x"
+                ? { x0: a, x1: b, z0: w.at - 0.15, z1: w.at + 0.15 }
+                : { x0: w.at - 0.15, x1: w.at + 0.15, z0: a, z1: b },
+            ));
+        }
+        cur < w.to && wr(cur, w.to);
+      }
+    let t0 = r.floors[0].t,
+      seeds = [];
+    if (f === 0) {
+      for (let p of r.openings)
+        if (p.kind === "door" && p.floor === 0 && (p.side === "front" || p.side === "back")) {
+          let z = p.side === "front" ? D / 2 : -D / 2,
+            s2 = p.side === "front" ? -1 : 1;
+          (walk.push({ x0: p.c - p.w / 2, x1: p.c + p.w / 2, z0: Math.min(z, z + s2 * (t0 + 0.4)) - 0.5, z1: Math.max(z, z + s2 * (t0 + 0.4)) + 0.5 }),
+            seeds.push([p.c, z + s2 * (t0 + 0.55)]));
+        }
+      r.stairs && (walk.push({ x0: r.stairs.x0, x1: r.stairs.x1, z0: r.stairs.z0, z1: r.stairs.z1 }), seeds.push([_d(r.stairs).fx, _d(r.stairs).fz]));
+    } else if (r.stairs) seeds.push([_d(r.stairs).hx, _d(r.stairs).hz]);
+    let inW = (x, z) => {
+        for (let q of walk) if (x >= q.x0 - 1e-6 && x <= q.x1 + 1e-6 && z >= q.z0 - 1e-6 && z <= q.z1 + 1e-6) return !0;
+        return !1;
+      },
+      base = new Uint8Array(nx * nz),
+      pts = [];
+    for (let k = 0; k < 12; k++) pts.push([Math.cos((k / 12) * 6.283) * R, Math.sin((k / 12) * 6.283) * R]);
+    let rectObs = [...walls];
+    if (f === 1 && r.stairs) {
+      let q = j1(r.stairs);
+      rectObs.push(q);
+    }
+    for (let i = 0; i < nx; i++)
+      for (let j = 0; j < nz; j++) {
+        let x = x0 + (i + 0.5) * st,
+          z = z0 + (j + 0.5) * st;
+        if (!inW(x, z)) continue;
+        let ok = !0;
+        for (let [a, b] of pts)
+          if (!inW(x + a, z + b)) {
+            ok = !1;
+            break;
+          }
+        if (!ok) continue;
+        for (let o of rectObs) {
+          let ex = Math.max(o.x0 - x, 0, x - o.x1),
+            ez = Math.max(o.z0 - z, 0, z - o.z1);
+          if (Math.hypot(ex, ez) < R) {
+            ok = !1;
+            break;
+          }
+        }
+        ok && (base[i * nz + j] = 1);
+      }
+    return { R, st, nx, nz, x0, z0, base, seeds, f };
+  }
+  function sgEval(r, d, items, spots) {
+    let { R, st, nx, nz, x0, z0, base, seeds, f } = d,
+      free = base.slice();
+    for (let it of items) {
+      if (it.floor !== f || it.flat || it.hang || it.type === "rug" || it.type === "tableware" || it.type === "bearskin") continue;
+      let c = Math.cos(it.yaw || 0),
+        s = Math.sin(it.yaw || 0),
+        hx = Math.abs(c * it.w) / 2 + Math.abs(s * it.d) / 2,
+        hz = Math.abs(s * it.w) / 2 + Math.abs(c * it.d) / 2,
+        a = Math.max(0, Math.floor((it.x - hx - R - x0) / st)),
+        b = Math.min(nx - 1, Math.ceil((it.x + hx + R - x0) / st)),
+        e = Math.max(0, Math.floor((it.z - hz - R - z0) / st)),
+        g = Math.min(nz - 1, Math.ceil((it.z + hz + R - z0) / st));
+      for (let i = a; i <= b; i++)
+        for (let j = e; j <= g; j++) {
+          let x = x0 + (i + 0.5) * st,
+            z = z0 + (j + 0.5) * st,
+            ex = Math.max(it.x - hx - x, 0, x - (it.x + hx)),
+            ez = Math.max(it.z - hz - z, 0, z - (it.z + hz));
+          Math.hypot(ex, ez) < R && (free[i * nz + j] = 0);
+        }
+    }
+    let lab = new Int32Array(nx * nz).fill(-1),
+      reach = new Uint8Array(nx * nz),
+      q = [];
+    for (let [sx, sz] of seeds) {
+      let bi = -1,
+        bd = 1e9;
+      for (let i = Math.max(0, Math.floor((sx - x0) / st) - 8); i <= Math.min(nx - 1, Math.floor((sx - x0) / st) + 8); i++)
+        for (let j = Math.max(0, Math.floor((sz - z0) / st) - 8); j <= Math.min(nz - 1, Math.floor((sz - z0) / st) + 8); j++)
+          if (free[i * nz + j]) {
+            let dd = Math.hypot(x0 + (i + 0.5) * st - sx, z0 + (j + 0.5) * st - sz);
+            dd < bd && ((bd = dd), (bi = i * nz + j));
+          }
+      bi >= 0 && !reach[bi] && ((reach[bi] = 1), q.push(bi));
+    }
+    for (; q.length; ) {
+      let c = q.pop(),
+        ci = (c / nz) | 0,
+        cj = c % nz;
+      for (let [a, b] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        let ni = ci + a,
+          nj = cj + b;
+        if (ni < 0 || nj < 0 || ni >= nx || nj >= nz) continue;
+        let n = ni * nz + nj;
+        free[n] && !reach[n] && ((reach[n] = 1), q.push(n));
+      }
+    }
+    let island = 0;
+    for (let i = 0; i < nx * nz; i++) free[i] && !reach[i] && island++;
+    let bad = [],
+      near = (x, z, rad) => {
+        let a = Math.floor((x - rad - x0) / st),
+          b = Math.floor((x + rad - x0) / st),
+          c = Math.floor((z - rad - z0) / st),
+          e = Math.floor((z + rad - z0) / st);
+        for (let i = Math.max(0, a); i <= Math.min(nx - 1, b); i++)
+          for (let j = Math.max(0, c); j <= Math.min(nz - 1, e); j++)
+            if (reach[i * nz + j] && Math.hypot(x0 + (i + 0.5) * st - x, z0 + (j + 0.5) * st - z) <= rad) return !0;
+        return !1;
+      };
+    for (let sp of spots) {
+      if (sp.floor !== f || sp.x === void 0) continue;
+      let k = sp.kind;
+      if (k === "bed" || k === "seat" || k === "work" || k === "hearth" || k === "serve" || k === "store") {
+        let rad = k === "bed" ? 1.5 : 1.15;
+        near(sp.x, sp.z, rad) || bad.push(sp);
+      }
+    }
+    return { bad, island: island * st * st, reach, free, nz, nx };
+  }
+  function sgRemove(items, spots, c, f) {
+    let list = Array.isArray(c) ? c : [c];
+    for (let x of list) {
+      let idx = items.indexOf(x);
+      if (idx < 0) continue;
+      if ((items.splice(idx, 1), x.type === "table" || x.type === "desk")) {
+        for (let q = items.length - 1; q >= 0; q--) {
+          let y = items[q];
+          y.floor === f &&
+            (y.type === "tableware" || y.type === "chair" || y.type === "bench" || y.type === "stool") &&
+            Math.hypot(y.x - x.x, y.z - x.z) < 1.6 &&
+            items.splice(q, 1);
+        }
+        for (let q = spots.length - 1; q >= 0; q--) {
+          let y = spots[q];
+          y.floor === f &&
+            (y.kind === "table" || (y.kind === "seat" && y.table)) &&
+            Math.hypot(y.x - x.x, y.z - x.z) < 1.6 &&
+            spots.splice(q, 1);
+        }
+      } else for (let q = spots.length - 1; q >= 0; q--) spots[q].item === x && spots.splice(q, 1);
+    }
+  }
+  function sgNavPath(d, free, a, b) {
+    let { nx, nz, x0, z0, st } = d,
+      cell = (x, z) => [Math.floor((x - x0) / st), Math.floor((z - z0) / st)],
+      ok = (i, j) => i >= 0 && j >= 0 && i < nx && j < nz && free[i * nz + j],
+      near = (x, z, rad) => {
+        let [ci, cj] = cell(x, z),
+          best = null,
+          bd = 1e9,
+          n = Math.ceil(rad / st);
+        for (let i = ci - n; i <= ci + n; i++)
+          for (let j = cj - n; j <= cj + n; j++)
+            if (ok(i, j)) {
+              let dd = Math.hypot(x0 + (i + 0.5) * st - x, z0 + (j + 0.5) * st - z);
+              dd < bd && dd <= rad && ((bd = dd), (best = [i, j]));
+            }
+        return best;
+      },
+      los = (p, q) => {
+        let dx = q[0] - p[0],
+          dz = q[1] - p[1],
+          n = Math.max(Math.abs(dx), Math.abs(dz)) * 2;
+        for (let k = 0; k <= n; k++) {
+          let t = n ? k / n : 0,
+            i = Math.round(p[0] + dx * t),
+            j = Math.round(p[1] + dz * t);
+          if (!ok(i, j)) return !1;
+        }
+        return !0;
+      },
+      s = near(a.x, a.z, 1.1),
+      g = near(b.x, b.z, 1.5);
+    if (!s || !g) return null;
+    if (los(s, g)) return [];
+    let open = [[s[0], s[1]]],
+      cost = new Map(),
+      prev = new Map(),
+      key = (i, j) => i * nz + j,
+      h = (i, j) => Math.hypot(i - g[0], j - g[1]);
+    cost.set(key(s[0], s[1]), 0);
+    let f = new Map([[key(s[0], s[1]), h(s[0], s[1])]]),
+      done = new Set(),
+      found = !1;
+    for (; open.length; ) {
+      let bi = 0;
+      for (let k = 1; k < open.length; k++) f.get(key(open[k][0], open[k][1])) < f.get(key(open[bi][0], open[bi][1])) && (bi = k);
+      let [ci, cj] = open[bi];
+      if ((open.splice(bi, 1), ci === g[0] && cj === g[1])) {
+        found = !0;
+        break;
+      }
+      let ck = key(ci, cj);
+      if (done.has(ck)) continue;
+      done.add(ck);
+      for (let [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]) {
+        let ni = ci + di,
+          nj = cj + dj;
+        if (!ok(ni, nj) || (di && dj && (!ok(ci + di, cj) || !ok(ci, cj + dj)))) continue;
+        let nk = key(ni, nj),
+          nc = cost.get(ck) + (di && dj ? 1.414 : 1);
+        nc < (cost.get(nk) ?? 1e9) && (cost.set(nk, nc), prev.set(nk, ck), f.set(nk, nc + h(ni, nj)), open.push([ni, nj]));
+      }
+    }
+    if (!found) return null;
+    let path = [],
+      cur = key(g[0], g[1]);
+    for (; cur !== void 0; ) {
+      path.push([(cur / nz) | 0, cur % nz]);
+      cur = prev.get(cur);
+    }
+    path.reverse();
+    let out = [],
+      idx = 0;
+    for (; idx < path.length - 1; ) {
+      let far = idx + 1;
+      for (let k = path.length - 1; k > idx + 1; k--)
+        if (los(path[idx], path[k])) {
+          far = k;
+          break;
+        }
+      ((idx = far), idx < path.length - 1 && out.push({ x: x0 + (path[idx][0] + 0.5) * st, z: z0 + (path[idx][1] + 0.5) * st }));
+    }
+    let gp = { x: x0 + (g[0] + 0.5) * st, z: z0 + (g[1] + 0.5) * st };
+    return (Math.hypot(gp.x - b.x, gp.z - b.z) > 0.25 && out.push(gp), s && Math.hypot(x0 + (s[0] + 0.5) * st - a.x, z0 + (s[1] + 0.5) * st - a.z) > 0.25 && out.unshift({ x: x0 + (s[0] + 0.5) * st, z: z0 + (s[1] + 0.5) * st }), out);
+  }
+  function sgPrune(r, rooms, items, spots) {
+    for (let f = 0; f < r.floors.length; f++) {
+      let d = sgWalkData(r, rooms, items, spots, f);
+      if (!d) continue;
+      let score = (p) => p.bad.length * 5 + (p.bad.length || p.island > 2.5 ? p.island : 0),
+        cur = sgEval(r, d, items, spots);
+      for (let it = 0; it < 40 && score(cur) > 0; it++) {
+        let singles = items
+            .filter((x) => x.floor === f && sgPrio[x.type] !== void 0 && !sgKeep.has(x.type))
+            .sort((a, b) => sgPrio[a.type] - sgPrio[b.type]),
+          cands = [...singles],
+          byType = {};
+        for (let x of singles) (byType[x.type] = byType[x.type] || []).push(x);
+        for (let k in byType) byType[k].length > 1 && cands.push(byType[k]);
+        let bestI = -1,
+          bestS = score(cur) - 0.05;
+        for (let k = 0; k < cands.length; k++) {
+          let c = cands[k],
+            sI = items.slice(),
+            sS = spots.slice();
+          sgRemove(items, spots, c, f);
+          let p = sgEval(r, d, items, spots),
+            sc = score(p) + (Array.isArray(c) ? sgPrio[c[0].type] * 0.012 : sgPrio[c.type] * 0.01);
+          (items.splice(0, items.length, ...sI), spots.splice(0, spots.length, ...sS), sc < bestS && ((bestS = sc), (bestI = k)));
+        }
+        if (bestI < 0) break;
+        (sgRemove(items, spots, cands[bestI], f), (cur = sgEval(r, d, items, spots)));
+      }
+      for (let q = spots.length - 1; q >= 0; q--) {
+        let y = spots[q];
+        y.floor === f && cur.bad.includes(y) && y.kind === "seat" && spots.splice(q, 1);
+      }
+    }
+  }
   function A3(r, t, e, n, i) {
     let s = [],
       o = [],
@@ -36663,8 +37047,8 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
         }
         return null;
       },
-      u = (b, _, E, S, k, I = 0.7, C = {}) => {
-        let z = b.centerSpot(E, S, I);
+      u = (b, _, E, S, k, I = 0.7, C = {}, mz) => {
+        let z = b.centerSpot(E, S, I, mz);
         return z ? h(b, _, { x: z.x, z: z.z, yaw: 0, rect: z.rect }, E, S, k, C) : null;
       },
       f = r.stairs;
@@ -36770,7 +37154,11 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
         case "cabin": {
           let _ = b.kind === "hall",
             E = _ ? 2.2 : b.w > 4 ? 1.6 : 1.25,
-            k = u(b, "table", E, _ ? 1 : 0.85, 0.76, 0.75) || u(b, "table", 1.1, 0.75, 0.76, 0.55);
+            k =
+              u(b, "table", E, _ ? 1 : 0.85, 0.76, 0.8, {}, 1.4) ||
+              u(b, "table", 1.1, 0.75, 0.76, 0.8, {}, 1.4) ||
+              u(b, "table", 1.1, 0.75, 0.76, 0.6, {}, 1.2) ||
+              u(b, "table", 1.1, 0.75, 0.76, 0.55);
           if (k) {
             let I = a() < 0.5 && !_,
               C = [];
@@ -36950,7 +37338,7 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
           let _ = Math.min(3.2, b.w - 2.6),
             E = b.wallSpot("back", _, 0.65, !1, a, "center");
           if (E) {
-            let I = io(E.x, E.z, E.yaw, 0.95);
+            let I = io(E.x, E.z, E.yaw, 1.4);
             (s.push({
               type: "counter",
               floor: 0,
@@ -36962,7 +37350,7 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
               d: 0.6,
               h: 1.05,
             }),
-              b.reserve(xr(I.x, I.z, _ + 0.2, 0.7 + 0.95 * 2 - 0.4, E.yaw, -0.95 / 2 + 0.1)),
+              b.reserve(xr(I.x, I.z, _ + 0.2, 0.7 + 1.4 * 2 - 0.4, E.yaw, -1.4 / 2 + 0.1)),
               s.push({
                 type: "kegs",
                 floor: 0,
@@ -36978,7 +37366,7 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
                 kind: "work",
                 floor: 0,
                 room: b.id,
-                ...io(E.x, E.z, E.yaw, 0.5),
+                ...io(E.x, E.z, E.yaw, 0.7),
                 face: E.yaw,
                 anim: "Idle_FoldArms_Loop",
                 counter: !0,
@@ -37211,7 +37599,7 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
       (g(b, !1, "guest") && (o[o.length - 1].guest = !0),
         a() < 0.6 && d(b, "nightstand", 0.45, 0.4, 0.55, { pref: "corner" }));
     for (let b of t.filter((_) => _.kind === "landing")) a() < 0.7 && d(b, "chest", 0.9, 0.5, 0.55);
-    ((r.items = s), (r.spots = o));
+    (sgPrune(r, t, s, o), (r.items = s), (r.spots = o));
   }
   function _d(r) {
     let t = (r.x0 + r.x1) / 2,
@@ -37261,9 +37649,31 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
   function k3(r, t) {
     let e = [],
       n = [],
+      sgG = {},
       i = (p, y, g, m, x = -1, w = {}) =>
         e.push({ id: e.length, x: p, z: y, floor: g, kind: m, room: x, ...w }) - 1,
-      s = (p, y) => n.push([p, y]),
+      gridFor = (f) => {
+        if (sgG[f] === void 0) {
+          let dd = sgWalkData(r, t, r.items, r.spots, f, 0.34, 0.12);
+          sgG[f] = dd ? { d: dd, free: sgEval(r, dd, r.items, r.spots).free } : null;
+        }
+        return sgG[f];
+      },
+      s = (p, y) => {
+        let A = e[p],
+          B = e[y];
+        if (!A || !B || A.floor !== B.floor || Math.hypot(A.x - B.x, A.z - B.z) < 0.9) return n.push([p, y]);
+        let f = A.floor,
+          q = gridFor(f),
+          wp = q ? sgNavPath(q.d, q.free, A, B) : null;
+        if (!wp || !wp.length) return n.push([p, y]);
+        let pv = p;
+        for (let w of wp) {
+          let nn = i(w.x, w.z, f, "wp", A.room >= 0 ? A.room : B.room);
+          (n.push([pv, nn]), (pv = nn));
+        }
+        n.push([pv, y]);
+      },
       o = {};
     for (let p of t) {
       let y = [p.cx, p.cz],
@@ -37347,6 +37757,28 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
         );
         ((y = x.x), (g = x.z));
       } else p.kind === "seat" && ((y = p.x + Math.sin(p.yaw) * -0), (g = p.z));
+      {
+        let q = gridFor(p.floor);
+        if (q) {
+          let { nx, nz, x0, z0, st } = q.d,
+            ci = Math.floor((y - x0) / st),
+            cj = Math.floor((g - z0) / st);
+          if (!(ci >= 0 && cj >= 0 && ci < nx && cj < nz && q.free[ci * nz + cj])) {
+            let bd = 1e9,
+              bx = y,
+              bz = g;
+            for (let a = Math.max(0, ci - 14); a <= Math.min(nx - 1, ci + 14); a++)
+              for (let b = Math.max(0, cj - 14); b <= Math.min(nz - 1, cj + 14); b++)
+                if (q.free[a * nz + b]) {
+                  let cx = x0 + (a + 0.5) * st,
+                    cz = z0 + (b + 0.5) * st,
+                    dd = Math.hypot(cx - y, cz - g);
+                  dd < bd && ((bd = dd), (bx = cx), (bz = cz));
+                }
+            bd < 1.8 && ((y = bx), (g = bz));
+          }
+        }
+      }
       let m = i(y, g, p.floor, "spot", p.room);
       ((p.node = m), o[p.room] !== void 0 && s(m, o[p.room]));
     }
@@ -37544,16 +37976,16 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
             }
             return null;
           }
-          centerSpot(t, e, n = 0.75) {
+          centerSpot(t, e, n = 0.75, mz = n) {
             let i = [];
             for (let s = this.x0 + t / 2 + n; s <= this.x1 - t / 2 - n + 1e-6; s += 0.1)
-              for (let o = this.z0 + e / 2 + n; o <= this.z1 - e / 2 - n + 1e-6; o += 0.1)
+              for (let o = this.z0 + e / 2 + mz; o <= this.z1 - e / 2 - mz + 1e-6; o += 0.1)
                 i.push([s - this.cx, o - this.cz]);
             i.sort((s, o) => Math.hypot(s[0], s[1]) - Math.hypot(o[0], o[1]));
             for (let [s, o] of i) {
               let a = this.cx + s,
                 l = this.cz + o,
-                c = { x0: a - t / 2 - n, x1: a + t / 2 + n, z0: l - e / 2 - n, z1: l + e / 2 + n };
+                c = { x0: a - t / 2 - n, x1: a + t / 2 + n, z0: l - e / 2 - mz, z1: l + e / 2 + mz };
               if (
                 c.x0 < this.x0 + 0.05 ||
                 c.x1 > this.x1 - 0.05 ||
@@ -39680,12 +40112,12 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
   }
   function j1(r) {
     return r.dir === "-z"
-      ? { x0: r.x0 - 0.05, x1: r.x1 + 0.05, z0: r.z0 - 0.02, z1: r.z0 + (r.z1 - r.z0) * 0.68 }
+      ? { x0: r.x0 - 0.05, x1: r.x1 + 0.05, z0: r.z0 - 0.02, z1: r.z0 + (r.z1 - r.z0) * 0.9 }
       : r.dir === "+z"
-        ? { x0: r.x0 - 0.05, x1: r.x1 + 0.05, z0: r.z1 - (r.z1 - r.z0) * 0.68, z1: r.z1 + 0.02 }
+        ? { x0: r.x0 - 0.05, x1: r.x1 + 0.05, z0: r.z1 - (r.z1 - r.z0) * 0.9, z1: r.z1 + 0.02 }
         : r.dir === "+x"
-          ? { x0: r.x1 - (r.x1 - r.x0) * 0.68, x1: r.x1 + 0.02, z0: r.z0 - 0.05, z1: r.z1 + 0.05 }
-          : { x0: r.x0 - 0.02, x1: r.x0 + (r.x1 - r.x0) * 0.68, z0: r.z0 - 0.05, z1: r.z1 + 0.05 };
+          ? { x0: r.x1 - (r.x1 - r.x0) * 0.9, x1: r.x1 + 0.02, z0: r.z0 - 0.05, z1: r.z1 + 0.05 }
+          : { x0: r.x0 - 0.02, x1: r.x0 + (r.x1 - r.x0) * 0.9, z0: r.z0 - 0.05, z1: r.z1 + 0.05 };
   }
   function $3(r, t) {
     let e = [];
@@ -51530,7 +51962,7 @@ uniform float uWet; uniform float uNight;`,
         let E = this.collide();
         Math.hypot(this.pos.x - b, this.pos.z - _) > Math.hypot(this.vel.x, this.vel.z) * t + 0.45 &&
         !this.climb &&
-        (this.revertT || 0) < 1.5
+        (this.revertT || 0) < 1.5 && !window.__noRevert
           ? ((this.revertT = (this.revertT || 0) + t),
             (this.pos.x = b),
             (this.pos.z = _),
@@ -65613,6 +66045,22 @@ uniform float uWet; uniform float uNight;`,
   }
   A.toggleMusic = () => {};
   A.debug = {
+    walk(r) {
+      let t = [];
+      for (let e = 0; e < r.floors.length; e++) {
+        let n = sgWalkData(r, r.rooms, r.items, r.spots, e);
+        if (!n) continue;
+        let i = sgEval(r, n, r.items, r.spots);
+        t.push({ f: e, bad: i.bad.map((s) => s.kind), island: +i.island.toFixed(2) });
+      }
+      return t;
+    },
+    walkGrid(r, t) {
+      let n = sgWalkData(r, r.rooms, r.items, r.spots, t);
+      if (!n) return null;
+      let i = sgEval(r, n, r.items, r.spots);
+      return { ...n, ...i };
+    },
     async house(r = "home", t = 1, e = 14) {
       let { debugHouse: n } = await Promise.resolve().then(() => (Lm(), rv)),
         i = A.player.pos,
