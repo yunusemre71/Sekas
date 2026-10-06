@@ -50193,7 +50193,29 @@ uniform float uWet; uniform float uNight;`,
           p = rd.clone().addScaledVector(f, n ? 0.9 : -0.9);
         Gl(i["upperarm_" + c], i["lowerarm_" + c], i["hand_" + c], u, p, t);
       }
+      poseSlope(t, e) {
+        let n = this.av,
+          i = this.bones;
+        ((this.gK = Bt(this.gK || 0, e.gentle || 0, 5, t)), (this.sK = Bt(this.sK || 0, e.scr || 0, 7, t)));
+        let s = this.gK * 0.3 + this.sK * 0.8;
+        if (s < 0.005) return;
+        n.root.updateMatrixWorld(!0);
+        let o = sgV2.set(1, 0, 0).transformDirection(n.root.matrixWorld);
+        (Yn(i.spine_01, o, s * 0.25),
+          Yn(i.spine_02, o, s * 0.35),
+          Yn(i.spine_03, o, s * 0.4),
+          Yn(i.neck_01, o, -s * 0.2),
+          Yn(i.Head, o, -s * 0.35),
+          (n.model.position.y -= 0.035 * this.gK + 0.1 * this.sK),
+          n.root.updateMatrixWorld(!0));
+        if (this.sK > 0.02 && e.hl && e.hr && !e.action) {
+          let a = rd.clone().addScaledVector(o, 0.9),
+            l = rd.clone().addScaledVector(o, -0.9);
+          (Gl(i.upperarm_l, i.lowerarm_l, i.hand_l, e.hl, a, this.sK), Gl(i.upperarm_r, i.lowerarm_r, i.hand_r, e.hr, l, this.sK), n.root.updateMatrixWorld(!0));
+        }
+      }
       poseExtra(t, e, n, i) {
+        this.poseSlope(t, e);
         let s = !!(n && n.type === "eat" && e.food && !e.dead);
         this.eatK = Bt(this.eatK || 0, s ? 1 : 0, 9, t);
         this.eatK > 0.01 && this.poseEat(this.eatK, s ? n.t / Math.max(0.2, n.dur) : 1, e);
@@ -53360,6 +53382,7 @@ uniform float uWet; uniform float uNight;`,
             grounded: this.grounded,
             vy: this.vel.y,
             crouch: this.crouching || this.scramble,
+            ...this.slopePose(t, e),
             swim: this.swim,
             action: c
               ? { type: c.type, t: c.t, dur: c.dur, item: c.itemId }
@@ -53407,6 +53430,39 @@ uniform float uWet; uniform float uNight;`,
           (Object.assign(t.outfit, o), s && t.outfit.acc.push(...s));
         }
         return t;
+      }
+      slopePose(t, e) {
+        let n = this.G,
+          i = this.grounded && !this.swim && !this.onFloor && !this.climb && !this.sleeping && !this.dead && !this.rest,
+          s = i ? n.gen.normalAt(this.pos.x, this.pos.z) : null,
+          o = Math.hypot(this.vel.x, this.vel.z),
+          a = 0,
+          l = 0,
+          c = 0;
+        if (s && o > 0.5) {
+          let h = Math.hypot(s.x, s.z) || 1;
+          a = -(this.vel.x * s.x + this.vel.z * s.z) / (h * o);
+          let d = xe(0.25, 0.7, a);
+          l = this.scramble ? 0 : d * xe(0.02, 0.1, 0.985 - s.y);
+          c = this.scramble ? 1 : 0;
+        }
+        this.scrPh = (this.scrPh || 0) + (this.scramble ? o * t * 2.6 : 0);
+        let u = { gentle: l, scr: c };
+        if (c > 0 || this.scrOut > 0.02) {
+          this.scrOut = Math.max(c, (this.scrOut || 0) - t * 4);
+          let f = Math.sin(this.yaw),
+            h2 = Math.cos(this.yaw),
+            p = h2,
+            y = -f,
+            g = (m, x, w) => {
+              let v = this.pos.x + f * m + p * x,
+                M = this.pos.z + h2 * m + y * x;
+              return new R(v, Math.max(n.gen.heightAt(v, M), this.pos.y - 0.25) + w, M);
+            };
+          ((u.hl = g(0.5 + 0.2 * Math.sin(this.scrPh), -0.2, 0.04)),
+            (u.hr = g(0.5 + 0.2 * Math.sin(this.scrPh + Math.PI), 0.2, 0.04)));
+        }
+        return u;
       }
       rebuildChar() {
         let t = this.G,
