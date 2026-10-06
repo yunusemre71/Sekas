@@ -43005,6 +43005,23 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
       waterDepth(t, e) {
         return 0 - this.heightAt(t, e);
       }
+      isSalt(t, e) {
+        let n = Math.round(t / 8) + "," + Math.round(e / 8),
+          i = (this._salt = this._salt || new Map()),
+          s = i.get(n);
+        if (s !== void 0) return s;
+        let o = 0;
+        for (let l = 0; l < 8; l++) {
+          let c = (l * Math.PI) / 4,
+            h = 0;
+          for (let d = 8; d <= 64; d += 8) {
+            if (this.heightAt(t + Math.cos(c) * d, e + Math.sin(c) * d) < -0.05) h = d;
+            else break;
+          }
+          h >= 48 && o++;
+        }
+        return (i.size > 4000 && i.clear(), i.set(n, o >= 4), o >= 4);
+      }
       groundColor(t, e, n, i, s) {
         let o = this.n,
           a = this.forest(t, e),
@@ -47644,6 +47661,23 @@ uniform float uWet; uniform float uNight;`,
           });
         }
       }
+      crumbs(t, e = 14738600, n = 5) {
+        for (let i = 0; i < n; i++)
+          this.emit({
+            pos: { x: t.x, y: t.y, z: t.z },
+            vel: { x: (Math.random() - 0.5) * 0.9, y: 0.3 + Math.random() * 0.5, z: (Math.random() - 0.5) * 0.9 },
+            life: 0.5 + Math.random() * 0.4,
+            size: 0.035,
+            sizeEnd: 0.02,
+            color: e,
+            alpha: 1,
+            alphaEnd: 0.4,
+            shape: 4,
+            gravity: -9,
+            drag: 0.5,
+            rotSpeed: (Math.random() - 0.5) * 10,
+          });
+      }
       chips(t, e = "wood", n = 8, i) {
         let s =
           e === "wood"
@@ -48869,6 +48903,10 @@ uniform float uWet; uniform float uNight;`,
       craft: { clip: "Fixing_Kneeling", seg: [0.6, 4], lower: !0 },
       climb: { clip: "ClimbUp_1m", seg: [0, 0.667], fadeIn: 0.08, fadeOut: 0.15 },
     },
+    sgV1 = new R(),
+    sgV2 = new R(),
+    sgV3 = new R(),
+    sgQ1 = new ce(),
     d1 = new R(),
     Uo = new R(),
     Qs = new R(),
@@ -48927,7 +48965,14 @@ uniform float uWet; uniform float uNight;`,
           (this.wasSleep = !!e.sleep));
         let o = e.action;
         if (o && !e.dead) {
-          if ((!this.lastAction || this.lastAction !== o.type || o.t < this.lastActT - 1e-4) && h1[o.type]) {
+          if (!this.lastAction || this.lastAction !== o.type || o.t < this.lastActT - 1e-4)
+            this.atkN = (this.atkN || 0) + 1;
+          if (
+            (!this.lastAction || this.lastAction !== o.type || o.t < this.lastActT - 1e-4) &&
+            h1[o.type] &&
+            !(o.type === "eat" && e.food) &&
+            !(s && /^(punch|swing|chop|mine|thrust)$/.test(o.type))
+          ) {
             let p = h1[o.type];
             Array.isArray(p) && (p = p[this.alt++ % p.length]);
             let y = Math.max(0.15, o.dur || p.seg[1] - p.seg[0]);
@@ -48999,7 +49044,8 @@ uniform float uWet; uniform float uNight;`,
         let h = (e.speed - this.prevSpeed) / Math.max(t, 0.001);
         ((this.prevSpeed = e.speed), (this.swimK = Bt(this.swimK, s ? 1 : 0, 5, t)));
         let d = e.dead || e.sleep ? 0 : (e.lookYaw || 0) + (this.idleT > 3 ? this.lookWander : 0),
-          u = (e.aim && !e.dead && e.lookPitch) || 0;
+          u =
+            ((e.aim || (o && !s && /^(punch|swing|chop|mine|thrust)$/.test(o.type))) && !e.dead && e.lookPitch) || 0;
         (n.update(t, {
           lookYaw: d,
           lookPitch: e.dead || e.sleep ? 0 : (e.lookPitch || 0) * 0.85,
@@ -49018,7 +49064,69 @@ uniform float uWet; uniform float uNight;`,
           this.bowK > 0.01 && this.poseBow(this.bowK, this.drawK, e.lookPitch || 0),
           (this.rodK = Bt(this.rodK, e.aim === "rod" && !e.dead ? 1 : 0, 6, t)),
           this.rodK > 0.01 && !o && this.poseRod(this.rodK),
+          this.poseExtra(t, e, o, s),
           n.root.updateMatrixWorld(!0));
+      }
+      mouthWorld(t) {
+        let e = this.bones.Head,
+          n = this.av.root.getWorldQuaternion(sgQ1),
+          i = sgV1.set(0, 0, 1).applyQuaternion(n);
+        return (e.getWorldPosition(t), t.addScaledVector(i, 0.1), (t.y += 0.07), t);
+      }
+      poseEat(t, e, n) {
+        let i = this.bones,
+          s = this.av,
+          o = (m) => m * m * (3 - 2 * m);
+        s.root.updateMatrixWorld(!0);
+        let a = sgV2.set(1, 0, 0).transformDirection(s.root.matrixWorld),
+          l = sgV3.set(0, 0, 1).transformDirection(s.root.matrixWorld),
+          c = new R();
+        i.hand_r.getWorldPosition(c);
+        let h = new R();
+        if (n.vmMouth) h.copy(n.vmMouth);
+        else (this.mouthWorld(h), h.addScaledVector(l, -0.03), (h.y -= 0.02));
+        let d =
+          e < 0.28
+            ? o(e / 0.28)
+            : e < 0.84
+              ? 1
+              : 1 - o((e - 0.84) / 0.16),
+          u = 0;
+        if (e >= 0.28 && e < 0.84) {
+          let m = (e - 0.28) / 0.56;
+          u = Math.max(0, Math.sin(m * Math.PI * 3)) * 0.055;
+        }
+        let f = new R().lerpVectors(c, h, d);
+        (f.addScaledVector(l, -u), (f.y -= u * 0.8));
+        let p = e >= 0.28 && e < 0.84 ? Math.sin(((e - 0.28) / 0.56) * Math.PI * 6) : 0;
+        (Yn(i.neck_01, a, 0.045 * p * t), Yn(i.Head, a, 0.04 * p * t));
+        let y = rd.clone().addScaledVector(a, -0.9);
+        Gl(i.upperarm_r, i.lowerarm_r, i.hand_r, f, y, t);
+      }
+      poseSwimAtk(t, e, n) {
+        let i = this.bones,
+          s = this.av;
+        s.root.updateMatrixWorld(!0);
+        let l = new R(0, 0, 1).transformDirection(s.root.matrixWorld).setY(0).normalize(),
+          c = n ? "l" : "r",
+          h = new R();
+        i["upperarm_" + c].getWorldPosition(h);
+        let d = e < 0.4 ? 1 - Math.pow(1 - e / 0.4, 2) : 1 - Math.pow((e - 0.4) / 0.6, 2) * 0.0 - (e - 0.4) / 0.6,
+          u = h.clone().addScaledVector(l, 0.1 + 0.5 * Math.max(0, d));
+        u.y -= 0.02;
+        let f = sgV2.set(1, 0, 0).transformDirection(s.root.matrixWorld),
+          p = rd.clone().addScaledVector(f, n ? 0.9 : -0.9);
+        Gl(i["upperarm_" + c], i["lowerarm_" + c], i["hand_" + c], u, p, t);
+      }
+      poseExtra(t, e, n, i) {
+        let s = !!(n && n.type === "eat" && e.food && !e.dead);
+        this.eatK = Bt(this.eatK || 0, s ? 1 : 0, 9, t);
+        this.eatK > 0.01 && this.poseEat(this.eatK, s ? n.t / Math.max(0.2, n.dur) : 1, e);
+        let o = !!(i && n && /^(punch|swing|chop|mine|thrust)$/.test(n.type) && !e.dead);
+        (o && (this.atkSide = n.type === "punch" ? (this.atkN || 0) % 2 : 0),
+          (this.atkP = o ? n.t / Math.max(0.1, n.dur) : 1),
+          (this.swK = Bt(this.swK || 0, o ? 1 : 0, 14, t)),
+          this.swK > 0.01 && this.poseSwimAtk(this.swK, this.atkP, this.atkSide || 0));
       }
       updatePose(t, e) {
         let n = this.av;
@@ -51153,7 +51261,9 @@ uniform float uWet; uniform float uNight;`,
         return !!(e.villages?.roofAbove(t) || e.structures?.roofAbove?.(t));
       }
       startAction(t, e, n = {}) {
-        ((this.action = { type: t, t: 0, dur: e, ...n, fired: !1 }), n.itemId && (this.forceHeld = !0));
+        ((this.action = { type: t, t: 0, dur: e, ...n, fired: !1 }),
+          n.itemId && (this.forceHeld = !0),
+          ["punch", "swing", "chop", "mine", "thrust"].includes(t) && (this.yaw = this.G.cam.yaw));
       }
       collide() {
         let t = this.G,
@@ -51340,7 +51450,7 @@ uniform float uWet; uniform float uNight;`,
         let m = e.gen.heightAt(this.pos.x, this.pos.z);
         this.waterDepth = this.pos.y > 0 + 0.3 && this.onFloor ? 0 : Math.max(0, 0 - m);
         let x = this.swim;
-        ((this.swim = this.waterDepth > 1.15 && this.pos.y < 0 - 0.6),
+        ((this.swim = this.waterDepth > (x ? 0.95 : 1.15) && this.pos.y < (x ? -0.4 : -0.6)),
           this.swim &&
             !x &&
             !this.swimTip &&
@@ -51398,21 +51508,19 @@ uniform float uWet; uniform float uNight;`,
           } else
             ((this.diving = !1),
               (this.vel.y = Bt(this.vel.y, (D - this.pos.y) * 4, 6, t)),
-              Y && (this.vel.y = Math.max(this.vel.y, 1.2)));
+              Y && this.pos.y < D - 0.02 && (this.vel.y = Math.max(this.vel.y, 0.6)),
+              this.pos.y >= D && this.vel.y > 0 && (this.vel.y = Math.min(this.vel.y, (D - this.pos.y) * 4 + 0.05)));
           ((this.grounded = !1), (this.wet = 1));
         } else
           (!d &&
             n.pressed("Space") &&
             this.grounded &&
-            this.stats.stam >= 8 &&
             !this.climb &&
             !this.steep &&
             (p && this.crouch
               ? (this.crouch = !1)
               : ((this.vel.y = 7),
                 (this.grounded = !1),
-                (this.stats.stam -= 8),
-                (this.stamDelay = 0.8),
                 e.audio?.jump())),
             (this.vel.y += -24 * t));
         let T = this.pos.y,
@@ -51776,7 +51884,7 @@ uniform float uWet; uniform float uNight;`,
           }
           (e.inventory.removeAt(t, 1),
             e.audio?.eat(),
-            this.startAction("eat", 1.3, {
+            this.startAction("eat", 2, {
               itemId: n.id,
               onDone: () => {
                 let s = this.stats;
@@ -51895,6 +52003,10 @@ uniform float uWet; uniform float uNight;`,
             break;
           case "water": {
             let s = this.selectedItem();
+            if (e.point && t.gen.isSalt(e.point.x, e.point.z)) {
+              t.ui?.notify("Deniz suyu tuzlu, içilmez.", null);
+              break;
+            }
             if (s?.id === "waterskin" && s.d < kt.waterskin.dur)
               ((s.d = kt.waterskin.dur),
                 this.startAction("drink", 1.2),
@@ -52023,7 +52135,12 @@ uniform float uWet; uniform float uNight;`,
           let c = 22;
           (n.food < 15 && (c *= 0.5), n.temp < 35.5 && (c *= 0.6), (n.stam = Math.min(100, n.stam + t * c)));
         }
-        ((this.underwater = this.swim && this.pos.y + 1.5 < 0 - 0.05),
+        ((this.underwater =
+          this.swim &&
+          (() => {
+            let hb = this.char.head?.getWorldPosition(sgV1);
+            return hb ? hb.y + 0.2 < -0.02 : this.pos.y + 1.5 < -0.05;
+          })()),
           this.breath == null && (this.breath = 100),
           this.underwater
             ? (this.breath = Math.max(0, this.breath - t * 4.5))
@@ -52106,7 +52223,16 @@ uniform float uWet; uniform float uNight;`,
       }
       animate(t, e) {
         let n = this.char;
-        (n.root.position.copy(this.pos), (n.root.rotation.y = this.yaw));
+        if ((n.root.position.copy(this.pos), (n.root.rotation.y = this.yaw), this.action && this.action.type === "eat" && this.action.itemId && kt[this.action.itemId]?.cat === "food")) {
+          let q = this.action.t / Math.max(0.2, this.action.dur),
+            w = this._eatP ?? 0;
+          for (let m of [0.4, 0.55, 0.7, 0.83])
+            if (w < m && q >= m && n.mouthWorld) {
+              let x = n.mouthWorld(new R());
+              (this.G.particles.crumbs(x, kt[this.action.itemId].crumb || 14738600, 5), this.G.audio?.eat?.());
+            }
+          this._eatP = q;
+        } else this._eatP = 0;
         let i = this.G.cam,
           s = this.selectedItem(),
           o = s ? kt[s.id] : null,
@@ -52125,7 +52251,10 @@ uniform float uWet; uniform float uNight;`,
             vy: this.vel.y,
             crouch: this.crouching || this.scramble,
             swim: this.swim,
-            action: c ? { type: c.type, t: c.t, dur: c.dur } : null,
+            action: c
+              ? { type: c.type, t: c.t, dur: c.dur, item: c.itemId }
+              : null,
+            food: !!(c && c.type === "eat" && c.itemId && kt[c.itemId]?.cat === "food"),
             holdPose: a,
             carry: !!this.G.physics.held,
             aim: h,
@@ -58310,15 +58439,15 @@ uniform float uWet; uniform float uNight;`,
           }
         this.updateTrees(t);
       }
-      pickItem(t, e, n, i) {
+      pickItem(t, e, n, i, ok) {
         let s = null,
           o = n,
           a = t,
           l = e;
         for (let c of this.items) {
-          if (c === this.held || c.frozen) continue;
+          if (c === this.held || c.frozen || (ok && !ok(c))) continue;
           let h = c.body.position,
-            d = Math.max(0.28, c.radius + 0.12),
+            d = Math.max(0.5, c.radius + 0.3),
             u = h.x - a.x,
             f = h.y - a.y,
             p = h.z - a.z,
@@ -58333,13 +58462,12 @@ uniform float uWet; uniform float uNight;`,
           }
         }
         if (!s) {
-          let c = 1.6;
+          let c = 2;
           for (let h of this.items) {
-            if (h === this.held || h.frozen) continue;
+            if (h === this.held || h.frozen || (ok && !ok(h))) continue;
             let d = h.body.position,
-              u = Math.hypot(d.x - i.x, d.z - i.z),
-              f = (d.x - i.x) * l.x + (d.z - i.z) * l.z;
-            u < c && f > -0.2 && Math.abs(d.y - i.y) < 1.5 && ((c = u), (s = h));
+              u = Math.hypot(d.x - i.x, d.z - i.z);
+            u < c && Math.abs(d.y - i.y) < 1.6 && ((c = u), (s = h));
           }
         }
         return s;
@@ -58435,8 +58563,23 @@ uniform float uWet; uniform float uNight;`,
         [n, i] = this.ray(),
         s = null,
         o = 1e9,
+        wallD = null,
+        wd = () => (
+          wallD === null && (wallD = t.villages ? (t.villages.raycast(n, i, 9) ?? 1e9) : 1e9), wallD
+        ),
+        blockedSeg = (c) => {
+          if (!t.villages) return !1;
+          let h = c.x - e.x,
+            d = c.y - (e.y + 1.4),
+            u = c.z - e.z,
+            f = Math.hypot(h, d, u);
+          if (f < 0.4) return !1;
+          let p = t.villages.raycast(new R(e.x, e.y + 1.4, e.z), new R(h / f, d / f, u / f), f);
+          return p !== null && p < f - 0.3;
+        },
         a = (c, h) => {
           if (c < 0 || c >= o) return;
+          if (h.kind !== "water" && c > wd() + (h.kind === "door" ? 0.45 : 0.35)) return;
           let d = n.x + i.x * c,
             u = n.z + i.z * c,
             f = n.y + i.y * c,
@@ -58446,6 +58589,8 @@ uniform float uWet; uniform float uNight;`,
             f > e.y + 3.8 ||
             ((o = c), (h.point = new R(d, f, u)), (h.dist = p), (s = h));
         };
+      let prox = null,
+        proxD = 1.6;
       t.world.forEachObject(e.x, e.z, 4.5, (c, h) => {
         let d = ve[c.t];
         if (De(c.t)) {
@@ -58471,11 +58616,29 @@ uniform float uWet; uniform float uNight;`,
               });
               break;
             case "pickup":
-              a(Sr(n, i, c.x, c.y + 0.08, c.z, 0.4), { kind: "pickup", obj: c, ch: h, name: d.name });
+            case "plant": {
+              let u = d.kind === "plant";
+              a(u ? Sr(n, i, c.x, c.y + 0.35, c.z, 0.7 * c.s) : Sr(n, i, c.x, c.y + 0.08, c.z, 0.85), {
+                kind: d.kind,
+                obj: c,
+                ch: h,
+                name: d.name,
+              });
+              let f = Math.hypot(c.x - e.x, c.z - e.z);
+              f < proxD &&
+                Math.abs(c.y - e.y) < 1.6 &&
+                !blockedSeg({ x: c.x, y: c.y + 0.2, z: c.z }) &&
+                ((proxD = f),
+                (prox = {
+                  kind: d.kind,
+                  obj: c,
+                  ch: h,
+                  name: d.name,
+                  point: new R(c.x, c.y + 0.1, c.z),
+                  dist: f,
+                }));
               break;
-            case "plant":
-              a(Sr(n, i, c.x, c.y + 0.35, c.z, 0.55 * c.s), { kind: "plant", obj: c, ch: h, name: d.name });
-              break;
+            }
             case "log": {
               let u = Math.cos(c.ry),
                 f = -Math.sin(c.ry);
@@ -58496,7 +58659,9 @@ uniform float uWet; uniform float uNight;`,
               break;
           }
       });
-      let l = t.physics.pickItem(n, i, o, e);
+      let l = t.physics.pickItem(n, i, o, e, (c) =>
+        !blockedSeg({ x: c.body.position.x, y: c.body.position.y, z: c.body.position.z }),
+      );
       if (l) {
         let c = l.body.position,
           h = (c.x - n.x) * i.x + (c.y - n.y) * i.y + (c.z - n.z) * i.z,
@@ -58548,6 +58713,30 @@ uniform float uWet; uniform float uNight;`,
               reach: c.dead ? 3.4 : 3.6,
             });
         }
+      {
+        let c = new Set(["tree", "stump", "log", "rock", "bush", "water"]);
+        if (t.villages) {
+          let h = null,
+            d = 1.9;
+          for (let u of t.villages.list.values())
+            if (
+              u.built &&
+              !(Math.abs(u.site.x - e.x) > u.site.r + 40 || Math.abs(u.site.z - e.z) > u.site.r + 40)
+            )
+              for (let f of u.houseDoors) {
+                let p = Math.hypot(f.pos.x - e.x, f.pos.z - e.z);
+                p < d && Math.abs(f.pos.y - f.h / 2 - e.y) < 1.3 && ((d = p), (h = f));
+              }
+          h &&
+            (!s || c.has(s.kind) || s.kind === "pickup" || s.kind === "plant") &&
+            !(s && s.kind === "door") &&
+            ((s = { kind: "door", door: h, name: h.name || "Kapı", reach: 2.8, point: h.pos.clone(), dist: d }),
+            (o = d));
+        }
+        prox &&
+          (!s || c.has(s.kind) || ((s.kind === "pickup" || s.kind === "plant") && (s.dist ?? 9) > prox.dist + 0.6)) &&
+          (s = prox);
+      }
       if (i.y < -0.05) {
         let c = (0 - n.y) / i.y;
         if (c > 0 && c < o) {
@@ -58667,12 +58856,16 @@ uniform float uWet; uniform float uNight;`,
               ? (s = "[Sol Tık] Yüz / Parçala")
               : (o = "Yüzmek için Bıçak ya da Balta gerekli");
             break;
-          case "water":
-            (n?.id === "waterskin"
-              ? (s = n.d < kt.waterskin.dur ? "[E] Matarayı Doldur" : "[E] İç")
-              : (s = "[E] Su İç"),
-              i?.fishing && (s = "[Sol Tık] Olta At   " + s));
+          case "water": {
+            let salt = e.point && t.gen.isSalt(e.point.x, e.point.z);
+            (salt
+              ? ((s = null), (o = "Deniz suyu tuzlu, içilmez"))
+              : n?.id === "waterskin"
+                ? (s = n.d < kt.waterskin.dur ? "[E] Matarayı Doldur" : "[E] İç")
+                : (s = "[E] Su İç"),
+              i?.fishing && (s = "[Sol Tık] Olta At" + (s ? "   " + s : "")));
             break;
+          }
         }
       ((this.prompt = s), (this.sub = o), (this.hp = a));
     }
@@ -58717,11 +58910,12 @@ uniform float uWet; uniform float uNight;`,
     meleeHit(t) {
       let e = this.G,
         n = e.player,
+        ay = e.cam.yaw,
         i = e.inventory,
         s = i.slots[t.slot],
         o = s && s.id === t.itemId ? kt[s.id] : null,
         a = o?.dmg || 3,
-        l = new R(Math.sin(n.yaw), 0, Math.cos(n.yaw)),
+        l = new R(Math.sin(ay), 0, Math.cos(ay)),
         c = n.pos
           .clone()
           .addScaledVector(l, 0.9)
@@ -58742,7 +58936,7 @@ uniform float uWet; uniform float uNight;`,
             w = m.pos.z - n.pos.z,
             v = Math.hypot(x, w) - m.sp.size * 0.45;
           v > 2 + (o?.act === "thrust" ? 0.9 : 0) ||
-            Math.abs(zn(n.yaw, Math.atan2(x, w))) > 1 ||
+            Math.abs(zn(ay, Math.atan2(x, w))) > 1 ||
             Math.abs(m.pos.y - n.pos.y) > 2 ||
             (v < u && ((u = v), (d = m)));
         }
@@ -58756,7 +58950,7 @@ uniform float uWet; uniform float uNight;`,
             M = Math.hypot(w, v) - 0.3;
           M > 1.9 + (o?.act === "thrust" ? 0.9 : 0) ||
             M >= p ||
-            Math.abs(zn(n.yaw, Math.atan2(w, v))) > 1 ||
+            Math.abs(zn(ay, Math.atan2(w, v))) > 1 ||
             Math.abs(x.pos.y - n.pos.y) > 1.6 ||
             ((p = M), (f = x));
         }
@@ -61824,21 +62018,6 @@ uniform float uWet; uniform float uNight;`,
           t.def.role === "innkeeper" &&
             !o &&
             n.push({ t: `Bir gece kal (${this.innPrice()} akçe)`, fn: () => this.rest() }),
-          !o &&
-            !t.def.child &&
-            (t.order && t.order.kind !== "come"
-              ? (t.order.kind !== "wait"
-                  ? n.push({ t: "Burada bekle.", fn: () => this.orderBye(this.order(t, "wait")) })
-                  : n.push({ t: "Benimle gel.", fn: () => this.orderBye(this.order(t, "follow")) }),
-                n.push({
-                  t: "Tamam, işine dönebilirsin.",
-                  fn: () => this.orderBye(this.order(t, "release")),
-                }))
-              : (n.push({ t: "Benimle gel.", fn: () => this.orderBye(this.order(t, "follow")) }),
-                n.push({
-                  t: "Bana yardım eder misin?",
-                  fn: () => this.orderBye(this.order(t, "help")),
-                }))),
           n.push({ t: "Hoşça kal", fn: () => this.bye() }),
           this.renderOptions(n));
       }
@@ -62410,14 +62589,31 @@ uniform float uWet; uniform float uNight;`,
           `M${w - T} ${x} Q${w - T * 0.25} ${(x + v) / 2} ${M} ${v} Q${w + T * 0.55} ${(x + v) / 2 - 3} ${w + T} ${x} Z`,
         );
       }
+      occluded(t, e, n) {
+        let i = this.G,
+          s = i.camera.position,
+          o = t - s.x,
+          a = e - s.y,
+          l = n - s.z,
+          c = Math.hypot(o, a, l);
+        if (c < 1) return !1;
+        let h = new R(o / c, a / c, l / c),
+          d = i.villages?.raycast(s, h, c);
+        if (d != null && d < c - 0.5) return !0;
+        let u = i.structures?.raycast(s, h, c);
+        return u != null && u < c - 0.5;
+      }
       updateBubbles(t) {
         let e = this.G.camera,
           n = window.innerWidth,
           i = window.innerHeight;
         this.bubbles = this.bubbles.filter((s) => {
           if (((s.t -= t), s.t <= 0 || s.npc.inside || s.npc === this.npc)) return (s.el.remove(), !1);
-          (s.npc.headPos(Ye), (Ye.y += 0.18), Ye.project(e));
-          let o = Ye.z < 1 && Math.abs(Ye.x) < 1.1 && Math.abs(Ye.y) < 1.1 && s.npc.playerDist < 30;
+          (s.npc.headPos(Ye), (Ye.y += 0.18));
+          ((s.occT = (s.occT || 0) - t),
+            s.occT <= 0 && ((s.occT = 0.12), (s.occ = this.occluded(Ye.x, Ye.y, Ye.z))),
+            Ye.project(e));
+          let o = !s.occ && Ye.z < 1 && Math.abs(Ye.x) < 1.1 && Math.abs(Ye.y) < 1.1 && s.npc.playerDist < 30;
           return (
             (s.el.style.display = o ? "" : "none"),
             o &&
@@ -62462,9 +62658,12 @@ uniform float uWet; uniform float uNight;`,
           i = window.innerWidth,
           s = window.innerHeight;
         for (let o of this.marks.values()) {
-          (o.npc.headPos(Ye), (Ye.y += 0.55), Ye.project(n));
+          (o.npc.headPos(Ye), (Ye.y += 0.55));
+          ((o.occT = (o.occT || 0) - t),
+            o.occT <= 0 && ((o.occT = 0.12), (o.occ = this.occluded(Ye.x, Ye.y, Ye.z))),
+            Ye.project(n));
           let a = this.bubbles.some((c) => c.npc === o.npc),
-            l = Ye.z < 1 && Math.abs(Ye.x) < 1.1 && Math.abs(Ye.y) < 1.1 && !a && !this.npc;
+            l = !o.occ && Ye.z < 1 && Math.abs(Ye.x) < 1.1 && Math.abs(Ye.y) < 1.1 && !a && !this.npc;
           ((o.el.style.display = l ? "" : "none"),
             l &&
               (o.el.style.transform = `translate(${Math.round(((Ye.x + 1) / 2) * i)}px, ${Math.round(((1 - Ye.y) / 2) * s)}px) translate(-50%, -100%)`));
@@ -62892,7 +63091,7 @@ uniform float uWet; uniform float uNight;`,
       invertY: !1,
       vol: { master: 0.8, sfx: 1, amb: 0.8, music: 0.35 },
       showFps: !1,
-      musicOn: !0,
+      musicOn: !1,
     };
     try {
       let e = JSON.parse(localStorage.getItem(Vv) || "null");
@@ -63360,7 +63559,7 @@ uniform float uWet; uniform float uNight;`,
       this.piano && this.piano.update(t, e);
     }
     setMusic(t) {
-      ((this.musicOn = t), this.piano?.setEnabled(t));
+      ((this.musicOn = !1), this.piano?.setEnabled(!1));
     }
     applyVolumes() {
       this.ctx &&
@@ -65412,16 +65611,7 @@ uniform float uWet; uniform float uNight;`,
       A.audio.setMusic(t.musicOn !== !1),
       r || kr(t));
   }
-  A.toggleMusic = () => {
-    let r = A.settings.musicOn === !1;
-    ((A.settings.musicOn = r),
-      kr(A.settings),
-      A.audio.setMusic(r),
-      A.ui?.notify(
-        r ? "Piyano müziği açık \u266A  [N]" : "Piyano müziği kapalı  [N]",
-        null,
-      ));
-  };
+  A.toggleMusic = () => {};
   A.debug = {
     async house(r = "home", t = 1, e = 14) {
       let { debugHouse: n } = await Promise.resolve().then(() => (Lm(), rv)),
@@ -65731,13 +65921,6 @@ uniform float uWet; uniform float uNight;`,
         "volAVal",
         () => e.vol.amb,
         (i) => (e.vol.amb = i),
-        (i) => Math.round(i * 100) + "%",
-      ),
-      n(
-        "setVolMu",
-        "volMuVal",
-        () => e.vol.music,
-        (i) => (e.vol.music = i),
         (i) => Math.round(i * 100) + "%",
       ),
       (Te("setQuality").value = e.quality),
@@ -66070,7 +66253,6 @@ uniform float uWet; uniform float uNight;`,
         : A.state === "playing"
           ? (Qv(e), Hz(t))
           : A.state === "paused" && A.rend.render(A.scene, A.camera),
-        A.input.pressed("KeyN") && A.state !== "menu" && A.toggleMusic(),
         A.audio.musicTick(Math.min(0.1, t), A));
     } catch (n) {
       (console.error(n), (A.lastError = String(n && n.stack ? n.stack : n)));
