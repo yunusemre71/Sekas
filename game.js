@@ -26072,6 +26072,8 @@ void main() {
     return (
       r.size >= 1 && e.push("innkeeper", "smith", "healer", "guard", "farmer", "woodcutter", "child"),
       r.size >= 2 && e.push("farmer", "guard", "child", "merchant", "farmer"),
+      r.size === 0 && e.push("merchant"),
+      r.size === 1 && e.push("merchant", "merchant"),
       r.size === 0 && e.push(t.next() < 0.5 ? "woodcutter" : "healer"),
       e
     );
@@ -26083,15 +26085,19 @@ void main() {
       i = [],
       s = [],
       o = [];
-    t.forEach((a, l) => {
+    let mg = [];
+    (t.forEach((a, l) => {
       a === "farmer"
         ? i.push(l)
         : a === "child"
           ? s.push(l)
           : a === "guard"
             ? o.push(l)
-            : n.push({ building: KT[a] || "home", members: [l], couple: !1 });
-    });
+            : a === "merchant"
+              ? mg.push(l)
+              : n.push({ building: KT[a] || "home", members: [l], couple: !1 });
+    }),
+      mg.length && n.push({ building: "merchant", members: mg, couple: !1, multi: !0 }));
     for (let a = 0; a < i.length; a += 2) {
       let l = i.slice(a, a + 2);
       n.push({ building: "farm", members: l, couple: l.length === 2 });
@@ -26114,7 +26120,7 @@ void main() {
       }),
         !a.couple && l === 1 && (a.beds = { double: e.next() < 0.45 ? 1 : 0, single: 0 }),
         a.beds.double === 0 && a.beds.single === 0 && (a.beds.single = 1),
-        a.building === "guard" && (a.beds = { double: 0, single: l }));
+        (a.building === "guard" || a.multi) && (a.beds = { double: 0, single: l }));
     }
     return { roles: t, households: n };
   }
@@ -42556,7 +42562,7 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
               T = i.gen.heightAt(w, v);
             this.stall(e, w, T, v, M, d[m % d.length], n);
             let [b, _] = _n(0, -0.32, M);
-            this.stalls.push({ x: w + b, z: v + _, face: M, i: m, stallX: w, stallZ: v });
+            this.stalls.push({ x: w + b, z: v + _, face: M, i: this.stalls.length, stallX: w, stallZ: v });
           }
           for (let m = 0; m < 4; m++) {
             let x = l(9.6, u + Math.PI / h + (m / 4) * Math.PI * 2, 2.3, c);
@@ -42620,10 +42626,31 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
               [f, p] = _n(u, 0, s);
             t.box(e + f, n + 2.25, i + p, 0.38, 0.05, 1.6, d % 2 ? o : 15919832, s, -0.22);
           }
-          for (let d = 0; d < 5; d++) {
-            let [u, f] = _n(-0.9 + d * 0.45, 0.45, s),
-              p = a.pick([14169388, 15245882, 8368714, 13081186, 10119749]);
-            t.sphere(e + u, n + 0.98, i + f, 0.13, p, 1.2, 0.8, 1.1);
+          this.stallGoods ||= {};
+          let sgi = this.stalls.length,
+            sgl = sgStallGoods[sgStallCats[sgi % 3]],
+            sgg = (this.stallGoods[sgi] = []);
+          for (let d = 0; d < 6; d++) {
+            let id = sgl[(d + sgi * 3) % sgl.length],
+              [u, f] = _n(-0.95 + d * 0.38, 0.45, s),
+              m = mi(id);
+            if (!m) continue;
+            m.updateMatrixWorld(!0);
+            let bb = new Wn().setFromObject(m),
+              sz = Math.max(bb.max.x - bb.min.x, bb.max.y - bb.min.y, bb.max.z - bb.min.z) || 0.2,
+              k = Math.min(1.8, 0.34 / sz),
+              lg = bb.max.y - bb.min.y > 1.8 * Math.max(bb.max.x - bb.min.x, bb.max.z - bb.min.z);
+            (m.scale.multiplyScalar(k),
+              (m.rotation.order = "YXZ"),
+              lg
+                ? m.rotation.set(Math.PI / 2, s + Math.PI / 2 + (a.next() - 0.5) * 0.5, 0)
+                : m.rotation.set(0, s + (a.next() - 0.5) * 1.2, 0),
+              m.updateMatrixWorld(!0));
+            let b2 = new Wn().setFromObject(m);
+            (m.position.set(e + u, n + 0.9 - b2.min.y + 0.01, i + f),
+              m.traverse((q) => q.isMesh && ((q.castShadow = !0), (q.receiveShadow = !1))),
+              this.group.add(m),
+              sgg.push({ id, mesh: m, sold: -1 }));
           }
           this.boxes.push({
             cx: e + c,
@@ -43042,6 +43069,12 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
                 Math.hypot(f.pos.x - d.pos.x, f.pos.z - d.pos.z) < 1.6 && !f.pose && (u = !0);
               u ? (d.autoT = 1.5) : this.setDoor(d, !1);
             }
+          }
+          if (this.stallGoods && ((this.goodsT = (this.goodsT || 0) - t), this.goodsT <= 0)) {
+            this.goodsT = 6;
+            let d = n.dialogue.nowH();
+            for (let u of Object.values(this.stallGoods))
+              for (let f of u) f.sold >= 0 && d - f.sold > 18 && ((f.sold = -1), (f.mesh.visible = !0));
           }
           let o = t * (n.env.timeScale || 1);
           for (let d of this.fields) d.update(o);
@@ -62653,6 +62686,15 @@ uniform float uWet; uniform float uNight;`,
       hunter: ["bow", "arrow", "spear_stone", "meat_cooked", "jacket_ranger", "pants_ranger", "boots_ranger", "hood_ranger", "jacket_hide"],
       healer: ["herb_tea", "bandage", "robe_wizard"],
     },
+    sgStallCats = ["cloth", "tool", "misc"],
+    sgStallNames = { cloth: "Giyim tezgâhı", tool: "Alet tezgâhı", misc: "Gıda ve şifa tezgâhı" },
+    sgStallGoods = {
+      cloth: ["shirt_peasant", "pants_peasant", "shoes_peasant", "scarf_wool", "coat_noble", "pants_noble", "boots_noble", "hood_ranger"],
+      tool: ["axe", "pickaxe", "knife", "rope", "torch", "waterskin", "rod", "arrow"],
+      misc: ["bread", "cheese", "apple", "bandage", "herb_tea", "stew", "mushroom", "berry_red"],
+    },
+    sgGoodsOf = (r) =>
+      r.def.role === "merchant" ? sgStallGoods[sgStallCats[(r.stall?.i ?? 0) % 3]] : Ar[r.def.role],
     vz = {
       merchant: null,
       innkeeper: [
@@ -62957,7 +62999,11 @@ uniform float uWet; uniform float uNight;`,
         if (e) return this.ready(e) ? "\u2605 Görevi teslim et" : `Görev: ${e.title}`;
         if (this.deliveryFor(t)) return "\u2709 Teslimat var";
         let n = this.npcState(t),
-          i = Ar[t.def.role] ? " \xB7 ticaret" : t.def.role === "innkeeper" ? " \xB7 konaklama" : "";
+          i = Ar[t.def.role]
+            ? " \xB7 " + (t.def.role === "merchant" ? sgStallNames[sgStallCats[(t.stall?.i ?? 0) % 3]].toLowerCase() : "ticaret")
+            : t.def.role === "innkeeper"
+              ? " \xB7 konaklama"
+              : "";
         return (n.met ? "" : "Yeni biri \xB7 ") + au[t.def.role] + i;
       }
       deliveryFor(t) {
@@ -63436,7 +63482,7 @@ uniform float uWet; uniform float uNight;`,
         ((co("tradeCoins").textContent = t.player.coins),
           (co("tradeWho").textContent = e.name),
           (i.innerHTML = ""));
-        for (let l of Ar[n] || []) {
+        for (let l of sgGoodsOf(e) || []) {
           let c = this.price(l, !0),
             h = document.createElement("button");
           ((h.className = "tr-row" + (t.player.coins < c ? " poor" : "")),
@@ -63483,9 +63529,17 @@ uniform float uWet; uniform float uNight;`,
             this.say("Çantan dolu!", { instant: !0 });
             break;
           }
-          (n.inventory.add(t, 1), (n.player.coins -= o), i++);
+          (n.inventory.add(t, 1), (n.player.coins -= o), i++, this.takeFromStall(t));
         }
         (i && (n.audio?.ui("coin"), this.npc?.emote("Interact")), this.renderTrade(), n.ui.refreshHotbar());
+      }
+      takeFromStall(t) {
+        let e = this.npc;
+        if (!e || e.def.role !== "merchant" || !e.stall) return;
+        let n = e.v.stallGoods?.[e.stall.i];
+        if (!n) return;
+        let i = n.find((s) => s.id === t && s.sold < 0);
+        i && ((i.sold = this.nowH()), (i.mesh.visible = !1));
       }
       sell(t, e) {
         let n = this.G,
