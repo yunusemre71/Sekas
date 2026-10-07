@@ -33,3 +33,7 @@ python3 -m http.server 8000
   zemin/tavan, merdiven, çatı, çit; mobilya: masa, sandalye, yan sehpa, raf.
   Parçalar hangi odundan yapıldıysa o renkte olur; taştan da yapılabilir.
 - Kovayla kumsaldan kum toplanır; taş fırında kum cama dönüşür; cam pencere yapımında kullanılır.
+
+## Hızlı başlatma
+- **Windows:** `start.bat` dosyasına çift tıkla. Sunucu arka planda açılır, oyun Chrome'da (yoksa varsayılan tarayıcıda) açılır. Kapatmak için `stop.bat`.
+- **Mac/Linux:** `./start.sh`
