@@ -31278,6 +31278,234 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
     }
     return (Re(s, { rim: 1.1, ink: 0.5 }), (s.name = r.name), im.set(i, s), s);
   }
+  var sgDiet = {
+    cow: ["fiber", "apple", "bread"],
+    bull: ["fiber", "apple", "bread"],
+    sheep: ["fiber", "apple"],
+    llama: ["fiber", "apple"],
+    alpaca: ["fiber", "apple"],
+    horse: ["fiber", "apple", "bread"],
+    horse_white: ["fiber", "apple", "bread"],
+    donkey: ["fiber", "apple", "bread"],
+    deer: ["fiber", "apple", "berry_red", "berry_blue", "mushroom"],
+    stag: ["fiber", "apple", "berry_red", "berry_blue", "mushroom"],
+    pig: ["apple", "berry_red", "berry_blue", "mushroom", "mushroom_red", "bread", "pinecone"],
+    boar: ["apple", "pinecone", "mushroom", "berry_red", "berry_blue"],
+    wolf: ["meat_raw", "meat_cooked", "fish_raw"],
+    fox: ["meat_raw", "meat_cooked", "fish_raw", "berry_red", "berry_blue"],
+    bear: ["fish_raw", "meat_raw", "meat_cooked", "berry_red", "berry_blue", "apple", "fat"],
+    rabbit: ["fiber", "apple", "berry_red", "berry_blue"],
+    dog: ["bone"],
+  };
+  function sgLikes(type, id) {
+    return !!id && !!sgDiet[type] && sgDiet[type].includes(id);
+  }
+  var SgHurt = class {
+      constructor() {
+        ((this.ov = []), (this.t = 9), (this.built = !1), (this.u = { value: 1e9 }), (this.root = null));
+      }
+      build(root) {
+        ((this.root = root), (this.built = !0));
+        let u = this.u,
+          m = new fe({
+            color: 16722458,
+            transparent: !0,
+            opacity: 0.27,
+            depthWrite: !1,
+            polygonOffset: !0,
+            polygonOffsetFactor: -2,
+            roughness: 1,
+          });
+        Re(m, { rim: 0, noInk: !0 });
+        let prev = m.onBeforeCompile;
+        ((m.onBeforeCompile = (sh, r) => {
+          (prev && prev(sh, r),
+            (sh.uniforms.uCut = u),
+            (sh.vertexShader = sh.vertexShader
+              .replace("#include <common>", "#include <common>\nvarying float vHY;")
+              .replace(
+                "#include <begin_vertex>",
+                "#include <begin_vertex>\ntransformed += normalize(normal) * (0.012 / length(modelMatrix[0].xyz));",
+              )
+              .replace(
+                "#include <skinning_vertex>",
+                "#include <skinning_vertex>\nvHY = (modelMatrix * vec4(transformed, 1.0)).y;",
+              )),
+            (sh.fragmentShader = sh.fragmentShader
+              .replace("#include <common>", "#include <common>\nvarying float vHY;\nuniform float uCut;")
+              .replace("#include <color_fragment>", "#include <color_fragment>\nif (vHY > uCut) discard;")));
+        }),
+          (m.customProgramCacheKey = () => (prev ? "h1" : "h0") + "hurt"));
+        let list = [];
+        root.traverse((o) => o.isMesh && !o.userData.hurtOv && !o.userData.furShell && list.push(o));
+        for (let o of list) {
+          if (!o.parent || !o.geometry?.attributes?.normal || o.geometry.attributes.position.count < 40) continue;
+          let s = o.isSkinnedMesh ? new ma(o.geometry, m) : new Ct(o.geometry, m);
+          (o.isSkinnedMesh && s.bind(o.skeleton, o.bindMatrix),
+            s.position.copy(o.position),
+            s.quaternion.copy(o.quaternion),
+            s.scale.copy(o.scale),
+            (s.frustumCulled = !1),
+            (s.castShadow = !1),
+            (s.receiveShadow = !1),
+            (s.visible = !1),
+            (s.renderOrder = 3),
+            (s.userData.hurtOv = !0),
+            o.parent.add(s),
+            this.ov.push(s));
+        }
+      }
+      hit(root) {
+        (this.built && this.root !== root && this.dispose(),
+          this.built || this.build(root),
+          (this.t = 0));
+        let b = new Wn().setFromObject(root);
+        ((this.y0 = b.min.y), (this.H = Math.max(0.3, b.max.y - b.min.y)), (this.rootY = root.position.y));
+      }
+      update(dt, root) {
+        if (!this.built) return;
+        this.t += dt;
+        let on = this.t < 0.95;
+        for (let o of this.ov) o.visible !== on && (o.visible = on);
+        if (on) {
+          let k = Math.max(0, (this.t - 0.1) / 0.8),
+            e = k * k * (3 - 2 * k),
+            drift = root.position.y - this.rootY;
+          this.u.value = this.y0 + drift + this.H * (1.05 - 1.1 * e);
+        }
+      }
+      dispose() {
+        for (let o of this.ov) o.removeFromParent();
+        ((this.ov = []), (this.built = !1));
+      }
+    },
+    SgFx = class {
+      constructor(G) {
+        ((this.G = G), (this.map = new Map()), (this.v = new R()));
+        let d = document.createElement("div");
+        ((d.id = "sgbars"),
+          (d.style.cssText = "position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:6;overflow:hidden"),
+          document.body.appendChild(d),
+          (this.host = d));
+      }
+      info(o) {
+        if (o.sp && o.type && o.m) return { root: o.m.root, hp: o.hp, max: o.sp.hp, y: o.pos.y + o.sp.size * 1.15 * (o.scale || 1) + 0.3, dead: o.dead, gone: o.removed };
+        if (o.char) return { root: o.char.root, hp: o.stats.hp, max: 100, y: 0, dead: o.dead, gone: !1, noBar: !0 };
+        let s = o.scale || o.def?.spec?.scale || 1;
+        return { root: o.root, hp: o.hp, max: o.maxHp || 70, y: o.pos.y + 2.05 * s, dead: o.dead || o.hp <= 0, gone: o.gone };
+      }
+      hit(o) {
+        let i = this.info(o),
+          e = this.map.get(o);
+        if (!e) {
+          let el = document.createElement("div");
+          ((el.style.cssText =
+            "position:absolute;width:78px;height:10px;margin:-5px 0 0 -39px;background:rgba(20,10,10,.72);border:1px solid rgba(0,0,0,.85);border-radius:5px;overflow:hidden;opacity:0;transition:opacity .25s"),
+            (el.innerHTML =
+              '<div style="position:absolute;left:0;top:0;height:100%;width:100%;background:#f1c76a"></div><div style="position:absolute;left:0;top:0;height:100%;width:100%;background:linear-gradient(#ff6a5c,#c92a22)"></div>'));
+          (i.noBar || this.host.appendChild(el),
+            (e = { o, el, gh: i.hp / i.max, show: 0, hurt: new SgHurt(), delay: 0, ratio: 1 }),
+            this.map.set(o, e));
+        }
+        ((e.show = 7), (e.delay = 0.45));
+        i.root && e.hurt.hit(i.root);
+      }
+      update(dt) {
+        if (!this.map.size) return;
+        let cam = this.G.camera,
+          v = this.v;
+        for (let [o, e] of this.map) {
+          let i = this.info(o);
+          if (i.gone || !i.root) {
+            (e.hurt.dispose(), e.el.remove(), this.map.delete(o));
+            continue;
+          }
+          e.hurt.update(dt, i.root);
+          let r = Math.max(0, Math.min(1, i.hp / i.max));
+          ((e.ratio = r), (e.show -= dt));
+          i.dead && (e.show = Math.min(e.show, 1.4));
+          if (e.show <= 0 && !e.hurt.ov.some((x) => x.visible)) {
+            (e.hurt.dispose(), e.el.remove(), this.map.delete(o));
+            continue;
+          }
+          (e.delay > 0 ? (e.delay -= dt) : e.gh > r && (e.gh = Math.max(r, e.gh - dt * 0.2)), r > e.gh && (e.gh = r));
+          if (i.noBar) continue;
+          v.set(o.pos.x, i.y, o.pos.z).project(cam);
+          let dist = Math.hypot(o.pos.x - cam.position.x, o.pos.z - cam.position.z),
+            vis = v.z < 1 && Math.abs(v.x) < 1.1 && Math.abs(v.y) < 1.1 && dist < 40 && e.show > 0;
+          if (!vis) {
+            e.el.style.opacity = "0";
+            continue;
+          }
+          let sc = Math.max(0.6, Math.min(1.15, 14 / Math.max(6, dist)));
+          ((e.el.style.left = ((v.x * 0.5 + 0.5) * innerWidth).toFixed(1) + "px"),
+            (e.el.style.top = ((-v.y * 0.5 + 0.5) * innerHeight).toFixed(1) + "px"),
+            (e.el.style.transform = `scale(${sc.toFixed(2)})`),
+            (e.el.style.opacity = Math.min(1, e.show).toFixed(2)),
+            (e.el.children[0].style.width = (e.gh * 100).toFixed(1) + "%"),
+            (e.el.children[1].style.width = (r * 100).toFixed(1) + "%"));
+        }
+      }
+      clear() {
+        for (let [, e] of this.map) (e.hurt.dispose(), e.el.remove());
+        this.map.clear();
+      }
+    };
+  function sgDeathNpc(n) {
+    let role = n.def?.role || "x",
+      av = n.av,
+      P = (name, o = {}) => av.play(name, { tag: "state", hold: !0, fadeIn: 0.12, lowerFollow: !1, ...o }),
+      dur = (name) => av.sampler(name)?.duration || 1;
+    ((n.dead = !0), (n.deadT = 0), (n.deathQ = []));
+    let q = (t, fn) => n.deathQ.push({ t, fn, d: !1 }),
+      d0 = dur("Death01");
+    switch (role) {
+      case "guard":
+        (P("Hit_Knockback", { hold: !1, fadeOut: 0.05 }), q(dur("Hit_Knockback") * 0.75, () => P("Death01", { dur: d0 * 0.9 })));
+        break;
+      case "elder":
+        P("Death01", { dur: d0 * 1.7 });
+        break;
+      case "child":
+        P("Death01", { dur: d0 * 0.55 });
+        break;
+      case "smith":
+        ((av.root.scale.x *= -1), P("Death01", { dur: d0 * 1.1 }));
+        break;
+      case "merchant":
+        (P("Hit_Head", { hold: !1, mask: "full", fadeOut: 0.05 }), q(dur("Hit_Head") * 0.7, () => P("Death01", { dur: d0 * 1.3 })));
+        break;
+      case "traveler":
+        ((av.root.scale.x *= -1),
+          P("Hit_Knockback", { hold: !1, fadeOut: 0.05 }),
+          q(dur("Hit_Knockback") * 0.75, () => P("Death01", { dur: d0 })));
+        break;
+      default:
+        P("Death01");
+    }
+  }
+  function sgDeathTick(n, t) {
+    if (!n.deathQ) return;
+    n.deadT += t;
+    for (let q of n.deathQ) !q.d && n.deadT >= q.t && ((q.d = !0), q.fn());
+    n.deadT > 200 && n.pos && (n.pos.y -= t * 0.1);
+  }
+  var sgDeathStyle = {
+    wolf: { ts: 1, buckle: 0.22, spin: 0.7 },
+    fox: { ts: 1.7, hop: 0.4, spin: 1.8 },
+    deer: { ts: 0.95, buckle: 0.4 },
+    stag: { ts: 0.7, buckle: 0.28, spin: 0.35 },
+    horse: { ts: 1, pre: 0.65, rear: 0.7 },
+    horse_white: { ts: 0.85, pre: 0.8, rear: 0.95 },
+    donkey: { ts: 0.75, buckle: 0.18, spin: -0.4 },
+    cow: { ts: 0.55, buckle: 0.15 },
+    bull: { ts: 0.65, pre: 0.45, rear: 0.3 },
+    dog: { ts: 1.4, spin: 1.2, hop: 0.15 },
+    boar: { roll: 1.5708, dur: 0.55, plow: 0.28, kick: 0.9, spin: 0.5 },
+    pig: { roll: 2.7, dur: 0.8, kick: 1.1, hop: 0.12 },
+    sheep: { roll: 1.5708, dur: 0.5, kick: 0.55, spin: 0.25 },
+    llama: { roll: 1.5708, dur: 1.15, sag: 0.18, buckle: 0.3, kick: 0.25 },
+  };
   var sgFurDef = {
       wolf: { len: 0.045, d: 55, n: 5 },
       fox: { len: 0.04, d: 65, n: 5 },
@@ -31659,12 +31887,22 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
               for (let q of this.shells) q.visible = fo;
             }
             if (t.dead) {
-              (this.dead ||
-                ((this.dead = !0), this.clips.Death ? this.play("Death", 0.12, !0) : (this.deathT = 0)),
-                this.clips.Death ||
-                  ((this.deathT = Math.min(1, (this.deathT || 0) + e * 2)),
-                  (this.body.rotation.z = (Math.PI / 2) * this.deathT * this.deathT * (t.id % 2 ? 1 : -1))),
-                this.mixer.update(e));
+              let st = sgDeathStyle[this.type] || {},
+                hc = !!this.clips.Death;
+              this.dead ||
+                ((this.dead = !0),
+                (this.dT = 0),
+                (this.sz = t.sp.size),
+                (this.clipOn = !1),
+                (this.deathT = 0),
+                hc && !st.pre && ((this.clipOn = !0), this.play("Death", 0.12, !0)?.setEffectiveTimeScale(st.ts || 1)));
+              this.dT += e;
+              hc &&
+                !this.clipOn &&
+                this.dT >= st.pre &&
+                ((this.clipOn = !0), this.play("Death", 0.15, !0)?.setEffectiveTimeScale(st.ts || 1));
+              this.mixer.update(e);
+              this.deathPose(st, this.dT, hc, t.id % 2 ? 1 : -1, e);
               return;
             }
             if (t.hitFlash > 0.95 && this.wasHit <= 0.95) {
@@ -31710,6 +31948,37 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
               this.play(this.idleName, 0.4);
             }
             this.mixer.update(e);
+          }
+          deathPose(st, k, hc, sg, dt) {
+            let b = this.body,
+              sm = (x) => x * x * (3 - 2 * x),
+              c01 = (x) => Math.max(0, Math.min(1, x)),
+              rx = 0,
+              ry = 0,
+              rz = 0,
+              py = 0;
+            if (st.rear) {
+              let pre = st.pre || 0.6;
+              rx -= st.rear * (k < pre ? Math.sin(c01(k / pre) * 1.57) : Math.exp(-(k - pre) * 3.5));
+            }
+            st.buckle && (rx += st.buckle * sm(c01(k / 0.6)) * (hc ? Math.exp(-Math.max(0, k - 0.8) * 2.5) : 1));
+            st.plow && (rx += st.plow * sm(c01(k / 0.5)));
+            st.hop && (py += st.hop * Math.sin(c01(k / 0.55) * Math.PI));
+            st.spin && (ry += st.spin * sm(c01(k / 0.9)) * sg);
+            if (!hc) {
+              let r = sm(c01(k / (st.dur || 0.7)));
+              let rr = (st.roll ?? 1.5708) * r,
+                S = this.sz ?? 1;
+              ((rz += rr * sg),
+                (py += S * (0.3 * Math.abs(Math.sin(rr)) + 0.75 * Math.max(0, -Math.cos(rr))) - (st.sag || 0) * sm(c01(k / 0.6))));
+              if (st.kick && this.legs) {
+                let a = Math.sin(k * 20) * st.kick * Math.exp(-k * 0.9) * c01(k / 0.4);
+                for (let l of this.legs) {
+                  (l.b.rotation.x += a * (l.front ? 1 : -1) * l.side, l.low && (l.low.rotation.x += a * 0.6));
+                }
+              }
+            }
+            ((b.rotation.x = rx), (b.rotation.y = ry), (b.rotation.z = rz), (b.position.y = py));
           }
           procLegs(t, e, n, i, s) {
             let o = this.def;
@@ -32442,6 +32711,9 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
             }
             if (
               ((this.hitFlash = 1),
+              (this.followT = 0),
+              (this.hurtAgo = 0),
+              s.sgFx?.hit(this),
               this.knockV.set(e.x * n, 0, e.z * n),
               (this.awareness = 1),
               (this.provoked = !0),
@@ -32595,6 +32867,19 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
               n = e.player,
               i = this.sp;
             this.stateT += t;
+            {
+              let hd = n.selectedItem?.();
+              hd &&
+                sgLikes(this.type, hd.id) &&
+                !this.dead &&
+                !n.dead &&
+                !this.provoked &&
+                (this.playerDist ?? 999) < 14 &&
+                this.state !== "flee" &&
+                this.state !== "led" &&
+                !this.lunging &&
+                (this.followT = Math.max(this.followT || 0, 0.8));
+            }
             let s = this.playerDist ?? 999,
               o = e.env.nightFactor > 0.5,
               a = i.fearFire && ((n.torchLit && s < 9) || e.structures?.fireNear(this.pos, 7));
@@ -32880,8 +33165,21 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
               ((this.deathT += t), (this.decay -= t));
               let y = Math.min(1, this.deathT * 1.8),
                 g = Math.sin(Math.min(1, this.deathT * 2.2) * Math.PI) * 0.15;
-              ((this.m.body.rotation.z = (Math.PI / 2) * (y * y) * (this.id % 2 ? 1 : -1)),
-                (this.m.body.position.y = this.sp.hip * (1 - y * 0.55) + g));
+              if (this.type === "bear") {
+                let k = Math.min(1, this.deathT / 1.5),
+                  q = k * k * (3 - 2 * k),
+                  rr = Math.min(1, this.deathT / 0.5);
+                ((this.m.body.rotation.x = -0.55 * Math.sin(rr * 1.57) * (1 - q) - 1.35 * q),
+                  (this.m.body.rotation.z = 0.25 * q * (this.id % 2 ? 1 : -1)),
+                  (this.m.body.position.y = this.sp.hip * (1 - q * 0.45) + Math.sin(rr * 1.57) * 0.12 * (1 - q)));
+              } else if (this.type === "rabbit") {
+                let k = Math.min(1, this.deathT * 1.6);
+                ((this.m.body.rotation.z = Math.PI * 0.95 * k * k * (this.id % 2 ? 1 : -1)),
+                  (this.m.body.position.y = this.sp.hip * (1 - k * 0.3) + Math.sin(k * Math.PI) * 0.25));
+              } else {
+                ((this.m.body.rotation.z = (Math.PI / 2) * (y * y) * (this.id % 2 ? 1 : -1)),
+                  (this.m.body.position.y = this.sp.hip * (1 - y * 0.55) + g));
+              }
               for (let m of this.m.legs)
                 ((m.hip.rotation.x = Bt(m.hip.rotation.x, m.back ? 0.5 : -0.5, 6, t)),
                   (m.knee.rotation.x = Bt(m.knee.rotation.x, 0.2, 6, t)));
@@ -32889,6 +33187,9 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
                 this.decay <= 0 && this.remove());
               return;
             }
+            this.hp < this.sp.hp &&
+              (this.hurtAgo = (this.hurtAgo ?? 99) + t) > 10 &&
+              (this.hp = Math.min(this.sp.hp, this.hp + this.sp.hp * 0.02 * t));
             if (((this.perceiveT -= t), this.perceiveT <= 0)) {
               let y = 0.2 + Math.random() * 0.05;
               (this.perceive(y), (this.perceiveT = y));
@@ -34902,7 +35203,11 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
                 (this.moveV = 0),
                 (this.criticalT = this.critical ? this.criticalT + t : 0),
                 (this.ghost = Math.max(0, this.ghost - t)),
-                this.scared > 0 && (this.scared -= t));
+                this.scared > 0 && (this.scared -= t),
+                this.hp < this.maxHp &&
+                  this.down <= 0 &&
+                  (this.hurtAgo = (this.hurtAgo ?? 99) + t) > 12 &&
+                  (this.hp = Math.min(this.maxHp, this.hp + this.maxHp * 0.025 * t)));
               if (
                 (this.reaggroT > 0 && (this.reaggroT -= t),
                 !this.hostile && this.down <= 0 && !n.dead && i < 9 && !(this.reaggroT > 0) && !this.inside)
@@ -36547,6 +36852,7 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
             if (this.down > 0) return;
             let i = this.G;
             ((this.hp -= t),
+              t > 0 && (i.sgFx?.hit(this), (this.hurtAgo = 0)),
               e && this.kb.set(e.x * 3.2, e.z * 3.2),
               this.av.play(this.alt++ % 2 ? "Hit_Chest" : "Hit_Head", {
                 tag: "hurt",
@@ -36747,7 +37053,7 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
               : (this.steer(u.x, u.z, h, t), this.groundY(t));
           }
           knockOut() {
-            ((this.down = 40 + this.r.next() * 25),
+            ((this.down = 1e9),
               (this.hostile = !1),
               (this.scared = 0),
               (this.atk = null),
@@ -36758,11 +37064,12 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
               this.setTool(null, "l"),
               this.av.stop("talk", 0.1),
               this.av.stop("atk", 0.1),
-              this.av.play("Death01", { tag: "state", hold: !0, fadeIn: 0.12, lowerFollow: !1 }),
-              this.G.ui?.notify(`${this.name} bayıldı!`, null, "bad"),
+              sgDeathNpc(this),
+              this.G.ui?.notify(`${this.name} öldü!`, null, "bad"),
               this.talking && this.G.dialogue?.close());
           }
           updateDown(t) {
+            if (this.dead) return sgDeathTick(this, t);
             ((this.down -= t),
               !(this.down > 0) &&
                 ((this.down = 0),
@@ -50176,19 +50483,35 @@ uniform float uWet; uniform float uNight;`,
         }
         if (
           (e.dead || e.sleep
-            ? (this.deathT = Math.min(1, this.deathT + t * (e.dead ? 1.6 : 0.8)))
-            : (this.deathT = Math.max(0, this.deathT - t * 3)),
+            ? (this.deathT = Math.min(1, this.deathT + t * (e.dead ? 0.85 : 0.8)))
+            : ((this.deathT = Math.max(0, this.deathT - t * 3)), (this.dStyle = null)),
           this.deathT > 0)
         ) {
           let F = this.deathT,
-            q = e.sleep ? xe(0, 1, F) : Math.min(1, F * 1.15) - Math.sin(Math.min(1, F) * Math.PI) * 0;
-          ((h -= 1.5 * q),
-            (c -= 0.72 * q),
-            l(i.L.up, 0, 0, 0.7 * q),
-            l(i.R.up, 0, 0, -0.7 * q),
-            l(s.L.th, -0.2 * q),
-            l(s.R.th, 0.1 * q, 0, -0.15 * q),
-            l(this.head, 0.2 * q));
+            q = e.sleep ? xe(0, 1, F) : Math.min(1, F * 1.15);
+          if (e.dead) {
+            this.dStyle ??= (Math.random() * 3) | 0;
+            let kb = xe(0, 1, Math.min(1, F / 0.4)),
+              tp = xe(0, 1, Math.max(0, Math.min(1, (F - 0.35) / 0.65))),
+              sn = this.dStyle === 2 ? 1 : 0;
+            ((c -= 0.34 * kb + 0.4 * tp),
+              l(s.L.th, -1.1 * kb * (1 - tp * 0.7)),
+              l(s.R.th, -0.9 * kb * (1 - tp * 0.7)),
+              l(this.head, 0.25 * kb - (this.dStyle === 1 ? 0.5 * tp : 0)));
+            if (this.dStyle === 0)
+              ((h -= 1.45 * tp), l(i.L.up, 0, 0, 0.8 * tp), l(i.R.up, 0, 0, -0.8 * tp), l(i.L.elbow, -0.4 * kb), l(i.R.elbow, -0.4 * kb));
+            else if (this.dStyle === 1)
+              ((h += 1.35 * tp), l(i.L.up, -1.5 * tp, 0, 0.9 * tp), l(i.R.up, -1.5 * tp, 0, -0.9 * tp));
+            else
+              ((d += 1.4 * tp), (h -= 0.25 * tp), l(i.L.up, 0, 0, 0.5 * tp), l(i.R.up, 0.6 * tp, 0, -0.3 * tp), l(i.R.elbow, -0.8 * tp));
+          } else
+            ((h -= 1.5 * q),
+              (c -= 0.72 * q),
+              l(i.L.up, 0, 0, 0.7 * q),
+              l(i.R.up, 0, 0, -0.7 * q),
+              l(s.L.th, -0.2 * q),
+              l(s.R.th, 0.1 * q, 0, -0.15 * q),
+              l(this.head, 0.2 * q));
         }
         for (let F in o) {
           let [q, V, st, tt] = o[F];
@@ -50346,6 +50669,22 @@ uniform float uWet; uniform float uNight;`,
       setHeadVisible(t) {
         this.av.setHeadVisible(t);
       }
+      startDeath(n) {
+        let d0 = n.sampler("Death01")?.duration || 1,
+          P = (nm, o = {}) => n.play(nm, { tag: "state", hold: !0, fadeIn: 0.12, lowerFollow: !1, ...o }),
+          du = (nm) => n.sampler(nm)?.duration || 1,
+          st = (Math.random() * 4) | 0;
+        ((this.dSt = st), (this.dTq = 0), (this.pend = null));
+        if (st === 0) P("Death01");
+        else if (st === 1) P("Death01", { dur: d0 * 1.6 });
+        else if (st === 2) {
+          (P("Hit_Head", { hold: !1, fadeOut: 0.05 }), (n.root.scale.x *= -1));
+          this.pend = { t: du("Hit_Head") * 0.7, fn: () => P("Death01", { dur: d0 * 1.2 }) };
+        } else {
+          P("Hit_Knockback", { hold: !1, fadeOut: 0.05 });
+          this.pend = { t: du("Hit_Knockback") * 0.75, fn: () => P("Death01", { dur: d0 * 0.9 }) };
+        }
+      }
       update(t, e) {
         let n = this.av,
           i = e.speed > 0.35,
@@ -50362,9 +50701,9 @@ uniform float uWet; uniform float uNight;`,
         ),
           e.dead &&
             !this.wasDead &&
-            (n.play("Death01", { tag: "state", hold: !0, fadeIn: 0.12, lowerFollow: !1 }),
-            (this.pose = null)),
-          !e.dead && this.wasDead && n.stop("state", 0.3),
+            (this.startDeath(n), (this.pose = null)),
+          e.dead && this.pend && ((this.dTq += t) >= this.pend.t) && (this.pend.fn(), (this.pend = null)),
+          !e.dead && this.wasDead && (n.stop("state", 0.3), (n.root.scale.x = Math.abs(n.root.scale.x)), (this.pend = null)),
           e.dead || this.updatePose(e.pose || null, t),
           (this.wasDead = !!e.dead),
           (this.wasSleep = !!e.sleep));
@@ -52776,6 +53115,7 @@ uniform float uWet; uniform float uNight;`,
         if (this.dead || this.godMode) return;
         let s = this.G;
         ((this.stats.hp -= t),
+          t >= 1 && s.sgFx?.hit(this),
           (this.hurtT = 1),
           (this.lastDamageCause = e),
           t >= 3 && s.dialogue?.npc && s.dialogue.close(),
@@ -53871,7 +54211,22 @@ uniform float uWet; uniform float uNight;`,
             break;
           case "animal": {
             let s = e.animal;
-            if (s.dead || !s.home) break;
+            if (s.dead) break;
+            let fd = this.selectedItem();
+            if (fd && sgLikes(s.type, fd.id)) {
+              (t.inventory.removeAt(this.selected, 1),
+                this.startAction("use", 0.9),
+                (s.provoked = !1),
+                (s.followT = 90),
+                s.setState("follow"),
+                (s.hp = Math.min(s.sp.hp, s.hp + s.sp.hp * 0.15)),
+                t.particles.sparkle(s.pos.clone().setY(s.pos.y + (s.sp.hip || 0.6) + 0.6), 16748468),
+                t.audio?.animalIdle(s.type, s.pos, !1, "wander"),
+                t.ui?.refreshHotbar?.(),
+                t.ui?.notify(`${s.sp.name} yemeği sevdi! Bir süre peşinden gelecek.`, null, "good"));
+              break;
+            }
+            if (!s.home) break;
             let o = this.selectedItem(),
               a = s.type === "sheep" || s.type === "llama",
               l = s.pos.clone().setY(s.pos.y + (s.sp.hip || 0.6) + 0.5);
@@ -53887,7 +54242,7 @@ uniform float uWet; uniform float uNight;`,
                 t.particles.sparkle(l, 16748468),
                 s.type === "dog"
                   ? (t.audio?.bark(s.pos, 1, 0.6),
-                    (s.followT = 60),
+                    (s.followT = 40),
                     s.setState("follow"),
                     t.ui?.notify("Köpek seni sevdi! Bir süre peşinden gelecek.", null, "good"))
                   : t.audio?.animalIdle(s.type, s.pos, !1, "wander"));
@@ -54043,12 +54398,11 @@ uniform float uWet; uniform float uNight;`,
                   : this.lastDamageCause || "Öldün";
           this.die(c);
         }
-        n.food > 55 &&
-          n.water > 55 &&
+        n.food > 20 &&
           this.bleed <= 0 &&
           this.poison <= 0 &&
           n.temp > 35.5 &&
-          (n.hp = Math.min(100, n.hp + t * (0.18 + (n.food > 85 && n.water > 85 ? 0.12 : 0))));
+          (n.hp = Math.min(100, n.hp + t * (0.25 + (n.food > 55 ? 0.35 : 0) + (this.hitCool > 0 ? 0 : 0.9))));
       }
       animate(t, e) {
         let n = this.char;
@@ -54644,7 +54998,14 @@ uniform float uWet; uniform float uNight;`,
           !this.staff && Ia() && ((this.staff = !0), this.av.setHeld("r", Pa("WoodenStaff", 1), cd)),
           this.spawnAnimal());
         let s = 0;
-        if (this.down > 0)
+        if (
+          (this.hp < 70 &&
+            this.down <= 0 &&
+            (this.hurtAgo = (this.hurtAgo ?? 99) + t) > 12 &&
+            (this.hp = Math.min(70, this.hp + 70 * 0.025 * t)),
+          this.dead && sgDeathTick(this, t),
+          this.down > 0)
+        )
           ((this.down -= t),
             this.down <= 0 &&
               (this.av.stop("state", 0.05),
@@ -54829,6 +55190,8 @@ uniform float uWet; uniform float uNight;`,
       hit(t, e) {
         if (this.down > 0) return;
         ((this.hp -= t),
+          (this.hurtAgo = 0),
+          this.G.sgFx?.hit(this),
           this.av.play("Hit_Chest", { tag: "hurt", mask: "upper", weight: 0.9, fadeIn: 0.04, fadeOut: 0.2 }),
           this.G.dialogue?.bark(this, this.r.pick(w5)),
           (this.fleeT = 25),
@@ -54846,10 +55209,11 @@ uniform float uWet; uniform float uNight;`,
           (n.home = null),
           (this.lostAnimal = n)),
           this.hp <= 0 &&
-            ((this.down = 50),
+            ((this.down = 1e9),
             (this.fleeT = 0),
-            this.av.play("Death01", { tag: "state", hold: !0, fadeIn: 0.12, lowerFollow: !1 }),
-            this.G.ui?.notify(`${this.name} bayıldı!`, null, "bad")));
+            (this.staff = !0),
+            sgDeathNpc(this),
+            this.G.ui?.notify(`${this.name} öldü!`, null, "bad")));
       }
       dispose() {
         ((this.gone = !0), this.av.dispose(), this.rope?.removeFromParent(), this.lamp?.removeFromParent());
@@ -60790,7 +61154,9 @@ uniform float uWet; uniform float uNight;`,
           case "animal": {
             let l = e.animal;
             ((a = l.hp / l.sp.hp),
+              !l.dead && i && sgLikes(l.type, i.id) && ((s = "[E] Yedir"), (o = "Seni takip edecek")),
               l.home &&
+                !(!l.dead && i && sgLikes(l.type, i.id)) &&
                 l.home.village &&
                 !l.dead &&
                 ((o = `${l.home.village.site.name} köyünün hayvanı`),
@@ -67591,6 +67957,7 @@ uniform float uWet; uniform float uNight;`,
       (A.animals = new yd(A)),
       (A.villages = new Kl(A)),
       (A.travelers = new Cd(A)),
+      (A.sgFx = new SgFx(A)),
       setTimeout(() => A.travelers.preload(), 4e3),
       (A.bridges = new Id(A)),
       (A.fish = new ou(A)),
@@ -67674,6 +68041,7 @@ uniform float uWet; uniform float uNight;`,
       A.animals.clear(),
       A.villages?.clear(),
       A.travelers?.clear(),
+      A.sgFx?.clear(),
       A.bridges?.clear(),
       A.fish.clear(),
       A.ambient.clear(),
@@ -68473,6 +68841,7 @@ uniform float uWet; uniform float uNight;`,
       A.prof && (A._t0 = performance.now()),
       A.villages.update(r),
       A.travelers.update(r),
+      A.sgFx.update(r),
       A.bridges.update(r),
       A.animals.update(r * (e.sleeping, 1)),
       A.prof && (A.prof["G.animals.update"] = (A.prof["G.animals.update"] || 0) + performance.now() - A._t0),
