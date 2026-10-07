@@ -196,6 +196,9 @@ kbd { font-family: var(--font-display); font-weight: 400; font-size: 15px; lette
 #stamina { width: 220px; height: 9px; border: 2px solid var(--ink); background: var(--paper-2); overflow: hidden; transition: opacity .4s; }
 #stamina i { display: block; height: 100%; background: var(--stam); width: 100%; }
 #stamina.full { opacity: 0; }
+#stamina { position: relative; }
+#stamina.boost::after { content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 35%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.75), transparent); transform: skewX(-20deg); animation: stamShine 3.2s ease-in-out infinite; pointer-events: none; }
+@keyframes stamShine { 0% { left: -40%; } 30% { left: 110%; } 100% { left: 110%; } }
 #hotbar { display: flex; gap: 7px; padding: 7px; background: var(--paper-2); border: var(--line); box-shadow: var(--shadow); }
 .slot { position: relative; width: 58px; height: 58px; background: var(--paper-3); border: 2.5px solid var(--ink); flex: none; box-sizing: border-box; }
 .slot img { position: absolute; inset: 4px; width: calc(100% - 8px); height: calc(100% - 8px); pointer-events: none; filter: drop-shadow(1.5px 0 0 var(--ink)) drop-shadow(-1.5px 0 0 var(--ink)) drop-shadow(0 1.5px 0 var(--ink)) drop-shadow(0 -1.5px 0 var(--ink)); }

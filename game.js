@@ -43580,7 +43580,7 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
             if (!t?.guest || !t.house || !t.house.village?.rented()) return;
             let n = this.G.player;
             ((n.stats.food = Math.min(100, n.stats.food + 30)),
-              (n.stats.water = Math.min(100, n.stats.water + 30)));
+              ((n.stats.water = Math.min(100, n.stats.water + 30)), (n.boostT = 30)));
             let i = t.house.front;
             (i && (n.spawn = { x: i.out.x, z: i.out.z }),
               this.G.ui?.notify(
@@ -53488,7 +53488,7 @@ uniform float uWet; uniform float uNight;`,
               itemId: n.id,
               onDone: () => {
                 ((this.stats.hp = Math.min(100, this.stats.hp + (i.heal || 0))),
-                  i.water && (this.stats.water = Math.min(100, this.stats.water + i.water)),
+                  i.water && ((this.stats.water = Math.min(100, this.stats.water + i.water)), (this.boostT = 30)),
                   i.stopBleed && (this.bleed = 0),
                   i.curePoison && (this.poison = 0),
                   e.ui?.notify(
@@ -53520,7 +53520,7 @@ uniform float uWet; uniform float uNight;`,
               onDone: () => {
                 let s = this.stats;
                 ((s.food = Math.min(100, s.food + (i.food || 0))),
-                  (s.water = Math.min(100, s.water + (i.water || 0))),
+                  (s.water = Math.min(100, s.water + (i.water || 0))), i.water && (this.boostT = 30),
                   (s.hp = Math.min(100, s.hp + (i.heal || 0))),
                   i.poison && !i.poisonChance && (this.poison = Math.max(this.poison, i.poison)),
                   i.poisonChance &&
@@ -53534,7 +53534,7 @@ uniform float uWet; uniform float uNight;`,
         }
       }
       drinkAmount(t) {
-        ((this.stats.water = Math.min(100, this.stats.water + t)), this.G.quests?.event("drink"));
+        ((this.stats.water = Math.min(100, this.stats.water + t)), (this.boostT = 30), this.G.quests?.event("drink"));
       }
       interact() {
         let t = this.G,
@@ -53747,6 +53747,12 @@ uniform float uWet; uniform float uNight;`,
             e.inventory.useDurability(this.selected, 20)));
       }
       updateStats(t) {
+        let s0 = this.stats.stam;
+        (this.updateStats0(t),
+          this.boostT > 0 &&
+            ((this.boostT -= t), this.stats.stam < s0 && (this.stats.stam = s0 - (s0 - this.stats.stam) * 0.5)));
+      }
+      updateStats0(t) {
         let e = this.G,
           n = this.stats,
           i = e.env;
@@ -66648,7 +66654,7 @@ uniform float uWet; uniform float uNight;`,
               this.set("targetHpFill", "width", yt(o.hp, 0, 1) * 100 + "%"))
             : this.set("targetHp", "hidden", !0),
           (Nt("stamFill").style.width = i.stam + "%"),
-          this.set("stamina", "class", i.stam > 99.5 ? "full" : ""));
+          this.set("stamina", "class", (i.stam > 99.5 ? "full" : "") + (this.G.player.boostT > 0 ? " boost" : "")));
         {
           let v = e.player.breath ?? 100;
           (this.set("breathRow", "hidden", v > 99.5 && !e.player.underwater),
