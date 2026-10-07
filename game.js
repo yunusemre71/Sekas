@@ -32706,6 +32706,15 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
                 (n = Math.sin(this.faceYaw)),
                 (i = Math.cos(this.faceYaw)));
             }
+            if (this.holdT > 0) ((this.holdT -= t), (s = 0));
+            else if (s > 0.4 && this.lastP) {
+              let q = Math.hypot(this.pos.x - this.lastP.x, this.pos.z - this.lastP.z);
+              this.stuckT = q < s * t * 0.25 ? (this.stuckT || 0) + t : Math.max(0, (this.stuckT || 0) - t);
+              this.stuckT > 1 &&
+                ((this.stuckT = 0),
+                this.state !== "flee" && this.state !== "chase" && (this.pickWanderTarget(), (this.holdT = 1.5), (s = 0), (this.speed = 0)));
+            }
+            this.lastP = this.lastP ? this.lastP.copy(this.pos) : this.pos.clone();
             if (s > 0.05) {
               [n, i] = this.mgr.avoid(this, n, i, s);
               let y = 1.2 + s * 0.4,
@@ -32713,17 +32722,28 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
                 m = this.pos.z + i * y,
                 x = 0 - e.gen.heightAt(g, m),
                 w = this.type === "bear" || (this.state === "flee" && this.type === "deer");
+              let calm = this.state !== "flee" && this.state !== "chase" && this.state !== "stalk" && !this.lunging,
+                blk = !1;
               if (x > (w ? 1.6 : 0.4) && e.bridges?.floorAt(g, m, this.pos.y) == null) {
-                let M = this.id % 2 ? 1 : -1;
-                (([n, i] = [-i * M, n * M]), this.state === "wander" && this.pickWanderTarget());
+                if (calm) blk = !0;
+                else {
+                  let M = this.id % 2 ? 1 : -1;
+                  [n, i] = [-i * M, n * M];
+                }
               }
               if (e.gen.normalAt(g, m).y < 0.7) {
-                let M = this.id % 2 ? 1 : -1;
-                [n, i] = [-i * M, n * M];
+                if (calm) blk = !0;
+                else {
+                  let M = this.id % 2 ? 1 : -1;
+                  [n, i] = [-i * M, n * M];
+                }
               }
+              blk && ((this.holdT = 1.2 + Math.random()), this.pickWanderTarget(), (s = 0), (this.speed = 0));
             }
             let o = s > 0.05 ? Math.atan2(n, i) : (this.faceYaw ?? this.yaw);
-            ((this.yaw = pn(this.yaw, o, s > 4 ? 7 : 4, t)),
+            let mt = this.state === "flee" || this.state === "chase" || this.state === "stalk" || this.lunging ? 99 : 2.2 * t;
+            ((this.yaw = this.yaw + yt(zn(this.yaw, o) * Math.min(1, (s > 4 ? 7 : 4) * t), -mt, mt)),
+              (this.yaw = zn(0, this.yaw)),
               (this.faceYaw = void 0),
               (this.speed = Bt(this.speed, s, s > this.speed ? 3.5 : 6, t)));
             let a = Math.sin(this.yaw),
@@ -37536,6 +37556,35 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
     let gp = { x: x0 + (g[0] + 0.5) * st, z: z0 + (g[1] + 0.5) * st };
     return (Math.hypot(gp.x - b.x, gp.z - b.z) > 0.25 && out.push(gp), s && Math.hypot(x0 + (s[0] + 0.5) * st - a.x, z0 + (s[1] + 0.5) * st - a.z) > 0.25 && out.unshift({ x: x0 + (s[0] + 0.5) * st, z: z0 + (s[1] + 0.5) * st }), out);
   }
+  function sgClearStairs(r, items, spots) {
+    let st = r.stairs;
+    if (!st || r.floors.length < 2) return;
+    let L =
+        st.dir === "-z"
+          ? { x0: st.x0 - 0.25, x1: st.x1 + 0.25, z0: st.z0 - 1.15, z1: st.z0 + 0.1 }
+          : st.dir === "+z"
+            ? { x0: st.x0 - 0.25, x1: st.x1 + 0.25, z0: st.z1 - 0.1, z1: st.z1 + 1.15 }
+            : st.dir === "+x"
+              ? { x0: st.x1 - 0.1, x1: st.x1 + 1.15, z0: st.z0 - 0.25, z1: st.z1 + 0.25 }
+              : { x0: st.x0 - 1.15, x1: st.x0 + 0.1, z0: st.z0 - 0.25, z1: st.z1 + 0.25 },
+      H = { x0: st.x0 - 0.1, x1: st.x1 + 0.1, z0: st.z0 - 0.1, z1: st.z1 + 0.1 },
+      hit = (it, q) => {
+        let hw = Math.max(it.w || 0.5, it.d || 0.5) / 2;
+        let hx = it.flat ? (it.w || 1) / 2 : hw,
+          hz = it.flat ? (it.d || 1) / 2 : hw;
+        if (it.flat) (hx = hz = Math.max(hx, hz));
+        return it.x + hx > q.x0 && it.x - hx < q.x1 && it.z + hz > q.z0 && it.z - hz < q.z1;
+      };
+    for (let i = items.length - 1; i >= 0; i--) {
+      let it = items[i];
+      if (it.floor !== 1 || it.hang) continue;
+      if (hit(it, H) || hit(it, L)) items.splice(i, 1);
+    }
+    for (let i = spots.length - 1; i >= 0; i--) {
+      let sp = spots[i];
+      sp.floor === 1 && sp.x !== void 0 && hit({ x: sp.x, z: sp.z, w: 0.6, d: 0.6 }, L) && spots.splice(i, 1);
+    }
+  }
   function sgPrune(r, rooms, items, spots) {
     for (let f = 0; f < r.floors.length; f++) {
       let d = sgWalkData(r, rooms, items, spots, f);
@@ -38160,7 +38209,7 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
       (g(b, !1, "guest") && (o[o.length - 1].guest = !0),
         a() < 0.6 && d(b, "nightstand", 0.45, 0.4, 0.55, { pref: "corner" }));
     for (let b of t.filter((_) => _.kind === "landing")) a() < 0.7 && d(b, "chest", 0.9, 0.5, 0.55);
-    (sgPrune(r, t, s, o), (r.items = s), (r.spots = o));
+    (sgClearStairs(r, s, o), sgPrune(r, t, s, o), (r.items = s), (r.spots = o));
   }
   function _d(r) {
     let t = (r.x0 + r.x1) / 2,
@@ -50257,7 +50306,7 @@ uniform float uWet; uniform float uNight;`,
         let n = this.av,
           i = this.bones;
         ((this.gK = Bt(this.gK || 0, e.gentle || 0, 5, t)), (this.sK = Bt(this.sK || 0, e.scr || 0, 7, t)));
-        let s = this.gK * 0.3 + this.sK * 0.8;
+        let s = this.gK * 0.3 + this.sK * 0.95;
         if (s < 0.005) return;
         n.root.updateMatrixWorld(!0);
         let o = sgV2.set(1, 0, 0).transformDirection(n.root.matrixWorld);
@@ -50266,7 +50315,7 @@ uniform float uWet; uniform float uNight;`,
           Yn(i.spine_03, o, s * 0.4),
           Yn(i.neck_01, o, -s * 0.2),
           Yn(i.Head, o, -s * 0.35),
-          (n.model.position.y -= 0.035 * this.gK + 0.1 * this.sK),
+          (n.model.position.y -= 0.035 * this.gK + 0.02 * this.sK),
           n.root.updateMatrixWorld(!0));
         if (this.sK > 0.02 && e.hl && e.hr && !e.action) {
           let a = rd.clone().addScaledVector(o, 0.9),
@@ -53704,7 +53753,7 @@ uniform float uWet; uniform float uNight;`,
             speed: e,
             grounded: this.grounded,
             vy: this.vel.y,
-            crouch: this.crouching || this.scramble,
+            crouch: this.crouching,
             ...this.slopePose(t, e),
             fp:
               this.G.cam.mode === "first" && !this.rest && !this.climb && !this.sleeping && !this.dead && !this.G.dialogue?.npc
