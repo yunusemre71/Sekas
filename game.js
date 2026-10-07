@@ -32622,7 +32622,7 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
                   (this.pickWanderTarget(),
                   (this.stateT = 0),
                   (this.state = Math.random() < 0.45 ? "graze" : "wander")),
-                  this.awareness > 0.35 && this.setState("alert"),
+                  this.awareness > 0.35 && i.kind !== "farm" && this.setState("alert"),
                   i.kind === "predator" &&
                     this.knows &&
                     !n.dead &&
@@ -32641,7 +32641,9 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
                 break;
               }
               case "alert": {
-                (this.awareness < 0.2 && this.stateT > 2.5 && this.setState("wander"),
+                ((this.awareness < 0.2 || (i.kind === "farm" && !this.provoked)) &&
+                  this.stateT > (i.kind === "farm" ? 0.4 : 2.5) &&
+                  this.setState("wander"),
                   i.kind === "prey" &&
                     (this.awareness > 0.85 || (this.knows && s < i.panic)) &&
                     this.setState("flee"),
