@@ -32903,7 +32903,7 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
                 (i = Math.cos(this.faceYaw)));
             }
             if (this.holdT > 0) ((this.holdT -= t), (s = 0));
-            else if (s > 0.4 && this.lastP) {
+            else if (s > 0.4 && this.lastP && this.state !== "led") {
               let q = Math.hypot(this.pos.x - this.lastP.x, this.pos.z - this.lastP.z);
               this.stuckT = q < s * t * 0.25 ? (this.stuckT || 0) + t : Math.max(0, (this.stuckT || 0) - t);
               this.stuckT > 1 &&
@@ -32920,14 +32920,14 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
                 w = this.type === "bear" || (this.state === "flee" && this.type === "deer");
               let calm = this.state !== "flee" && this.state !== "chase" && this.state !== "stalk" && !this.lunging,
                 blk = !1;
-              if (x > (w ? 1.6 : 0.4) && e.bridges?.floorAt(g, m, this.pos.y) == null) {
+              if (this.state !== "led" && x > (w ? 1.6 : 0.4) && e.bridges?.floorAt(g, m, this.pos.y) == null) {
                 if (calm) blk = !0;
                 else {
                   let M = this.id % 2 ? 1 : -1;
                   [n, i] = [-i * M, n * M];
                 }
               }
-              if (e.gen.normalAt(g, m).y < 0.7) {
+              if (this.state !== "led" && e.gen.normalAt(g, m).y < 0.7) {
                 if (calm) blk = !0;
                 else {
                   let M = this.id % 2 ? 1 : -1;
@@ -32935,6 +32935,9 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
                 }
               }
               blk && ((this.holdT = 1.2 + Math.random()), this.pickWanderTarget(), (s = 0), (this.speed = 0));
+              this.state !== "led" &&
+                ((this.slopeF = Bt(this.slopeF ?? 1, sgSlopeF(e.gen, this.pos.x, this.pos.z, n, i), 5, t)),
+                (s *= this.slopeF));
             }
             let o = s > 0.05 ? Math.atan2(n, i) : (this.faceYaw ?? this.yaw);
             let mt = this.state === "flee" || this.state === "chase" || this.state === "stalk" || this.lunging ? 99 : 2.2 * t;
@@ -34192,6 +34195,10 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
         l = i + e;
       a < l && a > 1e-4 && ((t.x = n.x + (s / a) * l), (t.z = n.z + (o / a) * l));
     });
+  }
+  function sgSlopeF(g, x, z, dx, dz) {
+    let k = (g.heightAt(x + dx * 1.2, z + dz * 1.2) - g.heightAt(x, z)) / 1.2;
+    return k > 0 ? 1 - Math.min(1, k / 0.9) * 0.5 : 1 - Math.min(1, -k / 0.9) * 0.3;
   }
   function sgWaterStep(r, n, ox, oz) {
     let d0 = r.gen.waterDepth(ox, oz),
@@ -54689,10 +54696,12 @@ uniform float uWet; uniform float uNight;`,
                 m = Math.hypot(this.animal.pos.x - g.x, this.animal.pos.z - g.z);
               m > 2.5 && (f *= yt(1 - (m - 2.5) / 4, 0.2, 1));
             }
-            s = f;
             let p = Math.atan2(h, d),
               wx = this.pos.x,
               wz = this.pos.z;
+            ((this.slopeF = Bt(this.slopeF ?? 1, sgSlopeF(e.gen, wx, wz, Math.sin(p), Math.cos(p)), 5, t)),
+              (f *= this.slopeF),
+              (s = f));
             if (((this.sideT = (this.sideT || 0) - t), (this.avoidSign = this.avoidSign || 1), this.sideT > 0))
               p += this.sideA;
             else if (
