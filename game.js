@@ -34193,6 +34193,21 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
       a < l && a > 1e-4 && ((t.x = n.x + (s / a) * l), (t.z = n.z + (o / a) * l));
     });
   }
+  function sgWaterStep(r, n, ox, oz) {
+    let d0 = r.gen.waterDepth(ox, oz),
+      d1 = r.gen.waterDepth(n.pos.x, n.pos.z);
+    if (d1 > 0.9 && d1 > d0 && (r.bridges?.floorAt(n.pos.x, n.pos.z, n.pos.y) ?? null) === null)
+      return ((n.pos.x = ox), (n.pos.z = oz), !0);
+    return !1;
+  }
+  function sgNpcBlocked(r, x, z, y) {
+    let q = { x, z };
+    (r.villages?.push2D(q, 0.34, y), cm(r, q, 0.34));
+    return (
+      Math.abs(q.x - x) + Math.abs(q.z - z) > 0.01 ||
+      (r.gen.waterDepth(x, z) > 0.9 && (r.bridges?.floorAt(x, z, y) ?? null) === null)
+    );
+  }
   function g3(r, t, e = "hit") {
     let n = r.G;
     ((r.alarmT = 80), n.dialogue?.addRep?.(r, e === "ko" ? -15 : -6));
@@ -35075,8 +35090,14 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
             let l = Math.atan2(s, o);
             this.yaw = pn(this.yaw, l, 9, i);
             let c = Math.max(0, Math.cos(zn(this.yaw, l))),
-              h = Math.min(a, n * (0.2 + 0.8 * c) * i);
-            ((this.pos.x += (s / a) * h), (this.pos.z += (o / a) * h), (this.moveV = h / Math.max(0.001, i)));
+              h = Math.min(a, n * (0.2 + 0.8 * c) * i),
+              ox = this.pos.x,
+              oz = this.pos.z;
+            (this.G.gen.waterDepth(ox + (s / a) * h, oz + (o / a) * h) > 0.45 && (h *= 0.65),
+              (this.pos.x += (s / a) * h),
+              (this.pos.z += (o / a) * h),
+              (this.moveV = h / Math.max(0.001, i)),
+              !this.loc.house && sgWaterStep(this.G, this, ox, oz) && (this.moveV = 0));
           }
           followY(t, e, n) {
             if (this.near) {
@@ -50570,8 +50591,9 @@ uniform float uWet; uniform float uNight;`,
           (n.model.position.y -= 0.035 * this.gK + 0.02 * this.sK),
           n.root.updateMatrixWorld(!0));
         if (this.sK > 0.02 && e.hl && e.hr && !e.action) {
-          let a = rd.clone().addScaledVector(o, 0.9),
-            l = rd.clone().addScaledVector(o, -0.9);
+          let fw = sgV3.set(0, 0, 1).transformDirection(n.root.matrixWorld),
+            a = rd.clone().addScaledVector(o, 0.7).addScaledVector(fw, -0.9),
+            l = rd.clone().addScaledVector(o, -0.7).addScaledVector(fw, -0.9);
           (Gl(i.upperarm_l, i.lowerarm_l, i.hand_l, e.hl, a, this.sK), Gl(i.upperarm_r, i.lowerarm_r, i.hand_r, e.hr, l, this.sK), n.root.updateMatrixWorld(!0));
         }
       }
@@ -54117,7 +54139,7 @@ uniform float uWet; uniform float uNight;`,
           l = this.scramble ? 0 : d * xe(0.02, 0.1, 0.985 - s.y);
           c = this.scramble ? 1 : 0;
         }
-        this.scrPh = (this.scrPh || 0) + (this.scramble ? o * t * 2.6 : 0);
+        this.scrPh = (this.scrPh || 0) + (this.scramble ? Math.min(o, 2.5) * t * 1.5 : 0);
         let u = { gentle: l, scr: c };
         if (c > 0 || this.scrOut > 0.02) {
           this.scrOut = Math.max(c, (this.scrOut || 0) - t * 4);
@@ -54130,8 +54152,13 @@ uniform float uWet; uniform float uNight;`,
                 M = this.pos.z + h2 * m + y * x;
               return new R(v, Math.max(n.gen.heightAt(v, M), this.pos.y - 0.25) + w, M);
             };
-          ((u.hl = g(0.5 + 0.2 * Math.sin(this.scrPh), -0.2, 0.04)),
-            (u.hr = g(0.5 + 0.2 * Math.sin(this.scrPh + Math.PI), 0.2, 0.04)));
+          {
+            let sw = Math.sin(this.scrPh),
+              sr = Math.sin(this.scrPh + Math.PI),
+              by = this.pos.y;
+            ((u.hl = new R(0, 0, 0).copy(g(0.34 + 0.2 * sw, 0.3, 0)).setY(by + 0.86 + 0.14 * sw)),
+              (u.hr = new R(0, 0, 0).copy(g(0.34 + 0.2 * sr, -0.3, 0)).setY(by + 0.86 + 0.14 * sr)));
+          }
         }
         return u;
       }
@@ -54636,10 +54663,13 @@ uniform float uWet; uniform float uNight;`,
               m = Math.hypot(y, g) || 1;
             (y * f + g * p) / m > -0.2 && ((f = y / m), (p = g / m));
           }
+          let wx0 = this.pos.x,
+            wz0 = this.pos.z;
           ((s = 3.6),
             (this.yaw = pn(this.yaw, Math.atan2(f, p), 8, t)),
             (this.pos.x += Math.sin(this.yaw) * s * t),
             (this.pos.z += Math.cos(this.yaw) * s * t),
+            sgWaterStep(e, this, wx0, wz0),
             u && Math.hypot(u[0] - this.pos.x, u[1] - this.pos.z) < 1.5 && this.ri++);
         } else if (this.state === "rest") {
           this.waitT -= t;
@@ -54660,10 +54690,48 @@ uniform float uWet; uniform float uNight;`,
               m > 2.5 && (f *= yt(1 - (m - 2.5) / 4, 0.2, 1));
             }
             s = f;
-            let p = Math.atan2(h, d);
+            let p = Math.atan2(h, d),
+              wx = this.pos.x,
+              wz = this.pos.z;
+            if (((this.sideT = (this.sideT || 0) - t), (this.avoidSign = this.avoidSign || 1), this.sideT > 0))
+              p += this.sideA;
+            else if (
+              sgNpcBlocked(e, wx + Math.sin(p) * 1.1, wz + Math.cos(p) * 1.1, this.pos.y) ||
+              sgNpcBlocked(e, wx + Math.sin(p) * 0.5, wz + Math.cos(p) * 0.5, this.pos.y)
+            ) {
+              let found = !1;
+              for (let o of [0.6, 1.1, 1.7]) {
+                for (let sg of [this.avoidSign, -this.avoidSign]) {
+                  let a2 = p + o * sg;
+                  if (!sgNpcBlocked(e, wx + Math.sin(a2) * 1.1, wz + Math.cos(a2) * 1.1, this.pos.y)) {
+                    ((this.sideA = o * sg), (this.avoidSign = sg), (this.sideT = 0.9), (p += o * sg), (found = !0));
+                    break;
+                  }
+                }
+                if (found) break;
+              }
+              found || ((this.sideA = 2.4 * this.avoidSign), (this.sideT = 1), (p += this.sideA));
+            }
+            ((this.stuckC = (this.stuckC || 0) + t),
+              this.stuckC > 1.5 &&
+                (Math.hypot(wx - (this.lastX ?? wx + 9), wz - (this.lastZ ?? wz)) < 0.3
+                  ? (this.stuckN = (this.stuckN || 0) + 1)
+                  : (this.stuckN = 0),
+                (this.lastX = wx),
+                (this.lastZ = wz),
+                (this.stuckC = 0),
+                this.stuckN >= 2 &&
+                  ((this.avoidSign = -this.avoidSign), (this.sideA = 1.57 * this.avoidSign), (this.sideT = 1.4)),
+                this.stuckN >= 5 && (this.ri++, (this.stuckN = 0)),
+                this.stuckN >= 4 &&
+                  this.playerDist > 40 &&
+                  (this.pos.set(c[0], this.pos.y, c[1]), (this.stuckN = 0))));
             this.yaw = pn(this.yaw, p, 5, t);
-            let y = Math.max(0, Math.cos(zn(this.yaw, p)));
-            ((this.pos.x += Math.sin(this.yaw) * f * y * t), (this.pos.z += Math.cos(this.yaw) * f * y * t));
+            let y = Math.max(0, Math.cos(zn(this.yaw, p))),
+              wf = e.gen.waterDepth(wx, wz) > 0.45 ? 0.65 : 1;
+            ((this.pos.x += Math.sin(this.yaw) * f * wf * y * t),
+              (this.pos.z += Math.cos(this.yaw) * f * wf * y * t),
+              sgWaterStep(e, this, wx, wz));
           }
           this.ri >= this.route.length && ((this.state = "rest"), (this.waitT = 30 + this.r.next() * 40));
         }
@@ -54672,7 +54740,7 @@ uniform float uWet; uniform float uNight;`,
             h = this.pos.z - n.pos.z;
           ((this.pos.x += (c / i) * (0.75 - i) * 0.6), (this.pos.z += (h / i) * (0.75 - i) * 0.6));
         }
-        (i < 60 && e.villages?.push2D(this.pos, 0.3, this.pos.y), i < 150 && cm(e, this.pos, 0.34));
+        (e.villages?.push2D(this.pos, 0.3, this.pos.y), i < 150 && cm(e, this.pos, 0.34));
         let o = i < 80 ? e.villages?.villageAt(this.pos.x, this.pos.z, 10) : null,
           a = e.bridges?.floorAt(this.pos.x, this.pos.z, this.pos.y);
         this.pos.y =
