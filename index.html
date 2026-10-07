@@ -175,7 +175,7 @@ kbd { font-family: var(--font-display); font-weight: 400; font-size: 15px; lette
 .vital .bar i { display: block; height: 100%; transition: width .25s; box-shadow: inset 0 3px 0 rgba(255,255,255,.35); }
 .vital[data-k=hp] .ico { fill: var(--hp); } #hpFill { background: var(--hp); }
 .vital[data-k=food] .ico { fill: var(--food); } #foodFill { background: var(--food); }
-.vital[data-k=water] .ico { fill: var(--water); } #waterFill { background: var(--water); }
+.vital[data-k=water] { display: none !important; } .vital[data-k=water] .ico { fill: var(--water); } #waterFill { background: var(--water); }
 .vital[data-k=breath] .ico { fill: #bfeaff; } #breathFill { background: #8fdcff; }
 .vital[data-k=breath].low #breathFill { background: #ff7a6b; }
 .vital[data-k=temp] .ico { fill: var(--paper-3); } .bar.temp { background: linear-gradient(90deg, #a8dcff, #c9eaa6 45%, #c9eaa6 60%, #ffb79a); position: relative; }

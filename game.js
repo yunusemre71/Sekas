@@ -30310,12 +30310,12 @@ varying float vLeaf;
       ((n = new fe({ map: t.body === "m" ? i.skin_m : i.skin_f, color: a, roughness: 0.62, metalness: 0 })),
         Re(n, { rim: 1.15, ink: 0.55 }));
     } else if (r.startsWith("MI_Regular"))
-      ((n = new fe({ color: ed(t.skin || "#c98d66"), roughness: 0.62, metalness: 0 })),
+      ((n = new fe({ color: sgBodySkin(t), roughness: 0.62, metalness: 0 })),
         Re(n, { rim: 1.15, ink: 0.55 }));
     else if (r === "SG_Shorts")
       ((n = new fe({ color: 3160668, roughness: 0.85, metalness: 0 })), Re(n, { rim: 1, ink: 0.55 }));
     else if (r === "SG_Boxer") {
-      ((n = new fe({ color: ed(t.skin || "#c98d66"), roughness: 0.62, metalness: 0 })),
+      ((n = new fe({ color: sgBodySkin(t), roughness: 0.62, metalness: 0 })),
         Re(n, { rim: 1.15, ink: 0.55 }));
       let s = n.onBeforeCompile,
         o = n.customProgramCacheKey;
@@ -30368,6 +30368,39 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
         Re(n, { rim: 1, ink: 0.55 }));
     }
     return ((n.name = r), Xp.set(e, n), n);
+  }
+  var sgTone = {};
+  function sgBodySkin(t) {
+    let k = t.body || "m",
+      e = sgTone[k];
+    if (!e) {
+      e = sgTone[k] = new vt(1, 1, 1);
+      try {
+        let im = In.tex[k === "m" ? "skin_m" : "skin_f"].image,
+          c = document.createElement("canvas");
+        ((c.width = im.width), (c.height = im.height));
+        let x = c.getContext("2d");
+        x.drawImage(im, 0, 0);
+        let d = x.getImageData(0, 0, c.width, c.height).data,
+          r = 0,
+          g = 0,
+          bl = 0,
+          cnt = 0;
+        for (let pr of In.body[k].parts.HeadMesh)
+          for (let q = 0; q < pr.cnt; q++) {
+            let px = Math.min(c.width - 1, Math.max(0, Math.floor(pr.uv[q * 2] * c.width))),
+              py = Math.min(c.height - 1, Math.max(0, Math.floor(pr.uv[q * 2 + 1] * c.height))),
+              j = (py * c.width + px) * 4;
+            if (d[j + 3] < 200) continue;
+            ((r += d[j]), (g += d[j + 1]), (bl += d[j + 2]), cnt++);
+          }
+        let D = new vt().setRGB(r / cnt / 255, g / cnt / 255, bl / cnt / 255, Le),
+          o = mA[k];
+        e.setRGB(D.r / o.r, D.g / o.g, D.b / o.b);
+      } catch {}
+    }
+    let s = ed(t.skin || "#c98d66");
+    return new vt(s.r * e.r, s.g * e.g, s.b * e.b);
   }
   function yA(r) {
     let t = In.body[r.body],
@@ -50006,6 +50039,36 @@ uniform float uWet; uniform float uNight;`,
       }
     };
   cn();
+  var sgHold = {
+      sword: { r: [-0.3, 1.0, 0.38], pt: 0.15, rl: 0.1 },
+      sword_stone: { r: [-0.3, 1.0, 0.38], pt: 0.15, rl: 0.1 },
+      axe: { r: [-0.3, 1.3, 0.12], pt: -0.9, rl: 0.2 },
+      iron_axe: { r: [-0.3, 1.3, 0.12], pt: -0.9, rl: 0.2 },
+      pickaxe: { r: [-0.3, 1.3, 0.12], pt: -0.9, rl: 0.2 },
+      club: { r: [-0.32, 1.0, 0.3], pt: 0.5, rl: 0 },
+      spear: { r: [-0.2, 1.1, 0.35], l: [0.12, 1.25, 0.55], pt: -0.2, rl: 0 },
+      spear_stone: { r: [-0.2, 1.1, 0.35], l: [0.12, 1.25, 0.55], pt: -0.2, rl: 0 },
+      torch: { r: [-0.3, 1.38, 0.35], pt: 0.1, rl: 0.15 },
+      knife: { r: [-0.22, 1.1, 0.42], pt: 0.9, rl: 0 },
+      iron_knife: { r: [-0.22, 1.1, 0.42], pt: 0.9, rl: 0 },
+      rod: { r: [-0.25, 1.15, 0.4], pt: -0.6, rl: 0 },
+      bow: { l: [0.28, 1.28, 0.42], which: "l", pt: 0, rl: 0 },
+      bucket: { r: [-0.3, 0.72, 0.2], pt: 0, rl: 0 },
+      waterskin: { r: [-0.25, 1.0, 0.3], pt: 0.2, rl: 0 },
+      food: { r: [-0.14, 1.22, 0.3], l: [0.1, 1.2, 0.28], pt: 0, rl: 0 },
+      small: { r: [-0.26, 1.05, 0.32], pt: 0.1, rl: 0 },
+      paper: { r: [-0.12, 1.22, 0.3], l: [0.12, 1.22, 0.3], pt: 0, rl: 0 },
+    },
+    sgHoldOf = (id) => {
+      if (sgHold[id]) return sgHold[id];
+      let k = kt[id];
+      if (!k) return null;
+      return k.cat === "food" || k.cat === "med"
+        ? sgHold.food
+        : k.cat === "cloth" || k.id === "letter"
+          ? sgHold.paper
+          : sgHold.small;
+    };
   var HA = {
       body: "m",
       skin: "#d9a47d",
@@ -50298,9 +50361,34 @@ uniform float uWet; uniform float uNight;`,
             w = l.clone().multiplyScalar(-0.8).addScaledVector(c, -0.9);
           (Gl(i.upperarm_r, i.lowerarm_r, i.hand_r, g, x, u),
             Gl(i.upperarm_l, i.lowerarm_l, i.hand_l, m, w, u),
-            n.held.r && Yn(i.hand_r, l, -0.55 * u),
+            n.held.r && Yn(i.hand_r, l, (e.heldId === "bucket" ? -0.2 : e.heldId === "torch" ? -0.3 : -0.55) * u),
             n.root.updateMatrixWorld(!0));
         }
+      }
+      poseHold(t, e) {
+        let n = this.av,
+          i = this.bones,
+          sp = e.heldId && n.held.r || n.held.l ? sgHoldOf(e.heldId) : null,
+          on = !!sp && !e.fp && !e.action && !e.aim && !e.carry && !e.dead && !e.sleep && !e.swim && !e.pose && !e.scr;
+        this.hdK = Bt(this.hdK || 0, on ? 1 : 0, 9, t);
+        if (this.hdK < 0.01) return;
+        this.hdSp = sp || this.hdSp;
+        sp = this.hdSp;
+        let w = this.hdK * (1 - 0.6 * xe(3.5, 6, e.speed || 0));
+        n.root.updateMatrixWorld(!0);
+        let a = sgV2.set(1, 0, 0).transformDirection(n.root.matrixWorld),
+          f = sgV3.set(0, 0, 1).transformDirection(n.root.matrixWorld),
+          br = Math.sin(performance.now() * 0.0018) * 0.004;
+        for (let h of ["r", "l"]) {
+          let q = sp[h];
+          if (!q) continue;
+          let d = n.root.localToWorld(new R(q[0], q[1] + br, q[2])),
+            u = rd.clone().addScaledVector(a, h === "r" ? -0.9 : 0.9);
+          Gl(i["upperarm_" + h], i["lowerarm_" + h], i["hand_" + h], d, u, w);
+        }
+        let h = (sp.which || "r"),
+          hb = i["hand_" + h];
+        (sp.pt && Yn(hb, a, sp.pt * w), sp.rl && Yn(hb, f, sp.rl * w), n.root.updateMatrixWorld(!0));
       }
       poseSlope(t, e) {
         let n = this.av,
@@ -50331,6 +50419,7 @@ uniform float uWet; uniform float uNight;`,
             .addScaledVector(new R(0, 0, -1).applyQuaternion(e.fp.q), 0.3)
             .addScaledVector(new R(0, 1, 0).applyQuaternion(e.fp.q), -0.2));
         this.poseSlope(t, e);
+        this.poseHold(t, e);
         let s = !!(n && n.type === "eat" && e.food && !e.dead);
         this.eatK = Bt(this.eatK || 0, s ? 1 : 0, 9, t);
         this.eatK > 0.01 && this.poseEat(this.eatK, s ? n.t / Math.max(0.2, n.dur) : 1, e);
@@ -52075,6 +52164,44 @@ uniform float uWet; uniform float uNight;`,
     { out: "fence_stone", n: 1, in: { stone: 4 }, time: 1.8, cat: "build" },
   );
   for (let r of Wl) sgPieceBases.includes(r.out) && (r.col = !0);
+  var sgRe = {
+    workbench: { wood: 4 },
+    campfire: { stone: 4, stick: 4 },
+    club: { wood: 2, fiber: 1 },
+    spear: { wood: 1, stick: 2, fiber: 2 },
+    spear_stone: { stick: 2, flint: 2, rope: 1 },
+    bow: { wood: 2, rope: 2, fiber: 2 },
+    chest: { wood: 10, fiber: 4 },
+    spikes: { wood: 5, stick: 6 },
+    foundation: { wood: 6, stone: 4 },
+    wall: { wood: 4, fiber: 3 },
+    doorway: { wood: 3, stick: 4, fiber: 2 },
+    door: { wood: 3, rope: 2 },
+    floor: { wood: 4, stick: 3 },
+    stairs: { wood: 5, rope: 2 },
+    window: { wood: 3, glass: 2, fiber: 2 },
+    halfwall: { wood: 2, stick: 3 },
+    pillar: { wood: 3, stone: 2 },
+    fence: { wood: 2, stick: 4 },
+    roof: { wood: 4, fiber: 4, stick: 2 },
+    table: { wood: 6, stick: 2 },
+    chair: { wood: 3, fiber: 2 },
+    sidetable: { wood: 4, rope: 1 },
+    shelf: { wood: 5, rope: 2 },
+    furnace: { stone: 8, wood: 2 },
+    bucket: { wood: 2, rope: 2 },
+    foundation_stone: { stone: 9, stick: 2 },
+    wall_stone: { stone: 7, fiber: 2 },
+    doorway_stone: { stone: 6, stick: 2 },
+    floor_stone: { stone: 5, fiber: 2 },
+    stairs_stone: { stone: 8, rope: 1 },
+    window_stone: { stone: 5, glass: 2 },
+    halfwall_stone: { stone: 4 },
+    pillar_stone: { stone: 5, rope: 1 },
+    roof_stone: { stone: 7, fiber: 3 },
+    fence_stone: { stone: 4, stick: 2 },
+  };
+  for (let r of Wl) sgRe[r.out] && (r.in = sgRe[r.out]);
   function mi(r) {
     let t = kt[r];
     if (t && t.prop && Ia()) {
@@ -53627,10 +53754,7 @@ uniform float uWet; uniform float uNight;`,
         let s = this.sprinting ? 1.8 : 1;
         if (
           ((n.food = Math.max(0, n.food - t * 0.034 * s)),
-          (n.water = Math.max(
-            0,
-            n.water - t * (0.05 + (this.sprinting ? 0.03 : 0) + (n.temp > 38.5 ? 0.04 : 0)),
-          )),
+          (n.water = 100),
           (this.stamDelay = Math.max(0, this.stamDelay - t)),
           this.sprinting && !this.swim && Math.hypot(this.vel.x, this.vel.z) > 1)
         )
@@ -53754,6 +53878,7 @@ uniform float uWet; uniform float uNight;`,
             grounded: this.grounded,
             vy: this.vel.y,
             crouch: this.crouching,
+            heldId: this.heldModel ? this.heldId : null,
             ...this.slopePose(t, e),
             fp:
               this.G.cam.mode === "first" && !this.rest && !this.climb && !this.sleeping && !this.dead && !this.G.dialogue?.npc
@@ -62400,7 +62525,7 @@ uniform float uWet; uniform float uNight;`,
       {
         id: "bench",
         title: "Çalışma tezgahı kur",
-        hint: "12 odun + 6 taş. Gelişmiş tarifler tezgah yakınında açılır.",
+        hint: "4 odun. Gelişmiş tarifler tezgah yakınında açılır.",
         place: "workbench",
       },
       {
