@@ -31278,6 +31278,162 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
     }
     return (Re(s, { rim: 1.1, ink: 0.5 }), (s.name = r.name), im.set(i, s), s);
   }
+  var sgFurDef = {
+      wolf: { len: 0.045, d: 55, n: 5 },
+      fox: { len: 0.04, d: 65, n: 5 },
+      deer: { len: 0.02, d: 80, n: 3 },
+      stag: { len: 0.026, d: 75, n: 4 },
+      boar: { len: 0.028, d: 42, n: 5 },
+      pig: { len: 0.008, d: 40, n: 2 },
+      cow: { len: 0.012, d: 70, n: 3 },
+      bull: { len: 0.016, d: 65, n: 3 },
+      horse: { len: 0.01, d: 90, n: 2 },
+      horse_white: { len: 0.01, d: 90, n: 2 },
+      donkey: { len: 0.018, d: 75, n: 3 },
+      alpaca: { len: 0.04, d: 34, n: 5 },
+      llama: { len: 0.04, d: 34, n: 5 },
+      sheep: { len: 0.08, d: 26, n: 6 },
+      shiba: { len: 0.04, d: 65, n: 4 },
+      husky: { len: 0.05, d: 60, n: 5 },
+    },
+    sgCoatDef = {
+      wolf: { bel: [0.84, 0.82, 0.76], ba: 0.6, bk: 0.3, mo: 0.28 },
+      fox: { bel: [0.96, 0.93, 0.88], ba: 0.85, bk: 0.12, mo: 0.14 },
+      deer: { bel: [0.94, 0.9, 0.8], ba: 0.75, bk: 0.12, mo: 0.14 },
+      stag: { bel: [0.9, 0.84, 0.72], ba: 0.65, bk: 0.15, mo: 0.16 },
+      boar: { bel: [0.45, 0.38, 0.3], ba: 0.35, bk: 0.1, mo: 0.4 },
+      pig: { bel: [1, 0.86, 0.84], ba: 0.35, bk: 0, mo: 0.18 },
+      cow: { bel: [0.95, 0.92, 0.86], ba: 0.5, bk: 0.05, mo: 0.12, pa: [0.96, 0.95, 0.92, 0.7] },
+      bull: { bel: [0.3, 0.2, 0.15], ba: 0.25, bk: 0.1, mo: 0.2 },
+      horse: { bel: [0.9, 0.82, 0.7], ba: 0.25, bk: 0.1, mo: 0.1 },
+      horse_white: { bel: [1, 1, 1], ba: 0.2, bk: 0, mo: 0.08 },
+      donkey: { bel: [0.9, 0.86, 0.8], ba: 0.55, bk: 0.12, mo: 0.14 },
+      llama: { bel: [0.9, 0.85, 0.75], ba: 0.35, bk: 0.05, mo: 0.2 },
+      alpaca: { bel: [0.9, 0.85, 0.75], ba: 0.35, bk: 0.05, mo: 0.2 },
+      sheep: { bel: [1, 1, 0.96], ba: 0.2, bk: 0, mo: 0.2 },
+      shiba: { bel: [0.98, 0.94, 0.86], ba: 0.8, bk: 0.12, mo: 0.1 },
+      husky: { bel: [0.98, 0.98, 0.98], ba: 0.85, bk: 0.2, mo: 0.15 },
+    };
+  function sgCoat(m, type) {
+    let c = sgCoatDef[type];
+    if (!c) return;
+    let prev = m.onBeforeCompile;
+    ((m.onBeforeCompile = (sh, r) => {
+      (prev && prev(sh, r),
+        (sh.uniforms.uBel = { value: new R(c.bel[0], c.bel[1], c.bel[2]) }),
+        (sh.uniforms.uCo = { value: new R(c.ba, c.bk, c.mo) }),
+        (sh.uniforms.uPa = { value: c.pa ? new R(c.pa[0], c.pa[1], c.pa[2]) : new R(0, 0, 0) }),
+        (sh.uniforms.uPt = { value: c.pa ? c.pa[3] : 2 }),
+        (sh.vertexShader = sh.vertexShader
+          .replace("#include <common>", "#include <common>\nvarying vec3 vFP;\nvarying vec3 vWN;\nvarying float vFS;")
+          .replace(
+            "#include <begin_vertex>",
+            "#include <begin_vertex>\nvFP = position;\nvFS = length(modelMatrix[0].xyz);\nvWN = normalize(mat3(modelMatrix) * objectNormal);",
+          )),
+        (sh.fragmentShader = sh.fragmentShader
+          .replace(
+            "#include <common>",
+            `#include <common>
+varying vec3 vFP;
+varying vec3 vWN;
+varying float vFS;
+uniform vec3 uBel;
+uniform vec3 uCo;
+uniform vec3 uPa;
+uniform float uPt;
+float cfh(vec3 p){ return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
+float cfn(vec3 p){ vec3 i = floor(p); vec3 f = fract(p); f = f*f*(3.0-2.0*f);
+  return mix(mix(mix(cfh(i), cfh(i+vec3(1,0,0)), f.x), mix(cfh(i+vec3(0,1,0)), cfh(i+vec3(1,1,0)), f.x), f.y),
+             mix(mix(cfh(i+vec3(0,0,1)), cfh(i+vec3(1,0,1)), f.x), mix(cfh(i+vec3(0,1,1)), cfh(i+vec3(1,1,1)), f.x), f.y), f.z); }`,
+          )
+          .replace(
+            "#include <color_fragment>",
+            `#include <color_fragment>
+{
+  vec3 wn = normalize(vWN);
+  float bl = smoothstep(0.2, -0.65, wn.y);
+  float bk = smoothstep(0.35, 1.0, wn.y);
+  vec3 mp = vFP * vFS; float n1 = cfn(mp * 4.0) * 0.6 + cfn(mp * 14.0) * 0.4;
+  diffuseColor.rgb = mix(diffuseColor.rgb, uBel, uCo.x * bl);
+  diffuseColor.rgb *= 1.0 - uCo.y * bk;
+  diffuseColor.rgb *= 1.0 + (n1 - 0.5) * uCo.z * 2.0;
+  if (uPt < 1.5) { float pn = cfn(mp * 1.7 + 3.7); diffuseColor.rgb = mix(diffuseColor.rgb, uPa, smoothstep(uPt, uPt + 0.06, pn)); }
+}`,
+          )));
+    }),
+      (m.customProgramCacheKey = () => (prev ? "c1" : "c0") + "coat" + type));
+  }
+  function sgFurMat(base, type, T, L, D) {
+    let m = base.clone();
+    ((m.onBeforeCompile = void 0), (m.customProgramCacheKey = void 0));
+    (Re(m, { rim: 0.9, noInk: !0 }), sgCoat(m, type));
+    let prev = m.onBeforeCompile,
+      k = m.customProgramCacheKey;
+    return (
+      (m.onBeforeCompile = (sh, r) => {
+        (prev && prev(sh, r),
+          (sh.uniforms.uFT = { value: T }),
+          (sh.uniforms.uFL = { value: L }),
+          (sh.uniforms.uFD = { value: D }),
+          (sh.vertexShader = sh.vertexShader
+            .replace("#include <common>", "#include <common>\nuniform float uFT;\nuniform float uFL;\nvarying float vFT;")
+            .replace(
+              "#include <begin_vertex>",
+              "#include <begin_vertex>\nvFT = uFT;\ntransformed += normalize(normal) * (uFL / length(modelMatrix[0].xyz)) * uFT;\ntransformed.y -= (uFL / length(modelMatrix[0].xyz)) * uFT * uFT * 0.25;",
+            )),
+          (sh.fragmentShader = sh.fragmentShader
+            .replace(
+              "#include <common>",
+              `#include <common>
+uniform float uFD;
+varying float vFT;
+float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 43758.5453); }`,
+            )
+            .replace(
+              "#include <color_fragment>",
+              `#include <color_fragment>
+{
+  vec3 cell = floor(vFP * vFS * uFD);
+  float h = fh3(cell);
+  if (h < vFT * 0.7 + 0.02) discard;
+  diffuseColor.rgb *= mix(0.72, 1.08, vFT) * (0.92 + 0.16 * fh3(cell + 7.0));
+}`,
+            )));
+      }),
+      (m.customProgramCacheKey = () => (k ? k() : "") + "fur"),
+      m
+    );
+  }
+  function sgAddFur(root, type, def) {
+    let f = sgFurDef[type];
+    if (!f) return [];
+    let shells = [],
+      list = [];
+    root.traverse((o) => o.isMesh && list.push(o));
+    for (let o of list) {
+      if (o.userData.furShell || o.geometry.attributes.position.count < 600 || /Horn|Antler/i.test(o.name)) continue;
+      let wool = type === "sheep",
+        black = wool && /Black/i.test(o.material.name),
+        L = black ? 0.012 : f.len,
+        D = (black ? 70 : f.d) * (["boar", "pig", "sheep", "llama", "alpaca"].includes(type) ? 9 : 4),
+        N = black ? 2 : f.n;
+      for (let k = 1; k <= N; k++) {
+        let fm = sgFurMat(o.material, type, k / N, L, D),
+          sm = o.isSkinnedMesh ? new ma(o.geometry, fm) : new Ct(o.geometry, fm);
+        (o.isSkinnedMesh && sm.bind(o.skeleton, o.bindMatrix),
+          sm.position.copy(o.position),
+          sm.quaternion.copy(o.quaternion),
+          sm.scale.copy(o.scale),
+          (sm.frustumCulled = !1),
+          (sm.castShadow = !1),
+          (sm.receiveShadow = !1),
+          (sm.userData.furShell = !0),
+          o.parent.add(sm),
+          shells.push(sm));
+      }
+    }
+    return shells;
+  }
   var pd,
     nm,
     sm,
@@ -31414,10 +31570,12 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
             (this.scene.traverse((s) => {
               s.isMesh &&
                 ((s.material = YA(s.material, t, e, i++)),
+                s.material.userData.coat || ((s.material.userData.coat = !0), sgCoat(s.material, t)),
                 (s.castShadow = !0),
                 (s.receiveShadow = !0),
                 (s.frustumCulled = !1));
             }),
+              (this.shells = sgAddFur(this.scene, t, e)),
               (this.bones = {}),
               this.scene.traverse((s) => {
                 (s.isBone || s.type === "Bone") && (this.bones[s.name] = s);
@@ -31494,7 +31652,12 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
           }
           update(t, e, n) {
             let i = this.def,
-              s = t.speed;
+              s = t.speed,
+              fo = (t.playerDist ?? 0) < 40;
+            if (this.furOn !== fo) {
+              this.furOn = fo;
+              for (let q of this.shells) q.visible = fo;
+            }
             if (t.dead) {
               (this.dead ||
                 ((this.dead = !0), this.clips.Death ? this.play("Death", 0.12, !0) : (this.deathT = 0)),
