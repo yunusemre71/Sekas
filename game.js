@@ -44171,6 +44171,7 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
               f = c * d - h * u,
               p = c * u + h * d;
             Math.abs(f) < l.w / 2 + 1.6 && p > -l.d / 2 - 1.2 && p < l.d / 2 + 2.8 && (n = Math.max(n, 0.55));
+            Math.abs(f) < l.w / 2 + 0.6 && p > -l.d / 2 - 0.6 && p < l.d / 2 + 0.8 && (n = 1);
           }
           for (let l of a.fields) {
             let c = t - l.x,
@@ -47900,7 +47901,7 @@ uniform float uWet; uniform float uNight;`,
         a = 1 - xe(0.35, 0.95, o) * 0.78;
       if ((i < 0 + 1.1 && (a *= xe(0 + 0.3, 0 + 1.1, i)), n.villageInfluence(t, e, 12) > 0)) {
         let [l, c] = n.villageGround(t, e);
-        ((a *= 1 - Math.max(l * 0.9, c)), this.G.villages?.blocksGrass(t, e) && (a = 0));
+        ((a *= 1 - Math.max(l * 0.9, c)), (l >= 1 || this.G.villages?.blocksGrass(t, e)) && (a = 0));
       }
       return a;
     }
