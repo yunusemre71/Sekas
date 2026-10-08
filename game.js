@@ -31938,11 +31938,11 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
                 h = this.play(c, 0.22),
                 d = yt(s / (l ? a : o), 0.45, l ? 2.4 : 2);
               h && h.setEffectiveTimeScale(n ? d * 0.6 : d);
-            } else if (t.state === "graze" && this.clips.Eating) this.play("Eating", 0.4);
+            } else if ((t.state === "graze" || (t.state === "search" && t.stateT > 2)) && this.clips.Eating) this.play("Eating", 0.4);
             else {
               if (((this.idleT -= e), this.idleT <= 0 || !i.idles.includes(this.curName))) {
                 this.idleT = 4 + Math.random() * 8;
-                let h = t.state === "alert" || t.state === "stalk";
+                let h = t.state === "alert" || t.state === "stalk" || t.state === "wary";
                 this.idleName = h ? i.idles[0] : i.idles[Math.floor(Math.random() * i.idles.length)];
               }
               this.play(this.idleName, 0.4);
@@ -32692,7 +32692,8 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
               (this.rear = 0),
               (this.soundT = 3 + Math.random() * 10),
               (this.provoked = !1),
-              (this.slope = { x: 0, z: 0 }));
+              (this.slope = { x: 0, z: 0 }),
+              sgInit(this));
           }
           aware() {
             return this.knows || this.awareness > 0.55;
@@ -32728,7 +32729,9 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
             }
             let o = this.sp.kind;
             if (
-              (o === "prey" || o === "farm"
+              (this.herd?.wild && sgHerdStartle(this, 1),
+              (this.hunting = this.hunting || o === "predator"),
+              o === "prey" || (o === "farm" && !this.beh.retaliate)
                 ? this.setState("flee")
                 : this.hp < this.sp.hp * 0.25 && this.type !== "bear"
                   ? this.setState("flee")
@@ -32744,6 +32747,7 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
                   (a.knows = !0),
                   (a.lastSeen = s.env.total),
                   a.threat.copy(s.player.pos),
+                  (a.hunting = !0),
                   a.setState("chase"));
           }
           die() {
@@ -32789,8 +32793,10 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
             );
           }
           setState(t) {
+            if (this.beh.temper === "docile" && (t === "alert" || t === "stalk" || t === "circle")) return;
             this.state !== t &&
               ((this.state = t),
+              (this.searchYaw = void 0),
               (this.stateT = 0),
               t === "flee" && this.G.audio?.animalAlarm(this.type, this.pos),
               t === "chase" && this.sp.kind !== "prey" && this.G.audio?.animalAggro(this.type, this.pos));
@@ -32800,59 +32806,10 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
               ((this.removed = !0), this.G.scene.remove(this.m.root), this.rig && this.rig.dispose());
           }
           perceive(t) {
-            let e = this.G,
-              n = e.player;
-            if (n.dead) {
-              ((this.awareness = Math.max(0, this.awareness - t)), (this.knows = !1));
-              return;
-            }
-            let i = n.pos.x - this.pos.x,
-              s = n.pos.z - this.pos.z,
-              o = Math.hypot(i, s);
-            if (o > 70) {
-              ((this.awareness = Math.max(0, this.awareness - t * 0.3)),
-                e.env.total - this.lastSeen > 15 && (this.knows = !1));
-              return;
-            }
-            let a = Dt(1, this.sp.nightVis || 0.5, e.env.nightFactor || 0),
-              l = this.sp.sight * a;
-            (n.torchLit && (l = Math.max(l, this.sp.sight * 0.95)),
-              n.crouching && (l *= 0.42),
-              Math.hypot(n.vel.x, n.vel.z) > 0.4 || (l *= 0.6),
-              n.sprinting && (l *= 1.25),
-              (l *= 1 - (e.env.rainAmount || 0) * 0.3),
-              (l *= e.env.cur.fog < 0.6 ? 0.6 : 1),
-              n.inCover && (l *= 0.55));
-            let h = this.sp.kind === "prey" ? 2 : 1.35,
-              d = Math.abs(zn(this.yaw, Math.atan2(i, s))),
-              u = !1;
-            if ((o < l && (d < h || o < 2.5) && (u = this.mgr.lineOfSight(this.pos, n.pos)), u)) {
-              let p = (1 - o / l) * 2.6 + 0.4;
-              ((this.awareness = Math.min(1.2, this.awareness + t * p)),
-                this.awareness >= 1 && (this.knows = !0),
-                this.knows && ((this.lastSeen = e.env.total), this.threat.copy(n.pos)));
-            }
-            let f = (this.sp.smell || 0) * (e.env.nightFactor > 0.5 ? 1.4 : 1) * (n.crouching ? 0.7 : 1);
-            if (
-              (!u &&
-                o < f &&
-                ((this.awareness = Math.min(1.2, this.awareness + t * 0.9 * (1 - o / f) + t * 0.15)),
-                this.awareness >= 1 && (this.knows = !0),
-                this.knows && ((this.lastSeen = e.env.total), this.threat.copy(n.pos)),
-                (u = !0)),
-              !u)
-            ) {
-              let p = this.knows ? 0.05 : 0.14;
-              ((this.awareness = Math.max(0, this.awareness - t * p)),
-                this.knows &&
-                  e.env.total - this.lastSeen > (this.sp.kind === "predator" ? 14 : 8) &&
-                  (this.knows = !1));
-            }
-            (this.knows && o < 3 && (this.threat.copy(n.pos), (this.lastSeen = e.env.total)),
-              (this.playerDist = o));
+            sgPerceive(this, t);
           }
           hear(t, e) {
-            if (this.dead) return;
+            if (this.dead || sgHear(this, t, e)) return;
             let n = this.pos.distanceTo(t),
               i = e * this.sp.hear;
             if (n > i) return;
@@ -32891,7 +32848,7 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
                 (this.ledBy.gone
                   ? (this.ledBy = null)
                   : this.state !== "led" && this.state !== "flee" && this.setState("led")),
-              this.state)
+              sgAI(this, t, s, o, a) ? "_ai" : this.state)
             ) {
               case "led":
                 this.ledBy || this.setState("wander");
@@ -33041,6 +32998,36 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
               this.target = new R(e.x + Math.cos(n) * i, 0, e.z + Math.sin(n) * i);
               return;
             }
+            if (this.herd?.wild && this.herd.roam) {
+              let h = this.herd;
+              for (let k = 0; k < 5; k++) {
+                let ang = Math.random() * Math.PI * 2,
+                  r = Math.sqrt(Math.random()) * (h.moving ? 4.5 : 3.4),
+                  x = h.roam.x + Math.cos(ang) * r,
+                  z = h.roam.z + Math.sin(ang) * r;
+                if (t.gen.heightAt(x, z) > 0.4) {
+                  this.target = new R(x, 0, z);
+                  return;
+                }
+              }
+              this.target = new R(h.roam.x, 0, h.roam.z);
+              return;
+            }
+            if (this.nightHunt && (this.playerDist ?? 0) > 24 && !t.player.dead && Math.random() < 0.7) {
+              let pp = t.player.pos,
+                dx = pp.x - this.pos.x,
+                dz = pp.z - this.pos.z,
+                d = Math.hypot(dx, dz) || 1,
+                step = Math.min(d - 18, 26),
+                ox = (Math.random() - 0.5) * 14,
+                oz = (Math.random() - 0.5) * 14,
+                x = this.pos.x + (dx / d) * step + ox,
+                z = this.pos.z + (dz / d) * step + oz;
+              if (t.gen.heightAt(x, z) > 0.3) {
+                this.target = new R(x, 0, z);
+                return;
+              }
+            }
             if (this.herd && !this.leader) {
               let e = this.herd,
                 n = Math.random() * Math.PI * 2,
@@ -33070,6 +33057,8 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
             this.target = this.pos.clone();
           }
           desiredMove() {
+            let sgm = sgMove(this);
+            if (sgm) return sgm;
             let e = this.G.player,
               n = this.sp,
               i = 0,
@@ -33314,7 +33303,7 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
               (n.root.rotation.x = this.pitch),
               this.rig)
             ) {
-              (e && (n.root.position.y = 0 - i.size * 0.55), this.rig.update(this, t, e));
+              (e && (n.root.position.y = 0 - i.size * 0.55), this.rig.update(this, t, e), sgGlance(this, t));
               let v = this.hitFlash;
               v > 0
                 ? this.rig.body.scale.set(1 + v * 0.1, 1 - v * 0.1, 1 + v * 0.06)
@@ -33363,9 +33352,9 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
                 v.back ||
                   ((v.hip.rotation.x = -0.6 * this.rearW + Math.sin(this.t * 3) * 0.2 * this.rearW),
                   (v.knee.rotation.x = 1 * this.rearW));
-            let g = this.state === "graze" && s < 0.2;
+            let g = (this.state === "graze" || (this.state === "search" && this.stateT > 2)) && s < 0.2;
             this.headDown = Bt(this.headDown, g ? 1 : 0, 3, t);
-            let m = this.state === "alert" || this.state === "stalk" ? 1 : 0;
+            let m = this.state === "alert" || this.state === "stalk" || this.state === "wary" ? 1 : 0;
             this.alertLook = Bt(this.alertLook, m, 5, t);
             let x = g ? Math.max(0, Math.sin(this.t * 6)) * 0.12 : 0;
             ((n.neck.rotation.x =
@@ -33431,6 +33420,8 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
               (this.nightPacks = []),
               (this.savedHerds = null),
               (this.spawnPoint = null),
+              (this.clock = 0),
+              (this.slotT = 0),
               Na(XA));
           }
           lineOfSight(t, e) {
@@ -33525,6 +33516,7 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
                 a = i * i + s * s;
               if (a < o * o && a > 1e-6 && Math.abs(t.y - n.pos.y) < 1.5) {
                 let l = Math.sqrt(a);
+                n.beh.ignorePlayer && sgBump(n, t.x, t.z, Math.hypot(this.G.player.vel.x, this.G.player.vel.z));
                 ((t.x = n.pos.x + (i / l) * o), (t.z = n.pos.z + (s / l) * o));
               }
             }
@@ -33711,17 +33703,20 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
               e = t.player.pos,
               n = Math.floor(e.x / 48),
               i = Math.floor(e.z / 48),
-              s = 2;
+              s = 2,
+              budget = 2;
             for (let o = -s; o <= s; o++)
               for (let a = -s; a <= s; a++) {
                 let l = n + a,
                   c = i + o,
                   h = t.world.chunkAt((l + 0.5) * 48, (c + 0.5) * 48);
                 if (!h || !h.ready) continue;
-                let d = this.herdFor(l, c);
-                if (!d.spawned) {
+                for (let d of [this.herdFor(l, c), sgFarmHerd(this, l, c)]) {
+                  if (d.spawned) continue;
                   if (Math.hypot(d.x - e.x, d.z - e.z) < 26 && d.everSeen) continue;
-                  (this.spawnHerd(d), (d.everSeen = !0));
+                  if (budget <= 0) continue;
+                  (d.wild ? sgSpawnFarmHerd(this, d) : this.spawnHerd(d), (d.everSeen = !0));
+                  d.spawned && d.members.length && budget--;
                 }
               }
             for (let o of this.herds.values())
@@ -33738,7 +33733,7 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
             let i = t.env.day <= 1 ? 1 : t.env.day <= 3 ? 2 : 3;
             if (new Set(this.nightPacks.map((o) => o.leader || o)).size < i && Math.random() < 0.08) {
               let o = this.spawnNear("wolf", e.x, e.z, 50, 80);
-              if (o) for (let a of this.list) (a === o || a.leader === o) && this.nightPacks.push(a);
+              if (o) for (let a of this.list) (a === o || a.leader === o) && ((a.nightHunt = !0), this.nightPacks.push(a));
             }
           }
           serialize() {
@@ -33752,6 +33747,7 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
           }
           update(t) {
             let n = this.G.player;
+            ((this.clock += t), sgTickHerds(this, t), (this.slotT -= t) <= 0 && ((this.slotT = 0.25), sgAssignSlots(this)));
             if (((this.spawnT -= t), this.spawnT <= 0)) {
               this.spawnT = 1;
               for (let i of this.list) {
@@ -34503,6 +34499,778 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
     let k = (g.heightAt(x + dx * 1.2, z + dz * 1.2) - g.heightAt(x, z)) / 1.2;
     return k > 0 ? 1 - Math.min(1, k / 0.9) * 0.5 : 1 - Math.min(1, -k / 0.9) * 0.3;
   }
+  // ===== SG:ANIMAL_AI BAŞLA =====
+  // Veri odaklı hayvan davranışı. `sgBehavior.temper` = tür sınıfı varsayılanları, `sgBehavior.species` = tür bazlı
+  // geçersiz kılmalar. Tür kataloğu (`sgSpecies`) varsa onun `temper` alanı esas alınır, yoksa `rm[tür].kind` kullanılır.
+  //  docile    = çiftlik / evcil: oyuncuyu hiç umursamaz (bakmaz, durmaz), sadece vurulur/itilirse tepki verir
+  //  skittish  = yabani otçul: uzaktan fark edip kaçar
+  //  defensive = yaban domuzu gibi: yaklaşılırsa uyarır, çok yaklaşılırsa saldırır
+  //  predator  = avcı: görüş + koku/rüzgâr + ses ile algılar, kısa dikkatten sonra avlanır, kaybederse arar, vazgeçer
+  // Menzil tabloları metre cinsindendir (oyuncunun hareket kipine göre): run=koşu, walk=yürüyüş, still=ayakta duruş,
+  // sneak=çömelerek yürüme, cstill=çömelik durma.
+  var sgBehavior = {
+    maxAttackers: 3,
+    temper: {
+      docile: {
+        ignorePlayer: true,
+        routine: { graze: [6, 14], walk: [6, 14], idle: [3, 9] },
+        flee: { time: 3.2, speed: 0.75 },
+        nudge: { startle: 3.2 },
+        glance: { every: [7, 16], dur: [1, 2], range: 9, amp: 0.75 },
+        cohesion: 7,
+      },
+      skittish: {
+        fov: 2.0, close: 2.5, alertness: 1, forget: 8,
+        smell: { mulDown: 2.0, mulUp: 0.5, cone: 0.3 },
+        hearMul: null,
+      },
+      defensive: {
+        fov: 1.35, close: 2.5, alertness: 1, forget: 8,
+        smell: { mulDown: 1.8, mulUp: 0.45, cone: 0.3 },
+        warn: 8, charge: 4.5, warnDur: 1.0, alertCool: 7, chaseMax: 9,
+        hearMul: 1, hearCap: 24,
+        routine: { graze: [5, 12], walk: [6, 14], idle: [3, 9] },
+      },
+      predator: {
+        fov: 1.2, close: 3, alertness: 1, forget: 10, lose: 5,
+        smell: { down: 22, up: 3, cone: 0.28 },
+        hearMul: 1.4, hearCap: 34,
+        notice: [0.6, 1.5],
+        approach: "stalk", stalkMul: 1.35, rush: 9, stalkMax: 10, reach: 1.25,
+        aggr: 1, dayAggr: 0.9, nightAggr: 1.2, cornered: 5,
+        maxChase: 20, pursuit: 26, giveDist: 50, search: [7, 11], cool: [30, 55], fleeHp: 0.22,
+        circleR: 8.5, wary: [4, 7],
+        routine: { graze: [5, 12], walk: [6, 14], idle: [3, 9] },
+      },
+    },
+    species: {
+      wolf: {
+        range: { run: 30, walk: 17, still: 9, sneak: 7, cstill: 4 },
+        smell: { down: 22, up: 3, cone: 0.28 },
+        fov: 1.25, approach: "stalk", stalkMul: 1.35, rush: 9, pack: true,
+      },
+      bear: {
+        range: { run: 26, walk: 15, still: 7, sneak: 5, cstill: 3 },
+        smell: { down: 20, up: 3, cone: 0.25 },
+        fov: 1.0, hearMul: 1.2, hearCap: 30,
+        notice: [0.9, 1.8], approach: "charge", stalkMul: 1.9, rush: 18, reach: 1.4,
+        aggr: 0.8, dayAggr: 1, nightAggr: 1.15, maxChase: 16, pursuit: 22, giveDist: 45,
+        search: [6, 9], cool: [40, 70], fleeHp: 0, circleR: 10, cornered: 6,
+      },
+      boar: { range: { run: 24, walk: 15, still: 9, sneak: 6, cstill: 3.5 } },
+      bull: { temper: "docile", retaliate: true },
+      dog: { glance: { every: [5, 10], dur: [1, 2.2], range: 14, amp: 0.8 } },
+    },
+    // Doğada 2-3'lü yarı vahşi çiftlik sürüleri (yerleşim deterministik: seed + hücre)
+    herds: {
+      chance: { meadow: 0.3, forest: 0.13, pine: 0.05 },
+      pick: {
+        meadow: [["sheep", 0.32], ["cow", 0.28], ["pig", 0.14], ["horse", 0.1], ["donkey", 0.07], ["llama", 0.05]],
+        forest: [["pig", 0.36], ["cow", 0.24], ["sheep", 0.2], ["horse", 0.1], ["donkey", 0.06]],
+        pine: [["pig", 0.4], ["sheep", 0.3], ["cow", 0.2], ["llama", 0.1]],
+      },
+      size: { default: [2, 3], donkey: [2, 2], llama: [2, 3] },
+      villageGap: 70, spawnGap: 40, maxForest: 0.8, minSlopeY: 0.88,
+      roam: [14, 32], rest: [16, 38], leash: 80, spacing: 3.2,
+    },
+  };
+  var sgBehCache = {};
+  function sgTemperOf(type, sp) {
+    let S = typeof sgSpecies !== "undefined" && sgSpecies ? sgSpecies[type] : null,
+      m = {
+        predator: "predator", aggressive: "predator", carnivore: "predator", hunter: "predator",
+        docile: "docile", domestic: "docile", tame: "docile", farm: "docile", calm: "docile",
+        skittish: "skittish", timid: "skittish", prey: "skittish", shy: "skittish", wild: "skittish", flighty: "skittish",
+        defensive: "defensive", territorial: "defensive",
+      },
+      t = S && S.temper && m[S.temper];
+    if (!t && S && S.cat === "predator") t = "predator";
+    return t || { prey: "skittish", farm: "docile", defensive: "defensive", predator: "predator" }[sp.kind] || "skittish";
+  }
+  function sgBeh(type, sp) {
+    let c = sgBehCache[type];
+    if (c) return c;
+    let ov = sgBehavior.species[type] || {},
+      t = ov.temper || sgTemperOf(type, sp),
+      S = typeof sgSpecies !== "undefined" && sgSpecies ? sgSpecies[type] : null,
+      b = Object.assign({ temper: t }, sgBehavior.temper[t], ov);
+    b.temper = t;
+    b.kind = { docile: "farm", skittish: "prey", defensive: "defensive", predator: "predator" }[t];
+    if (!b.range) {
+      let s = sp.sight || 20;
+      b.range = { run: s * 1.25, walk: s, still: s * 0.6, sneak: s * 0.42, cstill: s * 0.25 };
+    }
+    if (b.smell && b.smell.mulDown != null) {
+      let sm = sp.smell || 0;
+      b.smell = { down: sm * b.smell.mulDown, up: sm * b.smell.mulUp, cone: b.smell.cone };
+    }
+    if (S && S.sense) Object.assign(b, S.sense);
+    if (S && S.aggr != null) b.aggr = S.aggr;
+    b.alertness = b.alertness || 1;
+    return (sgBehCache[type] = b);
+  }
+  function sgInit(a) {
+    let b = (a.beh = sgBeh(a.type, a.sp));
+    if (a.sp.kind !== b.kind) a.sp = Object.assign(Object.create(a.sp), { kind: b.kind });
+    a.hunger = Math.random();
+    a.nerve = Math.random();
+    a.hunting = !1;
+    a.canAtk = !0;
+    a.noHuntUntil = 0;
+    a.flank = (a.id % 2 ? 1 : -1) * (0.45 + Math.random() * 0.6);
+    a.circleDir = a.id % 2 ? 1 : -1;
+    a.seenNow = !1;
+  }
+  function sgMode(p) {
+    let moving = Math.hypot(p.vel.x, p.vel.z) > 0.4;
+    return p.crouching ? (moving ? "sneak" : "cstill") : !moving ? "still" : p.sprinting ? "run" : "walk";
+  }
+  // Rüzgâr altındaki hayvan, oyuncunun kokusunu alır (rüzgâr oyuncudan hayvana doğru esiyorsa)
+  function sgSmell(a, p, env, b, mode, d) {
+    let sm = b.smell;
+    if (!sm || !(sm.down > 0)) return 0;
+    let wa = env.windAngle || 0,
+      ws = Math.min(1.6, env.windStrength == null ? 0.3 : env.windStrength),
+      wx = Math.cos(wa),
+      wz = Math.sin(wa),
+      ox = a.pos.x - p.pos.x,
+      oz = a.pos.z - p.pos.z,
+      along = ox * wx + oz * wz,
+      perp = Math.abs(ox * wz - oz * wx),
+      m = (env.nightFactor > 0.5 ? 1.2 : 1) * (1 - (env.rainAmount || 0) * 0.4) * (mode === "sneak" || mode === "cstill" ? 0.8 : 1),
+      f = 0,
+      reach = sm.down * (0.4 + ws * 0.8) * m;
+    along > 0 && along < reach && perp < 1.5 + along * sm.cone && (f = 1 - along / reach);
+    let up = sm.up * m;
+    d < up && (f = Math.max(f, 1 - d / up));
+    return f;
+  }
+  // Ortak algılama: görüş (ön koni + görüş hattı) + koku (rüzgâr) ; ses `hear()` ile gelir.
+  function sgPerceive(a, t) {
+    let G = a.G, p = G.player, env = G.env, b = a.beh, tot = env.total;
+    if (p.dead) {
+      a.awareness = Math.max(0, a.awareness - t);
+      a.knows = !1;
+      a.seenNow = !1;
+      return;
+    }
+    let dx = p.pos.x - a.pos.x,
+      dz = p.pos.z - a.pos.z,
+      d = Math.hypot(dx, dz);
+    a.playerDist = d;
+    a.seenNow = !1;
+    if (b.ignorePlayer) {
+      a.awareness = 0;
+      a.knows = !1;
+      return;
+    }
+    if (d > 75) {
+      a.awareness = Math.max(0, a.awareness - t * 0.3);
+      tot - a.lastSeen > 15 && (a.knows = !1);
+      return;
+    }
+    let mode = sgMode(p),
+      hunting = a.hunting && (a.state === "chase" || a.state === "stalk" || a.state === "circle" || a.state === "search"),
+      vis = b.range[mode] * Dt(1, a.sp.nightVis || 0.5, env.nightFactor || 0);
+    p.torchLit && (vis = Math.max(vis, b.range[mode] * 0.95));
+    vis *= 1 - (env.rainAmount || 0) * 0.3;
+    vis *= env.cur.fog < 0.6 ? 0.6 : 1;
+    p.inCover && (vis *= 0.55);
+    hunting && (vis = Math.max(vis, b.pursuit || 0));
+    let face = Math.abs(zn(a.yaw, Math.atan2(dx, dz))),
+      seen = !1,
+      gain = 0;
+    d < vis && (face < b.fov || d < b.close || hunting) && (seen = a.mgr.lineOfSight(a.pos, p.pos));
+    seen && (gain = ((1 - d / vis) * 2.6 + 0.4) * b.alertness);
+    let sm = sgSmell(a, p, env, b, mode, d);
+    sm > 0 && (gain = Math.max(gain, (0.3 + 1.1 * sm) * b.alertness));
+    hunting && b.pursuit && d < b.pursuit * 0.75 && (gain = Math.max(gain, 1.5));
+    if (gain > 0) {
+      a.awareness = Math.min(1.2, a.awareness + t * gain);
+      a.awareness >= 1 && (a.knows = !0);
+      if (a.knows) {
+        a.lastSeen = tot;
+        if (seen) ((a.seenNow = !0), a.threat.copy(p.pos));
+        else {
+          let j = yt(d * 0.12, 0.5, 3);
+          a.threat.distanceTo(p.pos) > j * 1.5 &&
+            a.threat.set(p.pos.x + (Math.random() - 0.5) * 2 * j, p.pos.y, p.pos.z + (Math.random() - 0.5) * 2 * j);
+        }
+      }
+    } else {
+      a.awareness = Math.max(0, a.awareness - t * (a.knows ? 0.05 : 0.14));
+      a.knows && tot - a.lastSeen > b.forget && (a.knows = !1);
+    }
+    a.knows && d < 3 && (a.threat.copy(p.pos), (a.lastSeen = tot), (a.seenNow = !0));
+  }
+  // Ses olayları (adım, balta, düşen ağaç...). Çiftlik hayvanları hiç umursamaz.
+  function sgHear(a, pos, radius) {
+    let b = a.beh, G = a.G;
+    if (a.dead || b.ignorePlayer) return !0;
+    if (b.temper === "skittish") return !1;
+    let r = Math.min(radius * (b.hearMul || 1), b.hearCap || 30),
+      d = a.pos.distanceTo(pos);
+    if (d > r) return !0;
+    let f = 1 - d / r;
+    a.awareness = Math.min(1.2, a.awareness + 0.28 + f * 0.5);
+    a.noisePos = pos.clone();
+    if (a.awareness >= 1 && !a.knows) {
+      a.knows = !0;
+      a.lastSeen = G.env.total;
+      let j = yt(d * 0.1, 0.5, 3);
+      a.threat.set(pos.x + (Math.random() - 0.5) * 2 * j, pos.y, pos.z + (Math.random() - 0.5) * 2 * j);
+    }
+    return !0;
+  }
+  function sgRand(r) {
+    return r[0] + Math.random() * (r[1] - r[0]);
+  }
+  // Rutin: otla / yürü / dinlen (oyuncudan bağımsız)
+  function sgRoutine(a, b) {
+    let R_ = b.routine || sgBehavior.temper.docile.routine,
+      st = a.state,
+      next = !1;
+    if (st === "graze" || st === "idle") next = a.stateT > (a.dwell || 6);
+    else next = !a.target || a.stateT > R_.walk[1] || a.pos.distanceTo(a.target) < 1.2;
+    if (!next) return;
+    let r = Math.random(), ns;
+    a.stateT = 0;
+    a.pickWanderTarget();
+    if (r < 0.45) ((ns = "graze"), (a.dwell = sgRand(R_.graze)));
+    else if (r < 0.58) ((ns = "idle"), (a.dwell = sgRand(R_.idle)));
+    else ns = "wander";
+    a.state = ns;
+  }
+  function sgCommonStates(a, s) {
+    let p = a.G.player;
+    if (a.state === "led") {
+      a.ledBy || a.setState("wander");
+      return !0;
+    }
+    if (a.state === "follow") {
+      (!(a.followT > 0) || p.dead || s > 60) && ((a.followT = 0), a.setState("wander"), (a.target = null));
+      return !0;
+    }
+    return !1;
+  }
+  function sgThinkDocile(a, t, s) {
+    let b = a.beh, p = a.G.player;
+    if (sgCommonStates(a, s)) return;
+    if (a.state === "flee") {
+      a.stateT > (a.fleeFor || b.flee.time) &&
+        ((a.provoked = !1), (a.knows = !1), (a.awareness = 0), (a.fleeFor = 0), a.setState("wander"));
+      return;
+    }
+    if (a.state === "chase") {
+      // sadece `retaliate` (boğa) türleri, vurulunca karşılık verir
+      (a.stateT > 6 || p.dead || s > 14) && (a.setState("wander"), (a.provoked = !1), (a.knows = !1));
+      s < a.sp.radius + 1.25 && a.attackT <= 0 && !a.lunging && a.startAttack();
+      return;
+    }
+    if (a.state === "alert" || a.state === "stalk" || a.state === "circle") a.state = "wander";
+    sgRoutine(a, b);
+  }
+  function sgThinkDefensive(a, t, s, night) {
+    let b = a.beh, G = a.G, p = G.player, st = a.state;
+    if (sgCommonStates(a, s)) return;
+    let near = a.knows && !p.dead;
+    if (st === "idle" || st === "graze" || st === "wander") {
+      sgRoutine(a, b);
+      (near && (s < b.charge || (a.provoked && s < 14))) && a.setState("chase");
+      near && a.state !== "chase" && s < b.warn && G.env.total > (a.alertUntil || 0) && a.setState("alert");
+    } else if (st === "alert") {
+      // uyarı: dönüp bakar, burnundan soluyup yerini kazır — kısa sürer, sonra rutinine döner
+      if (near && (s < b.charge || a.provoked)) a.setState("chase");
+      else if (a.stateT > b.warnDur || !near) {
+        a.alertUntil = G.env.total + b.alertCool;
+        a.setState("wander");
+        a.stateT = 0;
+        a.pickWanderTarget();
+      }
+    } else if (st === "chase") {
+      (p.dead || !a.knows) && a.stateT > 1 && a.setState("wander");
+      a.stateT > b.chaseMax && s > 8 && (a.setState("wander"), (a.provoked = !1), (a.alertUntil = G.env.total + b.alertCool));
+      a.hp < a.sp.hp * 0.22 && a.setState("flee");
+      s < a.sp.radius + 1.25 && a.attackT <= 0 && !a.lunging && a.startAttack();
+    } else if (st === "flee") {
+      a.stateT > 6.2 && ((a.provoked = !1), a.setState("wander"), (a.alertUntil = G.env.total + b.alertCool));
+    } else a.setState("wander");
+  }
+  // Yırtıcı: karar (hunger/gece/gündüz/cesaret) -> saldır mı, uzaklaş mı
+  function sgDecide(a, s, night) {
+    let b = a.beh, G = a.G, tot = G.env.total, hp = G.player.stats?.hp ?? 100;
+    if (a.provoked) return !0;
+    if (a.packHunt > tot) return !0;
+    if (tot < a.noHuntUntil && s > b.cornered) return !1;
+    let A_ = b.aggr * (night ? b.nightAggr : b.dayAggr) * (0.6 + 0.8 * a.hunger);
+    s < b.cornered && (A_ = 1);
+    hp < 35 && (A_ *= 1.15);
+    let go = a.nerve < A_;
+    if (go && b.pack) {
+      let root = a.leader || a;
+      for (let m of a.mgr.list) {
+        if (m === a || m.dead || m.removed || m.type !== a.type || (m.leader || m) !== root) continue;
+        if (m.pos.distanceTo(a.pos) > 45) continue;
+        m.packHunt = tot + 40;
+        if (!m.knows) {
+          m.awareness = 1;
+          m.knows = !0;
+          m.lastSeen = tot;
+          m.threat.copy(a.threat);
+        }
+      }
+    }
+    return go;
+  }
+  function sgGiveUp(a, to) {
+    let b = a.beh, tot = a.G.env.total;
+    a.hunting = !1;
+    a.provoked = !1;
+    a.packHunt = 0;
+    a.noHuntUntil = tot + sgRand(b.cool);
+    a.nerve = Math.random();
+    a.rear = 0;
+    a.setState(to || "wander");
+  }
+  function sgThinkPredator(a, t, s, night, fear) {
+    let b = a.beh, G = a.G, p = G.player, tot = G.env.total, st = a.state;
+    if (sgCommonStates(a, s)) return;
+    let sp = a.sp;
+    switch (st) {
+      case "idle":
+      case "graze":
+      case "wander": {
+        sgRoutine(a, b);
+        if (a.knows && !p.dead) {
+          a.noticeDur = a.packHunt > tot ? 0.25 + Math.random() * 0.35 : sgRand(b.notice);
+          a.hunting = sgDecide(a, s, night);
+          a.setState("alert");
+        }
+        break;
+      }
+      case "alert": {
+        // dikkat anı (kafa kalkar, burun/kulak jesti): kısa — donup kalmaz, sonra eyleme geçer
+        a.type === "bear" && (a.rear = a.knows && s < 22 ? 1 : 0);
+        if (!a.knows) {
+          a.stateT > 2.5 && a.awareness < 0.5 && ((a.hunting = !1), a.setState("wander"));
+          break;
+        }
+        if (a.stateT >= (a.noticeDur || 1)) {
+          a.rear = 0;
+          if (a.hunting) {
+            a.canAtk !== !1 && s < b.rush ? a.setState("chase") : a.setState("stalk");
+          } else {
+            a.waryDur = sgRand(b.wary);
+            a.noHuntUntil = tot + sgRand(b.cool);
+            a.setState("wary");
+          }
+        }
+        break;
+      }
+      case "stalk": {
+        if (p.dead) {
+          sgGiveUp(a);
+          break;
+        }
+        if (!a.knows) {
+          a.stateT > 3 && a.setState("search");
+          break;
+        }
+        if (fear) {
+          a.setState("circle");
+          break;
+        }
+        (s < b.rush || a.provoked || a.stateT > b.stalkMax) && a.canAtk !== !1 && a.setState("chase");
+        break;
+      }
+      case "circle": {
+        if (p.dead) {
+          sgGiveUp(a);
+          break;
+        }
+        !fear && a.canAtk !== !1 && a.stateT > 1.2 && a.setState(s < b.rush ? "chase" : "stalk");
+        a.stateT > 25 && sgGiveUp(a, "search");
+        !a.knows && a.stateT > 6 && a.setState("search");
+        break;
+      }
+      case "chase": {
+        if (p.dead) {
+          sgGiveUp(a);
+          break;
+        }
+        if (tot - a.lastSeen > b.lose) {
+          a.setState("search");
+          break;
+        }
+        if (fear && a.type === "wolf") {
+          a.setState("circle");
+          break;
+        }
+        if (p.swim && a.type !== "bear" && a.stateT > 1) {
+          a.setState("circle");
+          break;
+        }
+        if (a.stateT > b.maxChase && s > 8) {
+          sgGiveUp(a, "search");
+          break;
+        }
+        if (s > b.giveDist) {
+          sgGiveUp(a, "search");
+          break;
+        }
+        if (b.fleeHp && a.hp < sp.hp * b.fleeHp) {
+          a.setState("flee");
+          break;
+        }
+        if (a.canAtk === !1 && s < 13 && !a.lunging && !a.provoked) {
+          a.setState("circle");
+          break;
+        }
+        s < sp.radius + b.reach && a.attackT <= 0 && !a.lunging && a.startAttack();
+        break;
+      }
+      case "search": {
+        // son görülen yere gider, etrafı koklar; tekrar görürse kısa dikkat -> av
+        if (p.dead) {
+          sgGiveUp(a);
+          break;
+        }
+        if (a.seenNow && a.knows) {
+          a.noticeDur = 0.3;
+          a.setState("alert");
+          break;
+        }
+        a.stateT > (a.searchDur || (a.searchDur = sgRand(b.search))) && ((a.searchDur = 0), sgGiveUp(a));
+        break;
+      }
+      case "wary": {
+        // avlanmaya niyeti yok: yan yan uzaklaşır, durup bakmaz
+        if (a.stateT > (a.waryDur || 5) || s > b.range.run * 1.3) {
+          a.setState("wander");
+          a.stateT = 0;
+          a.pickWanderTarget();
+        } else if (s < b.cornered || a.provoked) {
+          a.hunting = !0;
+          a.setState(s < b.rush ? "chase" : "stalk");
+        }
+        break;
+      }
+      case "flee": {
+        if (a.stateT > 8) {
+          a.hp > sp.hp * 0.4 && a.knows ? ((a.hunting = !0), a.setState("stalk")) : sgGiveUp(a);
+        }
+        break;
+      }
+      default:
+        a.setState("wander");
+    }
+  }
+  function sgAI(a, t, s, night, fear) {
+    switch (a.beh.temper) {
+      case "docile":
+        return (sgThinkDocile(a, t, s), !0);
+      case "predator":
+        return (sgThinkPredator(a, t, s, night, fear), !0);
+      case "defensive":
+        return (sgThinkDefensive(a, t, s, night), !0);
+    }
+    return !1;
+  }
+  // Hareket: yeni durumlar (stalk/chase/search/wary/circle) + sürü uyumu. Dönüş: [dx, dz, hız] ya da null (eski mantık)
+  function sgMove(a) {
+    let b = a.beh, G = a.G, p = G.player, sp = a.sp, st = a.state, T = b.temper;
+    let dir = (tx, tz) => {
+      let h = tx - a.pos.x, d = tz - a.pos.z, u = Math.hypot(h, d) || 1;
+      return [h / u, d / u];
+    };
+    if (T === "predator") {
+      switch (st) {
+        case "stalk": {
+          let tg = a.seenNow ? p.pos : a.threat,
+            [x, z] = dir(tg.x, tg.z),
+            d = Math.hypot(tg.x - a.pos.x, tg.z - a.pos.z),
+            ang = a.flank * yt((d - 5) / 12, 0, 1),
+            c = Math.cos(ang), sn = Math.sin(ang);
+          return [x * c - z * sn, x * sn + z * c, sp.walk * b.stalkMul];
+        }
+        case "chase": {
+          let tg = a.seenNow ? p.pos : a.threat,
+            d = Math.hypot(tg.x - a.pos.x, tg.z - a.pos.z),
+            lead = a.seenNow && a.type === "wolf" ? Math.min(0.55, d / (sp.run * 1.4)) : 0,
+            [x, z] = dir(tg.x + p.vel.x * lead, tg.z + p.vel.z * lead);
+          return [x, z, a.playerDist < sp.radius + 1 ? 0 : sp.run * (a.type === "bear" ? 0.95 : 1)];
+        }
+        case "circle": {
+          let l = a.pos.x - p.pos.x, c = a.pos.z - p.pos.z, h = Math.hypot(l, c) || 1,
+            u = (h - b.circleR) * -0.25,
+            x = (-c / h) * 0.9 * a.circleDir + (l / h) * u,
+            z = (l / h) * 0.9 * a.circleDir + (c / h) * u,
+            f = Math.hypot(x, z) || 1;
+          return [x / f, z / f, sp.walk * 1.4];
+        }
+        case "search": {
+          let d = Math.hypot(a.threat.x - a.pos.x, a.threat.z - a.pos.z);
+          if (d > 2.5 && a.stateT < 6) {
+            let [x, z] = dir(a.threat.x, a.threat.z);
+            return [x, z, sp.walk * 1.5];
+          }
+          a.faceYaw = (a.searchYaw ??= a.yaw) + Math.sin(a.stateT * 0.9) * 1.1;
+          return [0, 0, 0];
+        }
+        case "wary": {
+          let x = a.pos.x - p.pos.x, z = a.pos.z - p.pos.z, d = Math.hypot(x, z) || 1,
+            ang = (a.id % 2 ? 1 : -1) * 0.9, c = Math.cos(ang), sn = Math.sin(ang);
+          x /= d; z /= d;
+          return [x * c - z * sn, x * sn + z * c, sp.walk * 1.15];
+        }
+        case "alert": {
+          let l = a.knows ? a.threat : a.noisePos || p.pos;
+          a.faceYaw = Math.atan2(l.x - a.pos.x, l.z - a.pos.z);
+          return [0, 0, 0];
+        }
+      }
+    } else if (T === "defensive") {
+      if (st === "chase") {
+        let [x, z] = dir(p.pos.x, p.pos.z);
+        return [x, z, a.playerDist < sp.radius + 1 ? 0 : sp.run];
+      }
+      if (st === "alert") {
+        a.faceYaw = Math.atan2(p.pos.x - a.pos.x, p.pos.z - a.pos.z);
+        return [0, 0, 0];
+      }
+    } else if (T === "docile") {
+      if (st === "flee") {
+        let l = a.knows ? a.threat : p.pos, x = a.pos.x - l.x, z = a.pos.z - l.z, d = Math.hypot(x, z) || 1;
+        return [x / d, z / d, sp.run * b.flee.speed];
+      }
+      if (st === "chase") {
+        let [x, z] = dir(p.pos.x, p.pos.z);
+        return [x, z, a.playerDist < sp.radius + 1 ? 0 : sp.run * 0.8];
+      }
+    }
+    // sürü uyumu: gruptan kopan yetişir; sürü yürüyorsa birlikte yürür
+    let h = a.herd;
+    if (h && h.wild && h.cen && (st === "wander" || st === "graze" || st === "idle")) {
+      let dx = h.cen.x - a.pos.x, dz = h.cen.z - a.pos.z, d = Math.hypot(dx, dz);
+      if (d > b.cohesion) return [dx / d, dz / d, Math.min(sp.walk * 1.7, sp.walk * (0.8 + (d - b.cohesion) * 0.12))];
+    }
+    return null;
+  }
+  // Oyuncu çarptı / itti (docile/defensive için): yavaşsa kenara çekilir, koşarak çarparsa ürker
+  function sgBump(a, px, pz, spd) {
+    if (a.dead || a.removed || a.state === "flee" || a.state === "led") return;
+    let b = a.beh;
+    if (!b.ignorePlayer) return;
+    let now = a.mgr.clock;
+    if (now - (a.bumpAt || -9) < 0.9) return;
+    a.bumpAt = now;
+    let dx = a.pos.x - px, dz = a.pos.z - pz, d = Math.hypot(dx, dz) || 1;
+    if (spd > b.nudge.startle) {
+      a.threat.set(px, a.pos.y, pz);
+      a.knows = !0;
+      a.fleeFor = 1.8 + Math.random() * 1.2;
+      a.setState("flee");
+      a.herd?.wild && sgHerdStartle(a, 0.7);
+    } else {
+      a.target = new R(a.pos.x + (dx / d) * 3.4, 0, a.pos.z + (dz / d) * 3.4);
+      if (a.state !== "follow") ((a.state = "wander"), (a.stateT = 0));
+    }
+  }
+  function sgHerdStartle(a, chance) {
+    let h = a.herd;
+    if (!h) return;
+    for (let m of h.members) {
+      if (m === a || m.dead || m.removed || m.state === "flee" || Math.random() > chance) continue;
+      m.threat.copy(a.pos);
+      m.knows = !0;
+      m.fleeFor = 1.5 + Math.random() * 1.5;
+      m.setState("flee");
+    }
+  }
+  // Başı oyuncuya kısa bir merakla çevirme (gövde yürümeye devam eder); sadece glTF iskeletli modeller
+  function sgGlance(a, t) {
+    let b = a.beh, g = b.glance, rig = a.rig;
+    if (!g || !rig || a.dead) return;
+    let S = a.glanceS || (a.glanceS = { w: 0, next: Math.random() * 6, dur: 0 }),
+      p = a.G.player.pos,
+      d = a.playerDist ?? 99;
+    S.next -= t;
+    S.dur > 0 && (S.dur -= t);
+    if (S.next <= 0) {
+      S.next = sgRand(g.every);
+      d < g.range && a.state !== "flee" && (S.dur = sgRand(g.dur));
+    }
+    let tgt = 0;
+    if (S.dur > 0 && d < g.range + 3) tgt = yt(zn(a.yaw, Math.atan2(p.x - a.pos.x, p.z - a.pos.z)), -g.amp, g.amp);
+    S.w = Bt(S.w, tgt, 4, t);
+    if (Math.abs(S.w) < 0.015) return;
+    let bn = rig.bones, head = bn.Head, necks = [bn.Neck, bn.Neck1, bn.Neck2, bn.Neck3].filter(Boolean);
+    if (!head) return;
+    let share = necks.length ? 0.5 : 1;
+    sgYawBone(head, S.w * share);
+    for (let n of necks) sgYawBone(n, (S.w * (1 - share)) / necks.length);
+  }
+  var sgQa = null, sgQb = null, sgQc = null, sgUp = null;
+  function sgYawBone(bone, ang) {
+    if (!sgQa) ((sgQa = new ce()), (sgQb = new ce()), (sgQc = new ce()), (sgUp = new R(0, 1, 0)));
+    let par = bone.parent;
+    if (!par) return;
+    par.updateWorldMatrix(!0, !1);
+    par.getWorldQuaternion(sgQa);
+    sgQb.setFromAxisAngle(sgUp, ang);
+    sgQc.copy(sgQa).invert().multiply(sgQb).multiply(sgQa);
+    bone.quaternion.premultiply(sgQc);
+  }
+  // ---- Doğadaki 2-3'lü çiftlik sürüleri (deterministik: seed + hücre) ----
+  function sgFarmHerd(mgr, cx, cz) {
+    let n = cx * 100003 + cz,
+      key = n + "f",
+      h = mgr.herds.get(key);
+    if (h) return h;
+    let G = mgr.G,
+      cfg = sgBehavior.herds,
+      seed = G.gen.seed || 1,
+      rng = new de(Qn(cx, cz, seed * 13 + 4421)),
+      x = (cx + 0.5) * 48,
+      z = (cz + 0.5) * 48,
+      type = null,
+      count = 0;
+    h = { key, cx, cz, x, z, type: null, count: 0, alive: 0, respawnDay: 0, members: [], spawned: !1, wild: !0 };
+    // biyom (merkez noktasına göre; ana sürü ile aynı sınıflandırma)
+    let f0 = G.gen.forest(x, z),
+      pm = G.gen.pineMix ? G.gen.pineMix(x, z, G.gen.heightAt(x, z)) : 0,
+      biome = f0 < 0.35 ? "meadow" : pm > 0.55 ? "pine" : "forest",
+      roll = rng.next(),
+      ok = roll < cfg.chance[biome];
+    if (ok) {
+      let pk = cfg.pick[biome], tot = pk.reduce((s, e) => s + e[1], 0), y = rng.next() * tot;
+      for (let [ty, w] of pk) {
+        if (y < w) {
+          type = ty;
+          break;
+        }
+        y -= w;
+      }
+      let sz = cfg.size[type] || cfg.size.default;
+      count = rng.int(sz[0], sz[1]);
+      // uygun bir merkez noktası bul
+      ok = !1;
+      let sp0 = mgr.spawnPoint;
+      for (let k = 0; k < 6 && !ok; k++) {
+        let px = (cx + 0.12 + rng.next() * 0.76) * 48,
+          pz = (cz + 0.12 + rng.next() * 0.76) * 48,
+          hh = G.gen.heightAt(px, pz);
+        if (hh < 1.0 || G.gen.normalAt(px, pz).y < cfg.minSlopeY) continue;
+        if (G.gen.forest(px, pz) > cfg.maxForest) continue;
+        if (G.villages?.near(px, pz, cfg.villageGap)) continue;
+        if (sp0 && Math.hypot(px - sp0.x, pz - sp0.z) < cfg.spawnGap) continue;
+        h.x = px;
+        h.z = pz;
+        ok = !0;
+      }
+    }
+    if (ok && type) ((h.type = type), (h.count = count), (h.alive = count));
+    let m = mgr.savedHerds?.get(key);
+    m && ((h.alive = Math.min(h.count, m[0])), (h.respawnDay = m[1]));
+    mgr.herds.set(key, h);
+    return h;
+  }
+  function sgSpawnFarmHerd(mgr, h) {
+    let G = mgr.G;
+    h.spawned = !0;
+    h.members = [];
+    if (!h.type || h.alive <= 0) {
+      h.spawned = h.alive <= 0 || !h.type;
+      return;
+    }
+    if (!Fa(h.type)) {
+      Na([h.type]);
+      h.spawned = !1;
+      return;
+    }
+    let rng = new de(Qn(h.cx, h.cz, (G.gen.seed || 1) * 5 + 77)),
+      sp = sgBehavior.herds.spacing,
+      ang0 = rng.next() * Math.PI * 2;
+    for (let i = 0; i < h.alive; i++) {
+      let x = h.x, z = h.z, ok = !1;
+      for (let k = 0; k < 8 && !ok; k++) {
+        let a_ = ang0 + (i / h.count) * Math.PI * 2 + (k ? rng.next() * 6.28 : 0),
+          r = sp * (0.6 + rng.next() * 0.8) * (1 + k * 0.3);
+        i === 0 && k === 0 && (r = 0);
+        x = h.x + Math.cos(a_) * r;
+        z = h.z + Math.sin(a_) * r;
+        ok = G.gen.heightAt(x, z) > 0.5 && G.gen.normalAt(x, z).y > 0.8;
+      }
+      if (!ok) continue;
+      let c = new gr(mgr, h.type, x, z, null);
+      c.herd = h;
+      c.stateT = rng.next() * 6;
+      mgr.list.push(c);
+      h.members.push(c);
+    }
+    h.roam = { x: h.x, z: h.z };
+    h.cen = { x: h.x, z: h.z };
+    h.moving = !1;
+    h.restUntil = mgr.clock + 4 + rng.next() * 20;
+  }
+  // Sürünün ortak hedefi: otlayarak durur, sonra yakın bir yere topluca yürür
+  function sgTickHerds(mgr, dt) {
+    let G = mgr.G, cfg = sgBehavior.herds, now = mgr.clock;
+    for (let h of mgr.herds.values()) {
+      if (!h.wild || !h.spawned) continue;
+      h.acc = (h.acc || 0) + dt;
+      if (h.acc < 0.4) continue;
+      h.acc = 0;
+      let n = 0, sx = 0, sz = 0;
+      for (let m of h.members) m.dead || m.removed || (n++, (sx += m.pos.x), (sz += m.pos.z));
+      if (!n) continue;
+      h.cen.x = sx / n;
+      h.cen.z = sz / n;
+      if (h.moving) {
+        (Math.hypot(h.roam.x - h.cen.x, h.roam.z - h.cen.z) < 5 || now - h.moveAt > 50) &&
+          ((h.moving = !1), (h.restUntil = now + sgRand(cfg.rest)));
+      } else if (now >= h.restUntil) {
+        let best = null;
+        for (let k = 0; k < 10 && !best; k++) {
+          let toAnchor = Math.hypot(h.x - h.cen.x, h.z - h.cen.z) > cfg.leash * 0.6,
+            ang = toAnchor ? Math.atan2(h.z - h.cen.z, h.x - h.cen.x) + (Math.random() - 0.5) * 1.6 : Math.random() * 6.283,
+            d = sgRand(cfg.roam),
+            x = h.cen.x + Math.cos(ang) * d,
+            z = h.cen.z + Math.sin(ang) * d;
+          if (Math.hypot(x - h.x, z - h.z) > cfg.leash) continue;
+          let good = !0;
+          for (let q = 1; q <= 4 && good; q++) {
+            let px = h.cen.x + (x - h.cen.x) * (q / 4),
+              pz = h.cen.z + (z - h.cen.z) * (q / 4);
+            good = G.gen.heightAt(px, pz) > 0.5 && G.gen.normalAt(px, pz).y > 0.78;
+          }
+          good && !G.villages?.near(x, z, 28) && (best = { x, z });
+        }
+        if (best) {
+          h.roam = best;
+          h.moving = !0;
+          h.moveAt = now;
+          for (let m of h.members) {
+            if (m.dead || m.removed || m.state === "flee" || m.state === "follow" || m.state === "led") continue;
+            m.pickWanderTarget();
+            m.state = "wander";
+            m.stateT = Math.random() * 2;
+          }
+        } else h.restUntil = now + 6;
+      }
+    }
+  }
+  // Aynı anda en fazla N yırtıcı oyuncuya saldırır; fazlası etrafında bekler
+  function sgAssignSlots(mgr) {
+    let pp = mgr.G.player.pos, c = [];
+    for (let a of mgr.list) {
+      if (a.dead || a.removed || a.beh.temper !== "predator" || !a.knows) continue;
+      (a.state === "chase" || a.state === "stalk" || a.state === "circle" || a.lunging) && c.push(a);
+    }
+    c.sort((x, y) => (y.lunging ? 1 : 0) - (x.lunging ? 1 : 0) || x.pos.distanceTo(pp) - y.pos.distanceTo(pp));
+    for (let i = 0; i < c.length; i++) c[i].canAtk = i < sgBehavior.maxAttackers;
+  }
+  // ===== SG:ANIMAL_AI BİTTİ =====
   function sgWaterStep(r, n, ox, oz) {
     let d0 = r.gen.waterDepth(ox, oz),
       d1 = r.gen.waterDepth(n.pos.x, n.pos.z);
@@ -68085,6 +68853,7 @@ uniform float uWet; uniform float uNight;`,
   A.debug = {
     In: () => In,
     models: () => to,
+    beh: () => sgBehavior,
     recipes: () => Wl,
     items: () => kt,
     walk(r) {
