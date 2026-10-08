@@ -50589,6 +50589,13 @@ uniform float uWet; uniform float uNight;`,
   // ===== SG:ANIM BAŞLA =====
   // SG:ANIM - oyuncu animasyon sistemi (tutma / taşıma / yeme / alet kullanımı)
   // Tek fabrika fonksiyonu: bağımlılıklar X ile gelir. game.js içinde sgA() ile tembel kurulur.
+  //
+  // EŞYA SÖZLEŞMESİ (kt tablosuna eklenecek isteğe bağlı alanlar; yoksa kategori/boyuttan türetilir):
+  //   hold: "small" | "long" | "big" | "flat" | "bundle" | "bowl" | "bottle" | "bag"
+  //         (ek iç türler: "log", "rock", "hang", "carcass", "tool")
+  //   eat : "bite" | "nibble" | "sip" | "gulp" | "chew_meat" | "munch" | "peel"
+  //   moveKind (yalnız alet/silah): "chop" | "mine" | "sword" | "club" | "stab" | "thrust" | "torch"  (yoksa kt.act'ten türetilir)
+  //   Örnek: Object.assign(kt, { muz: { name: "Muz", cat: "food", food: 12, model: "banana", hold: "small", eat: "peel", phys: {...} } });
   function sgAnimMake(X) {
     const { R, ce, Gt, Gl, Yn, Bt, Dt, yt, xe, kt } = X;
     const PI = Math.PI;
@@ -50631,14 +50638,17 @@ uniform float uWet; uniform float uNight;`,
       else if (id === "waterskin" || /matara|flask|bottle|canteen/.test(id)) r = "bottle";
       else if (/^wood(_|$)/.test(id) || k.model === "log" || /^log@/.test(k.model || "")) r = "log";
       else if (id === "stone" || id === "flint" || /^(rock|boulder|ore|coal|iron_ore|clay)/.test(id)) r = id === "flint" ? "small" : "rock";
+      else if (/tea|juice|milk|potion|drink|elixir/.test(id)) r = "bottle";
+      else if (/letter|note|map|scroll|paper|page/.test(id)) r = "flat";
+      else if (/rope|string/.test(id) || id === "fat") r = "small";
       else if (k.cat === "tool" || k.cat === "weapon") r = "tool";
       else if (k.cat === "cloth") r = "flat";
       else if (k.cat === "build") r = mx > 0.5 ? "big" : "flat";
       else if (/sack|bag|çuval|torba/.test(id) || (k.phys && k.phys.m > 4 && mx > 0.3)) r = "bag";
       else if (id === "hide" || id === "fiber" || id === "wool" || /hay|straw|grass|bundle|herb|flower|bouquet/.test(id)) r = id === "wool" || id === "hide" ? "bundle" : id === "fiber" ? "bundle" : "bundle";
       else if (k.phys && k.phys.t === "cyl" && sz.w >= 0.15 && sz.h <= 0.14) r = "bowl";
+      else if (mx / Math.max(0.01, mn) >= 2.6 && mx >= 0.16) r = "long";
       else if (mx >= 0.3) r = "big";
-      else if (mx / Math.max(0.01, mn) >= 2.6 && mx >= 0.16 && sz.h >= sz.w * 0.9 || (mx >= 0.2 && mx / Math.max(0.01, mn) >= 3)) r = "long";
       else if (sz.h <= Math.min(sz.w, sz.d) * 0.45 && Math.max(sz.w, sz.d) >= 0.16) r = "flat";
       else r = "small";
       k._hk = r;
@@ -50823,20 +50833,20 @@ uniform float uWet; uniform float uNight;`,
       const V = (x, y, z) => new R(x, y, z);
       switch (kind) {
         case "small": {
-          S.p = fp ? [0.2, -0.3, 0.5] : [0.2, 1.2, 0.32];
+          S.p = fp ? [0.2, -0.17, 0.44] : [0.2, 1.2, 0.32];
           S.y = [0, 1, 0]; S.z = fp ? [0, 0.15, 1] : [0, 0, 1];
           const gy = -Math.max(0, r - 0.045);
           S.hands.r = { g: V(0, gy, 0), n: V(0, 1, 0), f: V(0.3, 0, 1) };
           break;
         }
         case "long": {
-          S.p = fp ? [0.2, -0.26, 0.52] : [0.2, 1.17, 0.34];
+          S.p = fp ? [0.2, -0.16, 0.44] : [0.2, 1.17, 0.34];
           S.y = fp ? [0.1, 0.75, 0.65] : [0.15, 0.8, 0.55]; S.z = [0, -0.6, 1];
           S.hands.r = { g: V(0, -Math.min(dy * 0.28, 0.11), 0), n: V(1, 0, 0), f: V(0, 0, 1) };
           break;
         }
         case "bottle": {
-          S.p = fp ? [0.2, -0.3, 0.5] : [0.2, 1.12, 0.26];
+          S.p = fp ? [0.2, -0.17, 0.44] : [0.2, 1.12, 0.26];
           S.y = [0.0, 1, 0.12]; S.z = [0, -0.1, 1];
           S.hands.r = { g: V(0, 0, 0), n: V(1, 0, 0), f: V(0, 0, 1) };
           break;
@@ -50844,7 +50854,7 @@ uniform float uWet; uniform float uNight;`,
         case "big":
         case "rock": {
           const hx = Math.max(0.07, dx * 0.5);
-          S.p = fp ? [0, -0.34, 0.5] : [0, 1.2, kind === "rock" ? 0.28 : 0.3];
+          S.p = fp ? [0, -0.15, 0.44] : [0, 1.2, kind === "rock" ? 0.28 : 0.3];
           S.y = [0, 1, 0]; S.z = [0, 0, 1];
           S.hands.r = { g: V(-hx * 0.92, -dy * 0.12, 0), n: V(0.85, 0.5, 0), f: V(0.2, -0.15, 1) };
           S.hands.l = { g: V(hx * 0.92, -dy * 0.12, 0), n: V(-0.85, 0.5, 0), f: V(-0.2, -0.15, 1) };
@@ -50852,7 +50862,7 @@ uniform float uWet; uniform float uNight;`,
         }
         case "flat": {
           const hx = Math.max(0.07, dx * 0.5);
-          S.p = fp ? [0, -0.34, 0.5] : [0, 1.15, 0.32];
+          S.p = fp ? [0, -0.16, 0.44] : [0, 1.15, 0.32];
           S.y = [0, 1, 0]; S.z = [0, 0, 1];
           S.hands.r = { g: V(-hx * 0.78, -Math.max(0, dy / 2 - 0.035), -0.02), n: V(0, 1, 0), f: V(0.55, 0, 1) };
           S.hands.l = { g: V(hx * 0.78, -Math.max(0, dy / 2 - 0.035), -0.02), n: V(0, 1, 0), f: V(-0.55, 0, 1) };
@@ -50860,7 +50870,7 @@ uniform float uWet; uniform float uNight;`,
         }
         case "bundle": {
           const hx = Math.max(0.1, dx * 0.5);
-          S.p = fp ? [0, -0.3, 0.55] : [0, 1.2, 0.28];
+          S.p = fp ? [0, -0.14, 0.46] : [0, 1.2, 0.28];
           S.y = [0, 1, -0.2]; S.z = [0, 0.2, 1];
           S.hands.r = { g: V(-hx * 0.8, -dy * 0.25, 0.02), n: V(0.8, 0.5, 0), f: V(0.4, 0, 1) };
           S.hands.l = { g: V(hx * 0.8, -dy * 0.25, 0.02), n: V(-0.8, 0.5, 0), f: V(-0.4, 0, 1) };
@@ -50868,7 +50878,7 @@ uniform float uWet; uniform float uNight;`,
         }
         case "bowl": {
           const hx = Math.max(0.06, dx * 0.5);
-          S.p = fp ? [0, -0.3, 0.46] : [0, 1.18, 0.3];
+          S.p = fp ? [0, -0.16, 0.44] : [0, 1.18, 0.3];
           S.y = [0, 1, 0]; S.z = [0, 0, 1];
           S.hands.r = { g: V(-hx * 0.85, -dy * 0.15, 0), n: V(0.9, 0.35, 0), f: V(0.1, 0.1, 1) };
           S.hands.l = { g: V(hx * 0.85, -dy * 0.15, 0), n: V(-0.9, 0.35, 0), f: V(-0.1, 0.1, 1) };
@@ -50876,7 +50886,7 @@ uniform float uWet; uniform float uNight;`,
         }
         case "log": {
           const hy = dy * 0.5;
-          S.p = fp ? [0, -0.36, 0.5] : [0, 1.1, 0.3];
+          S.p = fp ? [0, -0.17, 0.44] : [0, 1.1, 0.3];
           S.y = [-1, 0, 0]; S.z = [0, 0, 1];
           S.hands.r = { g: V(0, -hy * 0.5, 0), n: V(-1, 0, 0), f: V(0, 0, 1) };
           S.hands.l = { g: V(0, hy * 0.5, 0), n: V(-1, 0, 0), f: V(0, 0, 1) };
@@ -50890,13 +50900,13 @@ uniform float uWet; uniform float uNight;`,
           break;
         }
         case "bag": {
-          S.p = fp ? [0.2, -0.3, 0.5] : [0.2, 1.5, 0.0];
+          S.p = fp ? [0.2, -0.16, 0.44] : [0.2, 1.5, 0.0];
           S.y = [0.1, 0.8, -0.6]; S.z = [0, 0.3, 1];
           S.hands.r = { g: V(0, dy * 0.4, 0), n: V(1, 0, 0), f: V(0, 0, 1) };
           break;
         }
         default: {
-          S.p = fp ? [0.2, -0.3, 0.5] : [0.17, 1.13, 0.37];
+          S.p = fp ? [0.2, -0.17, 0.44] : [0.17, 1.13, 0.37];
           S.y = [0, 1, 0]; S.z = [0, 0, 1];
           S.hands.r = { g: V(0, 0, 0), n: V(0, 1, 0), f: V(0, 0, 1) };
         }
@@ -55336,7 +55346,7 @@ uniform float uWet; uniform float uNight;`,
             break;
           }
           case "door":
-            t.villages?.toggleDoor(e.door, this);
+            (this.startAction("use", 0.7), t.villages?.toggleDoor(e.door, this));
             break;
           case "animal": {
             let s = e.animal;
@@ -63415,7 +63425,8 @@ uniform float uWet; uniform float uNight;`,
           case "furnace":
           case "chest":
           case "deathbag":
-            (e.ui.openPanel(t.type === "campfire" || t.type === "furnace" ? "fire" : "chest", t),
+            (t.type === "chest" && !e.player.action && e.player.startAction("open", 0.9),
+              e.ui.openPanel(t.type === "campfire" || t.type === "furnace" ? "fire" : "chest", t),
               t.type === "chest" && ((this.openChest = t), e.audio?.chest()));
             break;
           case "chair": {
@@ -69231,6 +69242,8 @@ uniform float uWet; uniform float uNight;`,
     sgSet(v) {
       sgAnim = v;
     },
+    holdKind: (id) => sgA().holdKindOf(id),
+    eatKind: (id) => sgA().eatKindOf(id),
     walk(r) {
       let t = [];
       for (let e = 0; e < r.floors.length; e++) {
