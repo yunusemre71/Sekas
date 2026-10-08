@@ -31451,6 +31451,1397 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
         this.map.clear();
       }
     };
+// ===== SG:SPECIES BAŞLA =====
+// Parametrik hayvan anatomisi motoru (SG:SPECIES). Katalog + önbellek + animasyon.
+var SGT = {};
+var sgInitDone = false;
+function sgInit() {
+  if (sgInitDone) return;
+  sgInitDone = true;
+  SGT.Vector3 = R; SGT.Quaternion = ce; SGT.Matrix4 = Gt; SGT.Bone = Ml; SGT.Skeleton = ga; SGT.SkinnedMesh = ma; SGT.Mesh = Ct;
+  SGT.MeshStandardMaterial = fe; SGT.Color = vt; SGT.Group = bt; SGT.Sphere = Gn; SGT.Euler = vn; SGT.BufferGeometry = oe; SGT.BufferAttribute = St;
+  SGT.toonPatch = function (m, shell) { Re(m, { rim: 1.0, ink: 0.5, noInk: !!shell }); };
+}
+
+// ---- sg1_core.js ----
+// ---- SG:SPECIES ÇEKİRDEK: parametrik anatomi motoru (geometri üretici, iskelet, malzeme) ----
+// Harici bağımlılık yok: three sınıfları SGT üzerinden (game.js'te sgInit ile doldurulur).
+var SgEng = (function () {
+  "use strict";
+  var V3, Q4, M4, Bone, Skel, SMesh, Mesh, BGeo, BAttr, Mat, Col, Grp, Sph, EulerC;
+  var inited = false;
+  function init() {
+    if (inited) return;
+    inited = true;
+    if (typeof sgInit === "function") sgInit();
+    V3 = SGT.Vector3; Q4 = SGT.Quaternion; M4 = SGT.Matrix4; Bone = SGT.Bone; Skel = SGT.Skeleton; SMesh = SGT.SkinnedMesh;
+    Mesh = SGT.Mesh; BGeo = SGT.BufferGeometry; BAttr = SGT.BufferAttribute; Mat = SGT.MeshStandardMaterial; Col = SGT.Color; Grp = SGT.Group;
+    Sph = SGT.Sphere; EulerC = SGT.Euler;
+  }
+  // ---------- küçük yardımcılar ----------
+  var PI = Math.PI, TAU = PI * 2, sin = Math.sin, cos = Math.cos, abs = Math.abs, sqrt = Math.sqrt, min = Math.min, max = Math.max;
+  function clamp(x, a, b) { return x < a ? a : x > b ? b : x; }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function sstep(a, b, x) { var t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+  function vadd(a, b) { return [a[0] + b[0], a[1] + b[1], a[2] + b[2]]; }
+  function vsub(a, b) { return [a[0] - b[0], a[1] - b[1], a[2] - b[2]]; }
+  function vmul(a, s) { return [a[0] * s, a[1] * s, a[2] * s]; }
+  function vdot(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
+  function vcross(a, b) { return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]; }
+  function vlen(a) { return sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2]); }
+  function vnorm(a) { var l = vlen(a) || 1; return [a[0] / l, a[1] / l, a[2] / l]; }
+  function vlerp(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
+  function rot3(v, e) { // Euler XYZ (derece değil, radyan) ile döndür
+    var x = v[0], y = v[1], z = v[2], c, s, t;
+    if (e[0]) { c = cos(e[0]); s = sin(e[0]); t = y * c - z * s; z = y * s + z * c; y = t; }
+    if (e[1]) { c = cos(e[1]); s = sin(e[1]); t = x * c + z * s; z = -x * s + z * c; x = t; }
+    if (e[2]) { c = cos(e[2]); s = sin(e[2]); t = x * c - y * s; y = x * s + y * c; x = t; }
+    return [x, y, z];
+  }
+  function hashStr(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function rng(seed) { var a = seed >>> 0; return function () { a = (a + 0x6d2b79f5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  var colCache = {};
+  function lin(hex) { // sRGB hex -> doğrusal [r,g,b]
+    var k = colCache[hex];
+    if (!k) { var c = new Col(hex); k = colCache[hex] = [c.r, c.g, c.b]; }
+    return k;
+  }
+  function mixc(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
+  function shade(c, f) { return [c[0] * f, c[1] * f, c[2] * f]; }
+
+  // ---------- mesh oluşturucu ----------
+  function MB() { this.P = []; this.N = []; this.C = []; this.M = []; this.SI = []; this.SW = []; this.I = []; this.nv = 0; }
+  // wt: [bone,w,bone,w,...]; cls: parça sınıfı (0 gövde,1 düz,2 kuyruk,3 bacak,4 baş,5 zar/kulak/yüzgeç); fl: tüy uzunluğu çarpanı
+  MB.prototype.vert = function (x, y, z, col, cls, fl, wt) {
+    var k = this.nv++;
+    this.P.push(x, y, z); this.N.push(0, 0, 0); this.C.push(col[0], col[1], col[2]); this.M.push(cls, fl);
+    var n = wt.length >> 1, i0 = 0, w0 = 0, i1 = 0, w1 = 0, i2 = 0, w2 = 0, i3 = 0, w3 = 0;
+    if (n === 1) { i0 = wt[0]; w0 = 1; }
+    else {
+      // en büyük 4'ü seç
+      var pr = [];
+      for (var i = 0; i < n; i++) if (wt[i * 2 + 1] > 1e-4) pr.push([wt[i * 2], wt[i * 2 + 1]]);
+      pr.sort(function (a, b) { return b[1] - a[1]; });
+      var sum = 0; for (i = 0; i < pr.length && i < 4; i++) sum += pr[i][1];
+      if (pr.length > 0) { i0 = pr[0][0]; w0 = pr[0][1] / sum; }
+      if (pr.length > 1) { i1 = pr[1][0]; w1 = pr[1][1] / sum; }
+      if (pr.length > 2) { i2 = pr[2][0]; w2 = pr[2][1] / sum; }
+      if (pr.length > 3) { i3 = pr[3][0]; w3 = pr[3][1] / sum; }
+    }
+    this.SI.push(i0, i1, i2, i3); this.SW.push(w0, w1, w2, w3);
+    return k;
+  };
+  MB.prototype.tri = function (a, b, c) { this.I.push(a, b, c); };
+  MB.prototype.mark = function () { return [this.nv, this.I.length]; };
+  MB.prototype.smooth = function (mk, keepN) { // [v0,i0] aralığındaki normalleri hesapla
+    var v0 = mk[0], i0 = mk[1], P = this.P, N = this.N, I = this.I, i;
+    for (i = i0; i < I.length; i += 3) {
+      var a = I[i], b = I[i + 1], c = I[i + 2];
+      var ux = P[b * 3] - P[a * 3], uy = P[b * 3 + 1] - P[a * 3 + 1], uz = P[b * 3 + 2] - P[a * 3 + 2];
+      var vx = P[c * 3] - P[a * 3], vy = P[c * 3 + 1] - P[a * 3 + 1], vz = P[c * 3 + 2] - P[a * 3 + 2];
+      var nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+      N[a * 3] += nx; N[a * 3 + 1] += ny; N[a * 3 + 2] += nz; N[b * 3] += nx; N[b * 3 + 1] += ny; N[b * 3 + 2] += nz; N[c * 3] += nx; N[c * 3 + 1] += ny; N[c * 3 + 2] += nz;
+    }
+    for (i = v0; i < this.nv; i++) {
+      var l = sqrt(N[i * 3] * N[i * 3] + N[i * 3 + 1] * N[i * 3 + 1] + N[i * 3 + 2] * N[i * 3 + 2]) || 1;
+      N[i * 3] /= l; N[i * 3 + 1] /= l; N[i * 3 + 2] /= l;
+    }
+  };
+  MB.prototype.setN = function (k, n) { this.N[k * 3] = n[0]; this.N[k * 3 + 1] = n[1]; this.N[k * 3 + 2] = n[2]; };
+  MB.prototype.geometry = function () {
+    var g = new BGeo(), nv = this.nv;
+    g.setAttribute("position", new BAttr(new Float32Array(this.P), 3));
+    g.setAttribute("normal", new BAttr(new Float32Array(this.N), 3));
+    g.setAttribute("color", new BAttr(new Float32Array(this.C), 3));
+    g.setAttribute("aMeta", new BAttr(new Float32Array(this.M), 2));
+    g.setAttribute("skinIndex", new BAttr(new Uint16Array(this.SI), 4));
+    g.setAttribute("skinWeight", new BAttr(new Float32Array(this.SW), 4));
+    g.setIndex(new BAttr(nv > 65000 ? new Uint32Array(this.I) : new Uint16Array(this.I), 1));
+    g.computeBoundingSphere();
+    return g;
+  };
+
+  // ---------- iskelet tanımı ----------
+  function Rig() { this.b = []; this.id = {}; }
+  Rig.prototype.add = function (name, parent, at) {
+    var i = this.b.length;
+    this.b.push({ n: name, p: parent == null ? -1 : (typeof parent === "string" ? this.id[parent] : parent), w: at.slice() });
+    this.id[name] = i; return i;
+  };
+  Rig.prototype.pos = function (n) { return this.b[typeof n === "string" ? this.id[n] : n].w; };
+  // zincir ağırlıkları: ids = kemik dizisi, u = süreklilik parametresi (0..n-1), m = eklem yumuşatma
+  function chainW(ids, u, m) {
+    var n = ids.length;
+    if (u <= 0) return [ids[0], 1];
+    if (u >= n - 1) return [ids[n - 1], 1];
+    m = m == null ? 0.3 : m;
+    var j = Math.round(u), d = u - j;
+    if (j >= 1 && j <= n - 1 && abs(d) < m) { var s = sstep(-m, m, d); return [ids[j - 1], 1 - s, ids[j], s]; }
+    return [ids[Math.floor(u)], 1];
+  }
+
+  // ---------- ilkel şekiller ----------
+  // Tüp: path = [{p:[x,y,z], rx, ry, col?, wt?, fl?}]  ; o = {seg, ref, cls, col, cap0, cap1, wt, fl, e(süperelips), colf(t,ca,sa)}
+  function tube(mb, path, o) {
+    var S = o.seg || 8, n = path.length, mk = mb.mark(), ref = o.ref || [0, 1, 0], e = o.e || 2, ex = 2 / e;
+    var rings = [], i, j;
+    var cs = [], sn = [];
+    for (j = 0; j < S; j++) { var a = (j / S) * TAU, c = cos(a), s = sin(a); cs.push(c < 0 ? -Math.pow(-c, ex) : Math.pow(c, ex)); sn.push(s < 0 ? -Math.pow(-s, ex) : Math.pow(s, ex)); }
+    var up = ref, prevU = null;
+    for (i = 0; i < n; i++) {
+      var pt = path[i], pp = path[max(0, i - 1)].p, pn = path[min(n - 1, i + 1)].p;
+      var T = vnorm(vsub(pn, pp)); if (vlen(T) < 1e-6) T = [0, 0, 1];
+      var r = ref; if (abs(vdot(T, r)) > 0.92) r = prevU || (abs(T[2]) < 0.9 ? [0, 0, 1] : [1, 0, 0]);
+      var U = vnorm(vsub(r, vmul(T, vdot(r, T)))), R = vcross(U, T);
+      prevU = U;
+      var rx = pt.rx, ry = pt.ry == null ? pt.rx : pt.ry;
+      var ring = { T: T, U: U, R: R, p: pt.p, rx: rx, ry: ry, v: [] };
+      var t = n > 1 ? i / (n - 1) : 0;
+      var wt = pt.wt || (o.wtf ? o.wtf(i, t) : o.wt);
+      var fl = pt.fl != null ? pt.fl : (o.fl != null ? o.fl : 1);
+      var basec = pt.col || o.col || [0.5, 0.5, 0.5];
+      for (j = 0; j < S; j++) {
+        var ox = R[0] * rx * cs[j] + U[0] * ry * sn[j], oy = R[1] * rx * cs[j] + U[1] * ry * sn[j], oz = R[2] * rx * cs[j] + U[2] * ry * sn[j];
+        var cc = o.colf ? o.colf(t, cs[j], sn[j], pt) : basec;
+        ring.v.push(mb.vert(pt.p[0] + ox, pt.p[1] + oy, pt.p[2] + oz, cc, o.cls || 0, fl, wt));
+      }
+      rings.push(ring);
+    }
+    function closeRound(ring, dir, steps) {
+      var rr = (ring.rx + ring.ry) * 0.5, prev = ring;
+      var wt = (dir > 0 ? pathW(path[n - 1]) : pathW(path[0]));
+      var ang = [0.5, 1.0], cnt = steps || 1, k;
+      var cap = [];
+      for (k = 1; k <= cnt; k++) {
+        var a2 = (k / (cnt + 1)) * (PI / 2) * 0.96 + 0.12;
+        var sc = cos(a2), off = sin(a2) * rr * 0.85;
+        var vs = [];
+        for (j = 0; j < S; j++) {
+          var ox = ring.R[0] * ring.rx * sc * cs[j] + ring.U[0] * ring.ry * sc * sn[j], oy = ring.R[1] * ring.rx * sc * cs[j] + ring.U[1] * ring.ry * sc * sn[j], oz = ring.R[2] * ring.rx * sc * cs[j] + ring.U[2] * ring.ry * sc * sn[j];
+          var cc = o.colf ? o.colf(dir > 0 ? 1 : 0, cs[j], sn[j], ring) : (dir > 0 ? (path[n - 1].col || o.col || [0.5, 0.5, 0.5]) : (path[0].col || o.col || [0.5, 0.5, 0.5]));
+          vs.push(mb.vert(ring.p[0] + ox + ring.T[0] * off * dir, ring.p[1] + oy + ring.T[1] * off * dir, ring.p[2] + oz + ring.T[2] * off * dir, cc, o.cls || 0, o.fl != null ? o.fl : 1, wt));
+        }
+        cap.push(vs);
+      }
+      var apexC = o.colf ? o.colf(dir > 0 ? 1 : 0, 0, 0, ring) : (dir > 0 ? (path[n - 1].col || o.col || [0.5, 0.5, 0.5]) : (path[0].col || o.col || [0.5, 0.5, 0.5]));
+      var apex = mb.vert(ring.p[0] + ring.T[0] * rr * dir, ring.p[1] + ring.T[1] * rr * dir, ring.p[2] + ring.T[2] * rr * dir, apexC, o.cls || 0, o.fl != null ? o.fl : 1, wt);
+      var seq = [ring.v].concat(cap);
+      for (k = 0; k < seq.length - 1; k++) {
+        var A = seq[k], B = seq[k + 1];
+        for (j = 0; j < S; j++) {
+          var j2 = (j + 1) % S;
+          if (dir > 0) { mb.tri(A[j], B[j], A[j2]); mb.tri(A[j2], B[j], B[j2]); } else { mb.tri(A[j], A[j2], B[j]); mb.tri(A[j2], B[j2], B[j]); }
+        }
+      }
+      var L = seq[seq.length - 1];
+      for (j = 0; j < S; j++) { var j2 = (j + 1) % S; if (dir > 0) mb.tri(L[j], apex, L[j2]); else mb.tri(L[j], L[j2], apex); }
+    }
+    function pathW(pt) { return pt.wt || (o.wtf ? o.wtf(pt === path[0] ? 0 : n - 1, pt === path[0] ? 0 : 1) : o.wt); }
+    for (i = 0; i < n - 1; i++) {
+      var A = rings[i].v, B = rings[i + 1].v;
+      for (j = 0; j < S; j++) { var j2 = (j + 1) % S; mb.tri(A[j], B[j], A[j2]); mb.tri(A[j2], B[j], B[j2]); }
+    }
+    if (o.cap1 !== "none") closeRound(rings[n - 1], 1, o.capn);
+    if (o.cap0 !== "none") closeRound(rings[0], -1, o.capn);
+    mb.smooth(mk);
+    return rings;
+  }
+  // Elipsoid: o={c:[x,y,z], r:[rx,ry,rz], rot:[ex,ey,ez], seg, st, col, cls, wt|wf(p), fl, skew:[ax,k] , colf(p)}
+  function blob(mb, o) {
+    var S = o.seg || 8, St = o.st || max(4, S >> 1), mk = mb.mark(), i, j, c = o.c, r = o.r, rot = o.rot;
+    var grid = [];
+    for (i = 0; i <= St; i++) {
+      var ph = -PI / 2 + (i / St) * PI, cp = cos(ph), sp = sin(ph), row = [];
+      for (j = 0; j < S; j++) {
+        var th = (j / S) * TAU;
+        var lx = cp * cos(th), ly = sp, lz = cp * sin(th);
+        var px = lx * r[0], py = ly * r[1], pz = lz * r[2];
+        if (o.taper) { var ax = o.taper[0], k = o.taper[1]; var q = ax === 0 ? lx : ax === 1 ? ly : lz; var f = 1 + k * q; if (ax !== 0) px *= f; if (ax !== 1) py *= f; if (ax !== 2) pz *= f; }
+        var p = [px, py, pz];
+        if (rot) p = rot3(p, rot);
+        p = [p[0] + c[0], p[1] + c[1], p[2] + c[2]];
+        var wt = o.wf ? o.wf(p) : o.wt;
+        var col = o.colf ? o.colf(p, ly) : (o.col || [0.5, 0.5, 0.5]);
+        row.push(mb.vert(p[0], p[1], p[2], col, o.cls || 0, o.fl != null ? o.fl : 1, wt));
+      }
+      grid.push(row);
+    }
+    for (i = 0; i < St; i++) for (j = 0; j < S; j++) {
+      var j2 = (j + 1) % S, a = grid[i][j], b = grid[i][j2], cc = grid[i + 1][j], d = grid[i + 1][j2];
+      mb.tri(a, cc, b); mb.tri(b, cc, d);
+    }
+    mb.smooth(mk);
+  }
+  // Parametrik yüzey (iki yüzlü yaprak): fn(u,v)->[x,y,z]; u,v in [0,1]; th kalınlık
+  function sheet(mb, o) {
+    var nu = o.nu || 4, nv = o.nv || 3, mk = mb.mark(), i, j, th = o.th == null ? 0.004 : o.th;
+    var P = [];
+    for (i = 0; i <= nu; i++) { var row = []; for (j = 0; j <= nv; j++) row.push(o.fn(i / nu, j / nv)); P.push(row); }
+    function norm(i, j) {
+      var a = P[min(nu, i + 1)][j], b = P[max(0, i - 1)][j], c = P[i][min(nv, j + 1)], d = P[i][max(0, j - 1)];
+      return vnorm(vcross(vsub(a, b), vsub(c, d)));
+    }
+    var sides = o.one ? [1] : [1, -1];
+    sides.forEach(function (sd) {
+      var g = [];
+      for (i = 0; i <= nu; i++) { var row = []; for (j = 0; j <= nv; j++) {
+        var n = norm(i, j), p = P[i][j];
+        var wt = o.wf ? o.wf(p, i / nu, j / nv) : o.wt;
+        var cc = o.colf ? o.colf(i / nu, j / nv, sd) : (sd > 0 ? (o.col || [0.5, 0.5, 0.5]) : (o.col2 || o.col || [0.5, 0.5, 0.5]));
+        var k = mb.vert(p[0] + n[0] * th * sd, p[1] + n[1] * th * sd, p[2] + n[2] * th * sd, cc, o.cls == null ? 5 : o.cls, o.fl != null ? o.fl : 0, wt);
+        row.push(k);
+      } g.push(row); }
+      for (i = 0; i < nu; i++) for (j = 0; j < nv; j++) {
+        var a = g[i][j], b = g[i][j + 1], c = g[i + 1][j], d = g[i + 1][j + 1];
+        if (sd > 0) { mb.tri(a, b, c); mb.tri(b, d, c); } else { mb.tri(a, c, b); mb.tri(b, c, d); }
+      }
+    });
+    mb.smooth(mk);
+  }
+  // Tüy tutamı (ince, sivrilen çift yüzlü şerit): base, yön, uzunluk, genişlik, kıvrım(yerçekimi)
+  function tuftTri(mb, o) {
+    var b = o.b, d = vnorm(o.d), L = o.len, w = o.w, g = o.g || 0, nrm = o.n || [0, 1, 0];
+    var side = vnorm(vcross(d, abs(d[1]) > 0.9 ? [0, 0, 1] : [0, 1, 0]));
+    var mk = mb.mark(), seg = o.seg || 2, rows = [], i;
+    var col = o.col, col2 = o.col2 || o.col;
+    for (i = 0; i <= seg; i++) {
+      var t = i / seg, wd = w * (1 - t * 0.92) * 0.5;
+      var p = [b[0] + d[0] * L * t, b[1] + d[1] * L * t - g * L * t * t, b[2] + d[2] * L * t];
+      var cc = col2 && o.grad ? mixc(col, col2, t) : col;
+      var wt = o.wt;
+      rows.push([mb.vert(p[0] - side[0] * wd, p[1] - side[1] * wd, p[2] - side[2] * wd, cc, o.cls || 1, 0, wt), mb.vert(p[0] + side[0] * wd, p[1] + side[1] * wd, p[2] + side[2] * wd, cc, o.cls || 1, 0, wt)]);
+    }
+    for (i = 0; i < seg; i++) {
+      var a = rows[i][0], bb = rows[i][1], c = rows[i + 1][0], dd = rows[i + 1][1];
+      mb.tri(a, c, bb); mb.tri(bb, c, dd);
+      mb.tri(a, bb, c); mb.tri(bb, dd, c); // arka yüz (çift yüz)
+    }
+    // normaller: dışa doğru yumuşak
+    for (var k = mk[0]; k < mb.nv; k++) mb.setN(k, nrm);
+  }
+
+  // ---------- kamu: Catmull-Rom ile yol örnekleme ----------
+  function catmull(pts, n) {
+    var out = [], m = pts.length;
+    if (m < 3) { for (var i = 0; i < n; i++) out.push(vlerp(pts[0], pts[m - 1], n > 1 ? i / (n - 1) : 0)); return out; }
+    for (var i2 = 0; i2 < n; i2++) {
+      var t = (i2 / (n - 1)) * (m - 1), k = min(m - 2, Math.floor(t)), f = t - k;
+      var p0 = pts[max(0, k - 1)], p1 = pts[k], p2 = pts[k + 1], p3 = pts[min(m - 1, k + 2)], f2 = f * f, f3 = f2 * f;
+      var r = [0, 0, 0];
+      for (var c = 0; c < 3; c++) r[c] = 0.5 * ((2 * p1[c]) + (-p0[c] + p2[c]) * f + (2 * p0[c] - 5 * p1[c] + 4 * p2[c] - p3[c]) * f2 + (-p0[c] + 3 * p1[c] - 3 * p2[c] + p3[c]) * f3);
+      out.push(r);
+    }
+    return out;
+  }
+  // profil enterpolasyonu: [[t,v],...]
+  function prof(arr, t) {
+    if (t <= arr[0][0]) return arr[0][1];
+    for (var i = 1; i < arr.length; i++) if (t <= arr[i][0]) { var a = arr[i - 1], b = arr[i], f = (t - a[0]) / (b[0] - a[0] || 1); f = f * f * (3 - 2 * f); return a[1] + (b[1] - a[1]) * f; }
+    return arr[arr.length - 1][1];
+  }
+
+  return {
+    init: init, MB: MB, Rig: Rig, tube: tube, blob: blob, sheet: sheet, tuftTri: tuftTri, chainW: chainW, catmull: catmull, prof: prof,
+    util: { clamp: clamp, lerp: lerp, sstep: sstep, vadd: vadd, vsub: vsub, vmul: vmul, vdot: vdot, vcross: vcross, vlen: vlen, vnorm: vnorm, vlerp: vlerp, rot3: rot3, hashStr: hashStr, rng: rng, lin: lin, mixc: mixc, shade: shade },
+    get T() { return { V3: V3, Q4: Q4, M4: M4, Bone: Bone, Skel: Skel, SMesh: SMesh, Mesh: Mesh, Mat: Mat, Col: Col, Grp: Grp, Sph: Sph, EulerC: EulerC }; },
+  };
+})();
+
+
+// ---- sg2_mat.js ----
+// ---- SG:SPECIES MALZEME: deri/tüy/pul/tüy-tüy desen gölgelendiricisi + kürk katmanları ----
+var SgMat = (function () {
+  "use strict";
+  var E = SgEng, U = E.util;
+  var GLSL_NOISE = [
+    "float sgh(vec3 p){ p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }",
+    "vec3 sgh3(vec3 p){ return vec3(sgh(p), sgh(p + 31.7), sgh(p + 71.3)); }",
+    "float sgn(vec3 p){ vec3 i = floor(p); vec3 f = fract(p); f = f*f*(3.0-2.0*f);",
+    "  return mix(mix(mix(sgh(i), sgh(i+vec3(1,0,0)), f.x), mix(sgh(i+vec3(0,1,0)), sgh(i+vec3(1,1,0)), f.x), f.y),",
+    "             mix(mix(sgh(i+vec3(0,0,1)), sgh(i+vec3(1,0,1)), f.x), mix(sgh(i+vec3(0,1,1)), sgh(i+vec3(1,1,1)), f.x), f.y), f.z); }",
+    "float sgf(vec3 p){ return sgn(p) * 0.6 + sgn(p * 2.3 + 5.1) * 0.3 + sgn(p * 5.1 + 2.7) * 0.1; }",
+    // worley: x = F1, y = F2, z = hücre rastgelesi
+    "vec3 sgw(vec3 p){ vec3 i = floor(p); vec3 f = fract(p); float d1 = 9.0, d2 = 9.0, id = 0.0;",
+    "  for (int x = -1; x <= 1; x++) for (int y = -1; y <= 1; y++) for (int z = -1; z <= 1; z++) {",
+    "    vec3 g = vec3(float(x), float(y), float(z)); vec3 o = sgh3(i + g); vec3 r = g + o - f; float d = dot(r, r);",
+    "    if (d < d1) { d2 = d1; d1 = d; id = o.x; } else if (d < d2) d2 = d; }",
+    "  return vec3(sqrt(d1), sqrt(d2), id); }",
+  ].join("\n");
+
+  var VERT_DECL = "attribute vec2 aMeta;\nvarying vec3 vFP;\nvarying vec3 vWN;\nvarying vec2 vMeta;\nvarying float vFT;\nuniform float uFT;\nuniform float uFL;\n";
+  var FRAG_DECL = [
+    "varying vec3 vFP;", "varying vec3 vWN;", "varying vec2 vMeta;", "varying float vFT;",
+    "uniform vec3 uBel; uniform vec3 uPC; uniform vec3 uPC2; uniform vec4 uPat; uniform vec4 uPat2; uniform vec4 uCS; uniform vec3 uTint; uniform vec2 uTex; uniform vec4 uFur; uniform vec3 uTip;",
+    GLSL_NOISE,
+  ].join("\n");
+
+  // Ana boyama: sınıfa göre desen, karşı gölgelendirme, mikro doku
+  var FRAG_COLOR = [
+    "{",
+    "  vec3 wn = normalize(vWN);",
+    "  float cls = vMeta.x;",
+    "  float solid = step(0.5, cls) * step(cls, 1.5);",
+    "  float pm = cls < 0.5 ? 1.0 : cls < 1.5 ? 0.0 : cls < 2.5 ? uPat2.x : cls < 3.5 ? uPat2.y : cls < 4.5 ? uPat2.z : 0.55;",
+    "  vec3 p = vFP + vec3(uPat2.w * 7.3, uPat2.w * 3.1, uPat2.w * 5.7);",
+    "  vec3 col = diffuseColor.rgb;",
+    "  float bl = smoothstep(uCS.y, uCS.y - 0.8, wn.y);",
+    "  float bk = smoothstep(0.25, 1.0, wn.y);",
+    "  if (solid < 0.5) {",
+    "    col = mix(col, uBel, uCS.x * bl);",
+    "    col *= 1.0 - 0.2 * bk * uCS.x;",
+    "    float k = uPat.x;",
+    "    if (k > 0.5 && pm > 0.01) {",
+    "      float m = 0.0; float sc = uPat.y;",
+    "      if (k < 1.5) { vec3 w = sgw(p * sc); float r = 0.14 + 0.26 * w.z; m = (1.0 - smoothstep(r * (1.0 - uPat.w), r, w.x)) * step(1.0 - uPat.z, w.z + 0.3); }",
+    "      else if (k < 2.5) { vec3 w = sgw(p * sc); float r = 0.24 + 0.16 * w.z; float on = step(1.0 - uPat.z, w.z + 0.3); float ring = smoothstep(r * 0.5, r * 0.66, w.x) * (1.0 - smoothstep(r * 0.92, r, w.x)); m = ring * on; col = mix(col, col * 0.85 + uPC2 * 0.08, (1.0 - smoothstep(r * 0.46, r * 0.6, w.x)) * 0.7 * on); }",
+    "      else if (k < 3.5) { vec3 q = p; q.x = abs(q.x); float ax = (cls > 2.5 && cls < 3.5) ? q.y * 1.5 : q.z; float s = ax * sc + q.y * sc * 0.28 + (sgf(q * sc * 0.55) - 0.5) * 2.6 * uPat.w; float v = abs(fract(s) - 0.5) * 2.0; m = smoothstep(uPat.z, uPat.z - 0.07, v); m *= (1.0 - bl * 0.9); }",
+    "      else if (k < 4.5) { float n = sgf(p * sc); m = smoothstep(uPat.z - uPat.w, uPat.z + uPat.w, n); }",
+    "      else if (k < 5.5) { m = smoothstep(0.3, 0.75, wn.y) * (1.0 - smoothstep(0.25, 0.7, abs(p.z * sc - uPat.z * 0.0))) * 0.95; m *= 0.85 + 0.15 * sgn(p * 7.0); }",
+    "      else if (k < 6.5) { float n = sgn(p * sc * 3.0) * 0.55 + sgn(p * sc * 9.0) * 0.45; m = smoothstep(uPat.z, uPat.z + uPat.w, n); }",
+    "      else if (k < 7.5) { vec3 w = sgw(p * sc); float ln = 1.0 - smoothstep(uPat.z * 0.12, uPat.z * 0.12 + uPat.w * 0.12, w.y - w.x); col = mix(col, uPC * (0.78 + 0.45 * w.z), (1.0 - ln) * pm); }",
+    "      else if (k < 8.5) { float s = sin(p.z * sc * 6.2831 + sgn(p * 2.0) * 2.0) * 0.5 + 0.5; m = smoothstep(uPat.z, uPat.z + uPat.w, s) * ((cls > 1.5 && cls < 2.5) ? 1.0 : 0.0); }",
+    "      else if (k < 9.5) { m = smoothstep(0.5, 0.92, wn.y) * (1.0 - smoothstep(uPat.z * 0.6, uPat.z * 0.6 + 0.04, abs(p.x * sc))); }",
+    "      else if (k < 10.5) { float s = sin(p.y * sc * 6.2831 + sgn(p * 1.5) * 1.5); m = smoothstep(uPat.z, uPat.z + uPat.w, s) * (1.0 - bl * 0.6); }",
+    "      else { float n = sgf(p * sc * vec3(1.0, 1.0, 0.45)); m = smoothstep(uPat.z - uPat.w, uPat.z + uPat.w, n); }",
+    "      col = mix(col, uPC, clamp(m, 0.0, 1.0) * pm);",
+    "    }",
+    "    float tx = uCS.w; float tsc = uTex.x;",
+    "    if (tx > 0.5 && tx < 1.5) { col *= 0.94 + 0.12 * sgn(p * tsc); col *= 1.0 + (sgf(p * 7.0) - 0.5) * uCS.z * 2.0; }",
+    "    else if (tx > 1.5 && tx < 2.5) { vec3 w = sgw(p * tsc); col *= 0.74 + 0.34 * (1.0 - smoothstep(0.12, 0.55, w.x)); col *= 1.0 + (sgf(p * 5.0) - 0.5) * uCS.z * 2.0; }",
+    "    else if (tx > 2.5 && tx < 3.5) { vec3 w = sgw(p * tsc * vec3(1.0, 1.0, 0.6)); col *= 1.12 - 0.4 * smoothstep(0.18, 0.62, w.x); col *= 1.0 + (sgf(p * 6.0) - 0.5) * uCS.z * 2.0; }",
+    "    else if (tx > 3.5) { col *= 1.0 + (sgf(p * 9.0) - 0.5) * uCS.z; }",
+    "    else { col *= 1.0 + (sgf(p * 8.0) - 0.5) * uCS.z * 2.0; }",
+    "  }",
+    "  diffuseColor.rgb = col * uTint;",
+    "}",
+  ].join("\n");
+
+  var FUR_FRAG = [
+    "{",
+    "  float cls2 = vMeta.x;",
+    "  if (cls2 > 0.5 && cls2 < 1.5) discard;",
+    "  if (vMeta.y < 0.04) discard;",
+    "  float T = vFT;",
+    "  vec3 q = vFP * uFur.x;",
+    "  vec3 cell = floor(q);",
+    "  vec3 jit = sgh3(cell) - 0.5;",
+    "  vec3 f = fract(q) - 0.5 - jit * 0.55;",
+    "  float rr = (0.42 - 0.3 * T) * uFur.y;",
+    "  float keep = sgh(cell + 3.7);",
+    "  if (dot(f, f) > rr * rr || keep < 0.12 + T * 0.45 * uFur.z) discard;",
+    "  diffuseColor.rgb *= mix(0.55, 1.08, T) * (0.9 + 0.2 * sgh(cell + 9.1));",
+    "  diffuseColor.rgb = mix(diffuseColor.rgb, uTip * diffuseColor.rgb * 2.0, smoothstep(0.55, 1.0, T) * uFur.w);",
+    "}",
+  ].join("\n");
+
+  // P: tür boyama parametreleri; shell: {T,len,dens,...} veya null
+  function make(P, shell, inst) {
+    var T = SgEng.T;
+    var m = new T.Mat({ vertexColors: true, roughness: P.rough != null ? P.rough : 0.85, metalness: 0, side: P.side || 0 });
+    if (SGT.toonPatch) SGT.toonPatch(m, !!shell);
+    var pat = P.pat || {};
+    var kindIdx = { none: 0, spots: 1, rosette: 2, stripes: 3, patches: 4, saddle: 5, speckle: 6, reticulated: 7, rings: 8, dorsal: 9, bars: 10, blotch: 11 };
+    var kd = kindIdx[pat.k || "none"] || 0;
+    var tint = inst && inst.tint ? inst.tint : [1, 1, 1];
+    var texK = { smooth: 0, fur: 1, scales: 2, feathers: 3, chitin: 4 }[P.tex || "fur"];
+    var cs = P.cs || {};
+    var uni = {
+      uBel: { value: new T.Col(P.belly != null ? P.belly : 0xdddddd) },
+      uPC: { value: new T.Col(pat.c != null ? pat.c : 0x222222) },
+      uPC2: { value: new T.Col(pat.c2 != null ? pat.c2 : 0xffffff) },
+      uPat: { value: [kd, pat.s || 4, pat.a != null ? pat.a : 0.5, pat.soft != null ? pat.soft : 0.2] },
+      uPat2: { value: [pat.tail != null ? pat.tail : 1, pat.leg != null ? pat.leg : 1, pat.head != null ? pat.head : 0.7, (inst && inst.seed) || 0] },
+      uCS: { value: [cs.belly != null ? cs.belly : 0.6, cs.edge != null ? cs.edge : 0.15, cs.noise != null ? cs.noise : 0.14, texK] },
+      uTint: { value: tint },
+      uTex: { value: [P.texS || 60, 1] },
+      uFT: { value: shell ? shell.T : 0 },
+      uFL: { value: shell ? shell.len : 0 },
+      uFur: { value: shell ? [shell.dens, shell.thick != null ? shell.thick : 1, shell.sparse != null ? shell.sparse : 1, shell.tip != null ? shell.tip : 0] : [1, 1, 1, 0] },
+      uTip: { value: new T.Col(shell && shell.tipc != null ? shell.tipc : 0xffffff) },
+    };
+    var prev = m.onBeforeCompile, prevKey = m.customProgramCacheKey;
+    m.onBeforeCompile = function (sh, r) {
+      if (prev) prev(sh, r);
+      for (var k in uni) sh.uniforms[k] = uni[k];
+      sh.vertexShader = sh.vertexShader
+        .replace("#include <common>", "#include <common>\n" + VERT_DECL)
+        .replace("#include <begin_vertex>", "#include <begin_vertex>\nvFP = position; vMeta = aMeta; vFT = uFT; vWN = normalize(mat3(modelMatrix) * objectNormal);" +
+          (shell ? "\ntransformed += normalize(normal) * (uFL * aMeta.y) * uFT;\ntransformed.y -= uFL * aMeta.y * uFT * uFT * 0.3;" : ""));
+      sh.fragmentShader = sh.fragmentShader
+        .replace("#include <common>", "#include <common>\n" + FRAG_DECL)
+        .replace("#include <color_fragment>", "#include <color_fragment>\n" + FRAG_COLOR + (shell ? "\n" + FUR_FRAG : ""));
+    };
+    m.customProgramCacheKey = function () { return (prevKey ? prevKey.call(m) : "") + "|sgskin" + (shell ? "F" : "B"); };
+    m.userData.sgU = uni;
+    return m;
+  }
+  return { make: make };
+})();
+
+
+// ---- sg3_quad.js ----
+// ---- SG:SPECIES PLAN: dört ayaklı (memeli) gövde planı: geometri ----
+var SgQuad = (function () {
+  "use strict";
+  var E = SgEng, U = E.util, tube = E.tube, blob = E.blob, sheet = E.sheet, chainW = E.chainW;
+  var PI = Math.PI, sin = Math.sin, cos = Math.cos, abs = Math.abs, sqrt = Math.sqrt, min = Math.min, max = Math.max;
+  var lin = U.lin, mixc = U.mixc, vadd = U.vadd, vsub = U.vsub, vmul = U.vmul, vlerp = U.vlerp, rot3 = U.rot3, clamp = U.clamp, sstep = U.sstep, prof = E.prof;
+
+  var DEF = {
+    h: 0.85, len: 1.05, deep: 0.40, wid: 0.30, rumpW: 1, rumpD: 1, tuck: 0.8, withers: 0, slope: 0, belly: 0, arch: 0, post: 0,
+    neck: { len: 0.45, thick: 0.2, thin: 0.12, up: 40, n: 2, crest: 0 },
+    head: { len: 0.3, wid: 0.16, ht: 0.18, muz: 0.5, muzW: 0.55, muzH: 0.55, drop: 30, jaw: 1, nose: 0.03, fang: 0, cheek: 0, brow: 0, eye: 0.028, fwd: 0.4, slit: 0, bulge: 1 },
+    ear: { k: "cone", len: 0.12, wid: 0.07, set: 0.5, spread: 0.55, tilt: 0.3, tuft: 0 },
+    horn: { k: "none" },
+    legs: { th: 0.065, zigF: 0.15, zigB: 0.7, up: 0.34, low: 0.4, foot: "paw", fsz: 1, splay: 0, hind: 1, front: 1, fz: 1 },
+    tail: { k: "whip", len: 0.5, th: 0.04, up: 0.2, curl: 0, tuft: 0 },
+    mane: { k: "none", len: 0.1 },
+    col: { c1: 0x8a6a4a, c2: 0xd8c8a8, c3: null, c4: null, nose: 0x222222, eye: 0x2a1a0a, hoof: 0x3a302a, horn: 0xcbbf9a, inner: 0xd9a89a, tip: null, mane: null },
+    fur: { k: "short", len: 0.01, dens: 60, layers: 2 },
+  };
+  function merge(base, o) {
+    var r = {}, k;
+    for (k in base) r[k] = base[k];
+    if (o) for (k in o) { var v = o[k]; r[k] = (v && typeof v === "object" && !Array.isArray(v) && base[k] && typeof base[k] === "object") ? merge(base[k], v) : v; }
+    return r;
+  }
+
+  // gövde profili (u: 0 kalça -> 1 göğüs)
+  function backY(B, H, u) {
+    var wth = B.withers * H * Math.exp(-Math.pow((u - 0.82) / 0.16, 2));
+    return H + B.slope * H * (0.5 - u) + wth + B.arch * H * sin(PI * u) * 0.5;
+  }
+
+  function build(S, q, mbIn, B0) {
+    var B = B0;
+    var mb = mbIn || new E.MB();
+    var rig = new E.Rig();
+    var H = B.h * S, L = B.len * S, D = B.deep * S, Wd = B.wid * S;
+    var zH = -L * 0.5, zF = L * 0.5; // kalça ucu, göğüs ucu
+    var C = B.col;
+    var c1 = lin(C.c1), c2 = lin(C.c2), c3 = lin(C.c3 != null ? C.c3 : C.c1), c4 = lin(C.c4 != null ? C.c4 : C.c1), cnose = lin(C.nose), chorn = lin(C.horn), cin = lin(C.inner), chf = lin(C.hoof);
+    var cmane = lin(C.mane != null ? C.mane : C.c1), ctip = C.tip != null ? lin(C.tip) : null;
+    var fr = B.fur || {};
+    var furK = fr.k || "short";
+    var longFur = furK === "long" || furK === "wool" ? 1.25 : 1;
+    var seg = q === 0 ? 12 : q === 1 ? 8 : 6;
+    var info = { plan: "quad", legs: [], neck: [], tail: [], ears: [], S: S };
+
+    // ---- gövde profil dizileri ----
+    var rd = B.rumpD, rw = B.rumpW;
+    var depthP = [[0, D * rd * 0.5], [0.16, D * rd * 0.92], [0.34, D * (0.5 + 0.5 * B.tuck) * 0.95], [0.5, D * B.tuck], [0.74, D * 0.98], [0.92, D * 0.9], [1, D * 0.55]];
+    var widP = [[0, Wd * rw * 0.5], [0.16, Wd * rw * 0.98], [0.34, Wd * (0.55 + 0.45 * B.tuck) * 0.96], [0.5, Wd * 0.9 * (B.tuck * 0.2 + 0.8)], [0.74, Wd], [0.92, Wd * 0.95], [1, Wd * 0.62]];
+    function backAt(u) { return backY(B, H, u); }
+    function zAt(u) { return zH + u * L; }
+    function torsoCenter(u) { var d = prof(depthP, u); return backAt(u) - d * 0.5 + B.belly * S * sin(PI * u) * 0.25; }
+
+    // ---- iskelet: gövde ----
+    var hipU = 0.17, midU = 0.5, chU = 0.82;
+    var pHip = [0, torsoCenter(hipU), zAt(hipU)], pMid = [0, torsoCenter(midU), zAt(midU)], pCh = [0, torsoCenter(chU), zAt(chU)];
+    var root = rig.add("root", null, [0, 0, 0]);
+    var hips = rig.add("hips", root, pHip), mid = rig.add("mid", hips, pMid), chest = rig.add("chest", mid, pCh);
+    info.root = root; info.hips = hips; info.mid = mid; info.chest = chest;
+    info.baseY = pHip[1];
+
+    // ---- bacaklar iskeleti ----
+    var Lg = B.legs;
+    var yHipJ = torsoCenter(0.16) - prof(depthP, 0.16) * 0.12, yShJ = torsoCenter(0.86) - prof(depthP, 0.86) * 0.06;
+    function legPath(front, side) {
+      var zig = front ? Lg.zigF : Lg.zigB, J, yj = front ? yShJ : yHipJ;
+      var xo = (front ? prof(widP, 0.86) : prof(widP, 0.16)) * 0.5 * (front ? 0.62 : 0.66) + (Lg.splay || 0) * S;
+      J = [side * xo, yj, front ? zAt(0.86) : zAt(0.16)];
+      var th = front ? [-0.05 * zig * 2, 0.12 * zig * 2, 0.0] : [0.62 * zig, -0.86 * zig, 0.28 * zig];
+      if (front) th = [-0.1 * zig, 0.12 * zig, 0.02 * zig];
+      var fu = Lg.up, fl = Lg.low, ff = max(0.1, 1 - Lg.up - Lg.low);
+      var lens = [fu, fl, ff];
+      var vsum = 0; for (var i = 0; i < 3; i++) vsum += lens[i] * cos(th[i]);
+      var sc = J[1] / vsum, pts = [J], p = J.slice();
+      for (i = 0; i < 3; i++) { p = [p[0], p[1] - cos(th[i]) * lens[i] * sc, p[2] + sin(th[i]) * lens[i] * sc]; pts.push(p); }
+      return { pts: pts, lens: [lens[0] * sc, lens[1] * sc, lens[2] * sc], th: th, front: front, side: side };
+    }
+    var legDefs = [["FL", 1, 1], ["FR", 1, -1], ["BL", 0, 1], ["BR", 0, -1]];
+    var legRigs = [];
+    legDefs.forEach(function (d) {
+      var lp = legPath(!!d[1], d[2]);
+      var par = d[1] ? chest : hips;
+      var bu = rig.add(d[0] + "_u", par, lp.pts[0]), bl = rig.add(d[0] + "_l", bu, lp.pts[1]), bf = rig.add(d[0] + "_f", bl, lp.pts[2]);
+      var th0 = [0, 0, 0];
+      // dikeyden ileri açı (rest)
+      for (var i = 0; i < 3; i++) { var dv = vsub(lp.pts[i + 1], lp.pts[i]); th0[i] = Math.atan2(dv[2], -dv[1]); }
+      var legLen = lp.pts[0][1];
+      info.legs.push({ key: d[0], front: d[1], side: d[2], ids: [bu, bl, bf], P: lp.pts, L: [vlen3(vsub(lp.pts[1], lp.pts[0])), vlen3(vsub(lp.pts[2], lp.pts[1])), vlen3(vsub(lp.pts[3], lp.pts[2]))], th0: th0, par: par, bend: d[1] ? -1 : 1, legLen: legLen, J: lp.pts[0] });
+      legRigs.push({ lp: lp, ids: [bu, bl, bf], d: d });
+    });
+    function vlen3(v) { return sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]); }
+
+    // ---- boyun iskeleti ----
+    var Nk = B.neck, nN = Nk.n || 2;
+    var up = Nk.up * PI / 180;
+    var nBase = [0, backAt(0.97) - prof(depthP, 0.97) * (0.35 + Nk.thick * 0.0) + 0.0, zAt(0.96)];
+    nBase[1] = backAt(0.94) - prof(depthP, 0.94) * 0.42;
+    var nLen = Nk.len * S;
+    var nDir = [0, sin(up), cos(up)];
+    var nIds = [], nPos = [];
+    for (var i = 0; i < nN; i++) { var pp = vadd(nBase, vmul(nDir, nLen * i / nN)); nPos.push(pp); nIds.push(rig.add("neck" + (i + 1), i === 0 ? chest : nIds[i - 1], pp)); }
+    var headP = vadd(nBase, vmul(nDir, nLen));
+    var head = rig.add("head", nIds[nN - 1], headP);
+    var jawJ = [0, -B.head.ht * S * 0.18, B.head.len * S * 0.22];
+    var jawW = vadd(headP, rot3(jawJ, [B.head.drop * PI / 180, 0, 0]));
+    var jaw = rig.add("jaw", head, jawW);
+    info.neck = nIds; info.head = head; info.jaw = jaw; info.nBase = nBase; info.nDir = nDir; info.headP = headP;
+    // kulaklar
+    var Hd = B.head, hl = Hd.len * S, hw = Hd.wid * S, hh = Hd.ht * S, drop = Hd.drop * PI / 180;
+    function HF(p) { var r = rot3(p, [drop, 0, 0]); return [headP[0] + r[0], headP[1] + r[1], headP[2] + r[2]]; }
+    var Er = B.ear, earIds = [], earPos = [];
+    if (Er.k !== "none") {
+      for (var si = 0; si < 2; si++) {
+        var sd = si ? -1 : 1;
+        var ep = HF([sd * hw * (0.28 + Er.spread * 0.22), hh * (0.18 + Er.set * 0.3), hl * 0.12]);
+        earPos.push(ep);
+        earIds.push(rig.add(si ? "earR" : "earL", head, ep));
+      }
+    }
+    info.ears = earIds;
+    // kuyruk iskeleti
+    var Tl = B.tail, nT = Tl.k === "none" ? 0 : (Tl.k === "stub" || Tl.k === "rabbit") ? 1 : 3;
+    var tIds = [], tPos = [];
+    var tBase = [0, backAt(0.02) - prof(depthP, 0.0) * 0.35 - D * 0.05, zH - D * 0.05];
+    var tUp = Tl.up;
+    function tailPath(n) {
+      var pts = [], len = Tl.len * S, curl = Tl.curl;
+      var ang = tUp * 1.2, p = tBase.slice();
+      for (var i = 0; i <= n; i++) {
+        pts.push(p.slice());
+        var t = i / n, a = ang + (Tl.k === "curl" ? t * 3.0 * (Tl.curl || 1) : Tl.k === "plume" ? -1.2 * t + 0.4 : curl * t * 1.4 * (Tl.k === "tuft" ? -1 : 1)) ;
+        if (Tl.k === "tuft" || Tl.k === "whiptuft") a = ang * (1 - t) - 1.1 * t * 0 - (Tl.hang != null ? Tl.hang : 0.9) * t;
+        p = [p[0], p[1] + sin(a) * len / n, p[2] - cos(a) * len / n];
+      }
+      return pts;
+    }
+    var tPath = nT ? tailPath(nT) : null;
+    if (nT) for (i = 0; i < nT; i++) tIds.push(rig.add("tail" + (i + 1), i === 0 ? hips : tIds[i - 1], tPath[i]));
+    info.tail = tIds; info.tailPath = tPath;
+    info.drop = drop; info.hl = hl;
+
+    // ================= GEOMETRİ =================
+    // --- gövde ---
+    var N = q === 0 ? 14 : q === 1 ? 9 : 6;
+    var tPts = [];
+    for (i = 0; i <= N; i++) {
+      var u = i / N, d = prof(depthP, u), w = prof(widP, u);
+      tPts.push({ p: [0, torsoCenter(u), zAt(u)], rx: w * 0.5, ry: d * 0.5, wt: chainW([hips, mid, chest], ((u - hipU) / (chU - hipU)) * 2, 0.35), col: c1 });
+    }
+    tube(mb, tPts, { seg: seg, cls: 0, fl: 1, cap0: "round", cap1: "round", e: 2.3 });
+    // --- boyun ---
+    var neckPts = [], NN = q === 0 ? 7 : q === 1 ? 5 : 3;
+    var nbR = Nk.thick * S * 0.5, ntR = Nk.thin * S * 0.5;
+    for (i = 0; i <= NN; i++) {
+      var t = i / NN, p = vadd(vsub(nBase, vmul(nDir, nLen * 0.0)), vmul(nDir, nLen * (t * 1.0)));
+      if (Nk.crest) p = [p[0], p[1] + Nk.crest * S * sin(PI * t) * 0.5, p[2]];
+      var r = lerp3(nbR, ntR, Math.pow(t, 0.8));
+      neckPts.push({ p: p, rx: r * 0.9, ry: r * (1 + Nk.crest * 0.4), wt: chainW([chest].concat(nIds, [head]), 1 + t * nN, 0.3), col: c1 });
+    }
+    // boyun tabanı göğse gömülü
+    neckPts.unshift({ p: vsub(nBase, vmul(nDir, nLen * 0.12)), rx: nbR * 1.05, ry: nbR * 1.05, wt: [chest, 1], col: c1 });
+    tube(mb, neckPts, { seg: seg, cls: 0, fl: 1, cap0: "round", cap1: "none", e: 2.1 });
+
+    // --- kafa ---
+    var headW = [head, 1];
+    var cranC = HF([0, hh * 0.05, hl * 0.26]);
+    blob(mb, { c: cranC, r: [hw * 0.5, hh * 0.52, hl * 0.36], rot: [drop, 0, 0], seg: seg + 2, st: seg >> 1, col: mixc(c1, c4, 0.25), cls: 4, fl: 0.6, wt: headW });
+    // yüz uzantısı (burun/namlu)
+    var mw = hw * Hd.muzW, mh = hh * Hd.muzH, mz0 = hl * 0.32, mz1 = hl * 0.98;
+    var mCols = function (t) { return mixc(mixc(c1, c4, 0.35), c4, t); };
+    var mp = [];
+    var MN = q === 0 ? 5 : 3;
+    for (i = 0; i <= MN; i++) {
+      var tt = i / MN, zz = lerp3(mz0, mz1, tt);
+      var tp = 1 - Math.pow(tt, 2.6) * 0.18, r2 = Hd.bulge || 1;
+      mp.push({ p: HF([0, -hh * (0.1 + 0.07 * tt) - (Hd.dish ? 0 : 0), zz]), rx: mw * 0.5 * (1 - 0.38 * Math.pow(tt, 1.4)) * tp, ry: mh * 0.5 * (1 - 0.28 * Math.pow(tt, 1.6)), wt: headW, col: mCols(tt) });
+    }
+    var muzTube = tube(mb, mp, { seg: seg, cls: 4, fl: 0.2, cap0: "none", cap1: "round", e: 2.4, ref: rot3([0, 1, 0], [drop, 0, 0]) });
+    // burun
+    var noseR = Hd.nose * S;
+    if (noseR > 0.001) blob(mb, { c: HF([0, -hh * 0.17, hl * 0.99]), r: [noseR * (Hd.noseW || 1.15), noseR * 0.8, noseR * 0.8], rot: [drop, 0, 0], seg: 6, st: 4, col: cnose, cls: 1, fl: 0, wt: headW });
+    // alt çene
+    var jawW2 = [jaw, 1];
+    var jp = [], JN = q === 0 ? 4 : 2;
+    var jlen = hl * 0.72 * (Hd.jaw || 1);
+    for (i = 0; i <= JN; i++) {
+      var tj = i / JN;
+      jp.push({ p: HF([0, -hh * (0.3 + 0.08 * tj) - 0.0, hl * 0.2 + jlen * tj]), rx: mw * 0.44 * (1 - 0.55 * tj * tj) * (1 + (1 - tj) * 0.25), ry: mh * 0.34 * (1 - 0.3 * tj) + hh * 0.05 * (1 - tj), wt: tj < 0.12 ? [head, 0.5, jaw, 0.5] : jawW2, col: mixc(c4, c2, 0.4) });
+    }
+    tube(mb, jp, { seg: max(6, seg - 2), cls: 4, fl: 0.2, cap0: "round", cap1: "round", e: 2.2, ref: rot3([0, 1, 0], [drop, 0, 0]) });
+    // yanaklar/kaş
+    if (Hd.cheek && q < 2) for (si = -1; si <= 1; si += 2) blob(mb, { c: HF([si * hw * 0.38, -hh * 0.05, hl * 0.3]), r: [hw * 0.2 * Hd.cheek, hh * 0.3, hl * 0.2], rot: [drop, 0, 0], seg: 6, st: 4, col: c1, cls: 4, fl: 1.2, wt: headW });
+    if (Hd.brow && q < 2) for (si = -1; si <= 1; si += 2) blob(mb, { c: HF([si * hw * 0.34, hh * 0.28, hl * 0.4]), r: [hw * 0.2, hh * 0.1 * Hd.brow, hl * 0.14], rot: [drop, 0, 0], seg: 6, st: 4, col: shadeC(c1, 0.9), cls: 4, fl: 0.6, wt: headW });
+    if (Hd.fang && q === 0) for (si = -1; si <= 1; si += 2) {
+      var fl = hl * 0.07 * Hd.fang;
+      tube(mb, [{ p: HF([si * mw * 0.28, -hh * 0.2, hl * 0.86]), rx: hl * 0.014, ry: hl * 0.014, wt: headW, col: [0.92, 0.9, 0.82] }, { p: HF([si * mw * 0.28, -hh * 0.2 - fl, hl * 0.87]), rx: 0.0005, ry: 0.0005, wt: headW, col: [0.92, 0.9, 0.82] }], { seg: 5, cls: 1, fl: 0, cap0: "none", cap1: "none" });
+      tube(mb, [{ p: HF([si * mw * 0.22, -hh * 0.3, hl * 0.86]), rx: hl * 0.012, ry: hl * 0.012, wt: jawW2, col: [0.92, 0.9, 0.82] }, { p: HF([si * mw * 0.22, -hh * 0.3 + fl * 0.8, hl * 0.87]), rx: 0.0005, ry: 0.0005, wt: jawW2, col: [0.92, 0.9, 0.82] }], { seg: 5, cls: 1, fl: 0, cap0: "none", cap1: "none" });
+    }
+    // gözler
+    var er = Hd.eye * S;
+    for (si = -1; si <= 1; si += 2) {
+      var fwd = Hd.fwd;
+      var ec = HF([si * hw * lerp3(0.47, 0.36, fwd), hh * 0.2, hl * lerp3(0.34, 0.5, fwd)]);
+      if (q < 2) {
+        blob(mb, { c: ec, r: [er * 0.9, er * 1.0, er * 0.8], rot: [drop, 0, 0], seg: 8, st: 5, col: lin(C.eye), cls: 1, fl: 0, wt: headW });
+        if (Hd.slit) blob(mb, { c: vadd(ec, rot3([si * er * 0.35, 0, er * 0.5], [drop, 0, 0])), r: [er * 0.2, er * 0.78, er * 0.3], rot: [drop, 0, 0], seg: 6, st: 4, col: [0.01, 0.01, 0.01], cls: 1, fl: 0, wt: headW });
+        else blob(mb, { c: vadd(ec, rot3([si * er * 0.3, 0, er * 0.45], [drop, 0, 0])), r: [er * 0.52, er * 0.55, er * 0.35], rot: [drop, 0, 0], seg: 6, st: 4, col: [0.012, 0.01, 0.01], cls: 1, fl: 0, wt: headW });
+        if (q === 0) blob(mb, { c: vadd(ec, rot3([si * er * 0.5, er * 0.4, er * 0.7], [drop, 0, 0])), r: [er * 0.2, er * 0.2, er * 0.14], seg: 5, st: 3, col: [1, 1, 1], cls: 1, fl: 0, wt: headW });
+      } else blob(mb, { c: ec, r: [er * 0.8, er * 0.9, er * 0.7], seg: 5, st: 3, col: [0.02, 0.015, 0.012], cls: 1, fl: 0, wt: headW });
+    }
+    // kulaklar
+    if (Er.k !== "none") for (si = 0; si < 2; si++) buildEar(mb, B, S, q, earPos[si], si ? -1 : 1, earIds[si], head, drop, hl, hh, hw, c1, c4, cin);
+
+    // boynuzlar
+    buildHorns(mb, B, S, q, headP, drop, head, hl, hh, hw, chorn, c1);
+
+    // --- bacaklar ---
+    legRigs.forEach(function (lr) {
+      var front = lr.d[1], side = lr.d[2], P = lr.lp.pts, ids = lr.ids;
+      var th = Lg.th * S, thr = front ? [2.5, 1.7, 0.95, 0.78] : [3.4, 2.0, 0.85, 0.8];
+      var path = [], lastT = 0;
+      var lens = lr.lp.lens, total = lens[0] + lens[1] + lens[2];
+      var NS = q === 0 ? 4 : q === 1 ? 3 : 2;
+      for (var k = 0; k < 3; k++) {
+        for (var s = (k === 0 ? 0 : 1); s <= NS; s++) {
+          var f = s / NS, p = vlerp(P[k], P[k + 1], f);
+          var gt = (sumTo(lens, k) + lens[k] * f) / total;
+          // yarıçap: kalçada kalın, kanonda ince, bilekte düğüm
+          var rpr = prof([[0, thr[0]], [0.3, thr[1]], [0.52, thr[2] * 1.12], [0.62, thr[2] * 0.82], [0.88, thr[3] * 0.8], [1, thr[3] * 0.95]], gt);
+          var rr2 = th * 0.5 * rpr;
+          var cc = gt > 0.55 ? mixc(c1, c3, sstep(0.5, 0.75, gt)) : c1;
+          path.push({ p: p, rx: rr2 * (front ? 0.95 : 0.85), ry: rr2, wt: chainW(ids, k + f, 0.28), col: cc, fl: gt > 0.6 ? 0.4 : 0.9 });
+        }
+      }
+      tube(mb, path, { seg: max(6, seg - 3), cls: 3, cap0: "none", cap1: "none", e: 2.2, ref: [1, 0, 0] });
+      // ayak
+      buildFoot(mb, B, S, q, P[3], P[2], ids[2], lr, front, c1, c3, chf, th);
+    });
+
+    // --- kuyruk ---
+    if (nT) buildTail(mb, B, S, q, tPath, tIds, hips, c1, c2, ctip, cmane, seg);
+    // --- yele ---
+    if (B.mane.k !== "none" && q < 2) buildMane(mb, B, S, q, nBase, nDir, nLen, nIds, chest, head, headP, drop, hl, hh, hw, cmane, c1, chU, zAt, backAt, hips, mid);
+    // gömlek: küçük hayvanlarda kürk uzunluğu
+    info.furK = furK;
+    info.rig = rig;
+    info.mb = mb;
+    info.dims = { H: H, L: L, D: D, headY: headP[1], headZ: headP[2] };
+    return info;
+  }
+
+  function lerp3(a, b, t) { return a + (b - a) * t; }
+  function sumTo(a, k) { var s = 0; for (var i = 0; i < k; i++) s += a[i]; return s; }
+  function shadeC(c, f) { return [c[0] * f, c[1] * f, c[2] * f]; }
+
+  function buildEar(mb, B, S, q, ep, sd, earId, head, drop, hl, hh, hw, c1, c4, cin) {
+    var E_ = B.ear, k = E_.k, L = E_.len * S, W = E_.wid * S;
+    if (k === "none") return;
+    var spread = E_.spread, tilt = E_.tilt;
+    // yön: yukarı-dışa (+ geri)
+    var axis, side, nrm;
+    var rotE;
+    var yaw = sd * (0.35 + spread * 0.9), pitch = -(0.25 + tilt * 0.5);
+    if (k === "flop") { yaw = sd * (1.3 + spread * 0.3); pitch = -0.1; }
+    axis = rot3(rot3([0, 1, 0], [0, 0, -yaw]), [0, 0, 0]);
+    axis = vnorm3([sin(yaw) * 0.9, cos(yaw) * (1 - tilt * 0.4), -tilt * 0.55 + (k === "flop" ? -0.2 : 0.05)]);
+    if (k === "flop") axis = vnorm3([sd * 0.55, -0.85, 0.1]);
+    axis = rot3(axis, [drop, 0, 0]);
+    var sidev = vnorm3(cross3(axis, rot3([0, 0, 1], [drop, 0, 0]))); // genişlik yönü
+    if (abs(vdot3(sidev, sidev)) < 0.001) sidev = [1, 0, 0];
+    nrm = vnorm3(cross3(sidev, axis)); if (nrm[2] < 0 && k !== "flop") nrm = vmul(nrm, -1);
+    var cup = (k === "leaf" || k === "long" || k === "cone") ? 0.22 : k === "round" ? 0.3 : 0.12;
+    var bend = k === "long" ? 0.15 : k === "flop" ? 0.0 : 0.1;
+    var NU = q === 0 ? 5 : 3, NV = q === 0 ? 4 : 2;
+    var prf = {
+      cone: function (u) { return Math.pow(max(0, 1 - u), 0.85) * (0.4 + 0.6 * min(1, u * 5)); },
+      round: function (u) { return sqrt(max(0, sin(PI * (0.06 + 0.94 * u)))) * 0.95; },
+      long: function (u) { return (0.5 + 0.5 * sin(PI * min(1, u * 1.15))) * (1 - 0.35 * u * u * u) * 0.8 + 0.1 * (1 - u); },
+      leaf: function (u) { return Math.pow(sin(PI * (0.04 + 0.92 * u)), 0.7) * 0.95; },
+      flop: function (u) { return (0.55 + 0.6 * sin(PI * (0.5 * u + 0.25))) * (1 - 0.45 * u * u); },
+      tuft: function (u) { return Math.pow(max(0, 1 - u), 0.9) * (0.5 + 0.5 * min(1, u * 5)); },
+      bat: function (u) { return (0.75 + 0.25 * sin(PI * u)) * Math.pow(max(0, 1 - u * u), 0.45); },
+    }[k] || function (u) { return 1 - u; };
+    var wtE = [earId, 1];
+    var sgn = sd;
+    var colIn = cin, colOut = mixc(c1, c4, 0.3);
+    var tuftN = E_.tuft;
+    sheet(mb, {
+      nu: NU, nv: NV, th: 0.003 * S + 0.002, cls: 5, fl: 0.25,
+      fn: function (u, v) {
+        var w = prf(u) * W * (v - 0.5) * 2 * 0.5;
+        var cupv = cup * W * (1 - Math.pow((v - 0.5) * 2, 2)) * 0.5 * (k === "flop" ? 0.3 : 1);
+        var base = [ep[0], ep[1], ep[2]];
+        var bd = bend * L * u * u;
+        return [base[0] + axis[0] * L * u + sidev[0] * w + nrm[0] * (cupv - bd), base[1] + axis[1] * L * u + sidev[1] * w + nrm[1] * (cupv - bd) - (k === "flop" ? 0.0 : 0), base[2] + axis[2] * L * u + sidev[2] * w + nrm[2] * (cupv - bd)];
+      },
+      colf: function (u, v, sd2) { return sd2 > 0 ? mixc(cin, c1, clamp(u * 0.9 + 0.1, 0, 1) * 0.0 + (k === "round" ? 0.55 : 0.2)) : colOut; },
+      wt: wtE,
+    });
+    if (tuftN && q < 2) {
+      var tp = vadd(ep, vmul(axis, L * 0.96));
+      for (var i = 0; i < 3; i++) tuftTri(mb, { b: tp, d: vadd(axis, [0, 0.0, -0.1 * i]), len: tuftN * S, w: 0.012 * S, g: 0.0, col: shadeC(c1, 0.35), n: axis, wt: wtE, cls: 1 });
+    }
+  }
+  function tuftTri(mb, o) { E.tuftTri(mb, o); }
+  function vnorm3(a) { return U.vnorm(a); }
+  function cross3(a, b) { return U.vcross(a, b); }
+  function vdot3(a, b) { return U.vdot(a, b); }
+
+  function buildHorns(mb, B, S, q, headP, drop, head, hl, hh, hw, chorn, c1) {
+    var Hn = B.horn; if (!Hn || Hn.k === "none") return;
+    function HF(p) { var r = rot3(p, [drop, 0, 0]); return [headP[0] + r[0], headP[1] + r[1], headP[2] + r[2]]; }
+    var wt = [head, 1], k = Hn.k, L = (Hn.len || 0.2) * S, th = (Hn.th || 0.025) * S;
+    var cols = chorn;
+    var hornSeg = q === 0 ? 8 : 5;
+    var NP = q === 0 ? 8 : q === 1 ? 5 : 3;
+    function horn(base, dirfn, len, rbase, color, opts) {
+      opts = opts || {};
+      var pts = [], p = base.slice();
+      for (var i = 0; i <= NP; i++) {
+        var t = i / NP;
+        pts.push({ p: p.slice(), rx: rbase * (1 - Math.pow(t, opts.taperE || 1) * (opts.tip != null ? 1 - opts.tip : 0.9)), ry: rbase * (1 - Math.pow(t, opts.taperE || 1) * (opts.tip != null ? 1 - opts.tip : 0.9)) * (opts.flat || 1), wt: wt, col: color && color.length ? (opts.base && t < 0.22 ? mixc(opts.base, color, t / 0.22) : color) : cols, fl: 0 });
+        var d = dirfn(t); p = [p[0] + d[0] * len / NP, p[1] + d[1] * len / NP, p[2] + d[2] * len / NP];
+      }
+      tube(mb, pts, { seg: hornSeg, cls: 1, fl: 0, cap0: "none", cap1: "round", e: 2, ref: opts.ref || [0, 0, 1] });
+    }
+    for (var si = -1; si <= 1; si += 2) {
+      var sd = si;
+      if (k === "bovid" || k === "curve" || k === "ibex") {
+        // yanlara açılıp yukarı kıvrılan boynuz
+        var base = HF([sd * hw * 0.32, hh * 0.5, hl * 0.06]);
+        var out = Hn.out != null ? Hn.out : 0.8, curv = Hn.curl != null ? Hn.curl : 1.2, back = Hn.back || 0;
+        horn(base, function (t) { var a = out * (1 - t) + curv * t; return rot3([sd * sin(a) * (1 - t * 0.6), cos(a * 0.9) * (0.6 + t * 0.5) , (k === "ibex" ? -0.9 * t - 0.15 : 0.35 * t - back)], [drop * 0.3, 0, 0]); }, L, th, mixc(cols, shadeC(cols, 0.75), 0.4), { taperE: 1.2, tip: 0.05, base: shadeC(cols, 0.7), flat: k === "ibex" ? 1.5 : 1 });
+      } else if (k === "spiral") {
+        var base2 = HF([sd * hw * 0.2, hh * 0.52, hl * 0.04]);
+        horn(base2, function (t) { var a = t * 7; return rot3([sd * 0.16 + sin(a) * 0.05, 0.98, -0.18 - t * 0.35 + cos(a) * 0.05], [drop * 0.4, 0, 0]); }, L, th, shadeC(cols, 0.85), { taperE: 1, tip: 0.04, base: shadeC(cols, 0.6) });
+      } else if (k === "lyre") {
+        var base5 = HF([sd * hw * 0.2, hh * 0.52, hl * 0.04]);
+        horn(base5, function (t) { var a = t * 2.4; return rot3([sd * (0.55 - 0.9 * t), 0.8 + 0.1 * t, -0.2 + 0.5 * t * t], [drop * 0.4, 0, 0]); }, L, th, shadeC(cols, 0.85), { taperE: 1, tip: 0.04, base: shadeC(cols, 0.6) });
+      } else if (k === "straight") {
+        var base3 = HF([sd * hw * 0.22, hh * 0.5, hl * 0.06]);
+        horn(base3, function (t) { return rot3([sd * 0.14, 0.96, -0.3], [drop * 0.4, 0, 0]); }, L, th, cols, { taperE: 1, tip: 0.04, base: shadeC(cols, 0.7) });
+      } else if (k === "antler") {
+        var base4 = HF([sd * hw * 0.22, hh * 0.52, hl * 0.04]);
+        var tines = Hn.tines != null ? Hn.tines : 3, ab = Hn.pal || 0;
+        horn(base4, function (t) { return rot3([sd * (0.38 - 0.1 * t), 0.9 - 0.2 * t, -0.28 * (1 - t) - 0.35 * t], [drop * 0.4, 0, 0]); }, L, th, cols, { taperE: 1, tip: 0.2, base: shadeC(cols, 0.6), flat: 1 });
+        for (var tn = 0; tn < tines; tn++) {
+          var f = 0.25 + 0.7 * (tn + 0.5) / tines;
+          var bp = vadd(base4, rot3([sd * (0.38 * f * L - 0.1 * f * f * L * 0.5), 0.9 * f * L - 0.2 * f * f * L * 0.5, -0.28 * f * L * (1 - f * 0.5) - 0.35 * f * f * L * 0.5], [drop * 0.4, 0, 0]));
+          horn(bp, function (t) { return rot3([sd * (0.35 + 0.1 * t), 0.7 - 0.35 * t, 0.55 + 0.25 * t], [drop * 0.4, 0, 0]); }, L * (0.38 - 0.1 * (tn / tines)), th * 0.5, cols, { taperE: 1, tip: 0.1 });
+        }
+        if (ab) { for (var tn2 = 0; tn2 < 3; tn2++) { var f2 = 0.5 + tn2 * 0.15; var bp2 = vadd(base4, rot3([sd * 0.38 * f2 * L, 0.9 * f2 * L, -0.28 * f2 * L], [drop * 0.4, 0, 0])); horn(bp2, function (t) { return rot3([sd * 0.5, 0.5 + 0.3 * t, 0.6], [drop * 0.4, 0, 0]); }, L * 0.3, th * 0.45, cols, { tip: 0.1 }); } }
+      } else if (k === "palmate") {
+        var base6 = HF([sd * hw * 0.3, hh * 0.45, hl * 0.04]);
+        var pbase = base6;
+        var dirp = rot3([sd * 0.95, 0.35, 0.05], [drop * 0.3, 0, 0]);
+        horn(base6, function (t) { return rot3([sd * (0.9 - 0.2 * t), 0.35 + 0.3 * t, 0.05], [drop * 0.3, 0, 0]); }, L * 0.35, th * 1.4, cols, { tip: 0.5 });
+        var pe = vadd(base6, vmul(rot3([sd * 0.85, 0.5, 0.05], [drop * 0.3, 0, 0]), L * 0.33));
+        var NU = q === 0 ? 5 : 3, NV = q === 0 ? 6 : 3;
+        sheet(mb, { nu: NU, nv: NV, th: th * 0.35, cls: 1, fl: 0, col: cols, col2: shadeC(cols, 0.8), wt: wt, fn: function (u, v) {
+          var ang = (v - 0.5) * 1.5, r = L * (0.2 + 0.78 * u) * (0.8 + 0.3 * sin(PI * v * 3.5) * (u > 0.6 ? 1 : 0));
+          return vadd(pe, rot3([sd * cos(ang) * r * 0.5, 0.1 * r * (v - 0.5) + 0.2 * r * u, sin(ang) * r * 0.75], [drop * 0.3, 0, 0]));
+        } });
+      } else if (k === "giraffe") {
+        var base7 = HF([sd * hw * 0.2, hh * 0.5, hl * 0.08]);
+        horn(base7, function (t) { return rot3([sd * 0.05, 1, -0.15], [drop * 0.4, 0, 0]); }, L, th, shadeC(c1, 0.85), { tip: 0.85 });
+        var tp7 = vadd(base7, rot3([sd * 0.05 * L, L, -0.15 * L], [drop * 0.4, 0, 0]));
+        blob(mb, { c: tp7, r: [th * 1.2, th * 1.2, th * 1.2], seg: 6, st: 4, col: shadeC(cols, 0.45), cls: 1, fl: 0, wt: wt });
+      } else if (k === "boar" || k === "tusk") {
+        var base8 = HF([sd * mwOf(B, S) * 0.3, -hh * 0.15, hl * 0.9]);
+        horn(base8, function (t) { return rot3([sd * (0.5 - 0.4 * t), 0.25 + 1.1 * t, 0.35 - 0.2 * t], [drop, 0, 0]); }, L, th, [0.92, 0.9, 0.82], { tip: 0.05 });
+      } else if (k === "walrus") {
+        var base9 = HF([sd * mwOf(B, S) * 0.25, -hh * 0.3, hl * 0.85]);
+        horn(base9, function (t) { return rot3([sd * 0.05, -1, 0.12 + 0.1 * t], [drop, 0, 0]); }, L, th, [0.93, 0.9, 0.8], { tip: 0.1 });
+      } else if (k === "rhino" && si === 1) {
+        var base10 = HF([0, hh * 0.05, hl * 0.95]);
+        horn(base10, function (t) { return rot3([0, 0.9 - 0.3 * t, 0.15 + 0.6 * t], [drop, 0, 0]); }, L, th * 2.0, shadeC(cols, 0.8), { tip: 0.04, base: shadeC(c1, 0.8) });
+        if (Hn.two) { var base11 = HF([0, hh * 0.3, hl * 0.62]); horn(base11, function (t) { return rot3([0, 0.9, 0.15 + 0.5 * t], [drop, 0, 0]); }, L * 0.5, th * 1.4, shadeC(cols, 0.8), { tip: 0.05, base: shadeC(c1, 0.8) }); }
+      }
+    }
+    if (k === "tuftcrest" ) {}
+  }
+  function mwOf(B, S) { return B.head.wid * S * B.head.muzW; }
+
+  function buildFoot(mb, B, S, q, toe, ankle, bid, lr, front, c1, c3, chf, th) {
+    var k = B.legs.foot, wt = [bid, 1], fsz = B.legs.fsz || 1, side = lr.d[2];
+    var dir = U.vnorm(vsub(toe, ankle));
+    var fwdz = [0, 0, 1];
+    var ccolor = c3;
+    if (k === "hoof" || k === "cloven") {
+      var hr = th * 0.62 * fsz;
+      if (k === "hoof") {
+        // yuvarlak toynak: kesik koni
+        tube(mb, [{ p: vadd(toe, vmul(dir, -hr * 1.2)), rx: hr * 0.9, ry: hr * 0.95, wt: wt, col: chf, fl: 0 }, { p: vadd(toe, [0, hr * 0.15, hr * 0.0]), rx: hr * 1.18, ry: hr * 1.25, wt: wt, col: chf, fl: 0 }, { p: [toe[0], 0.002, toe[2] + hr * 0.15], rx: hr * 1.22, ry: hr * 1.3, wt: wt, col: shadeC(chf, 0.8), fl: 0 }], { seg: max(6, 8 - (q > 0 ? 2 : 0)), cls: 1, fl: 0, cap0: "none", cap1: "round", e: 2.2, ref: [0, 0, 1] });
+      } else {
+        // çatal toynak: iki parça
+        for (var s2 = -1; s2 <= 1; s2 += 2) {
+          var bx = toe[0] + s2 * hr * 0.42;
+          tube(mb, [{ p: [bx, toe[1] + hr * 1.1, toe[2] - hr * 0.1], rx: hr * 0.52, ry: hr * 0.7, wt: wt, col: chf, fl: 0 }, { p: [bx, toe[1] + hr * 0.15, toe[2] + hr * 0.25], rx: hr * 0.6, ry: hr * 0.7, wt: wt, col: chf, fl: 0 }, { p: [bx, 0.002, toe[2] + hr * 0.55], rx: hr * 0.58, ry: hr * 0.7, wt: wt, col: shadeC(chf, 0.8), fl: 0 }], { seg: 6, cls: 1, fl: 0, cap0: "none", cap1: "round", e: 2.2, ref: [0, 0, 1] });
+        }
+        if (q < 2) blob(mb, { c: vadd(toe, [0, hr * 1.5, -hr * 0.4]), r: [hr * 0.85, hr * 0.6, hr * 0.8], seg: 6, st: 4, col: c3, cls: 3, fl: 0.4, wt: wt });
+      }
+    } else if (k === "paw" || k === "pad") {
+      var pr = th * 0.62 * fsz;
+      blob(mb, { c: [toe[0], toe[1] + pr * 0.45, toe[2] + pr * (front ? 0.55 : 0.75)], r: [pr * 0.95, pr * 0.62, pr * 1.45], seg: 8, st: 5, col: c3, cls: 3, fl: 0.4, wt: wt });
+      if (q === 0) {
+        for (var ti = -1; ti <= 1; ti++) blob(mb, { c: [toe[0] + ti * pr * 0.42, toe[1] + pr * 0.18, toe[2] + pr * (front ? 1.7 : 1.85) - abs(ti) * pr * 0.18], r: [pr * 0.34, pr * 0.3, pr * 0.42], seg: 5, st: 3, col: c3, cls: 3, fl: 0.2, wt: wt });
+      }
+      if (B.legs.claw && q < 2) for (var ci = -1; ci <= 1; ci++) tube(mb, [{ p: [toe[0] + ci * pr * 0.42, toe[1] + pr * 0.18, toe[2] + pr * 2.0], rx: pr * 0.12, ry: pr * 0.12, wt: wt, col: [0.9, 0.88, 0.8], fl: 0 }, { p: [toe[0] + ci * pr * 0.42, toe[1] + pr * 0.0, toe[2] + pr * 2.0 + pr * 0.7 * B.legs.claw], rx: 0.0003, ry: 0.0003, wt: wt, col: [0.9, 0.88, 0.8], fl: 0 }], { seg: 4, cls: 1, fl: 0, cap0: "none", cap1: "none" });
+    } else if (k === "flat") {
+      var fr = th * 0.7 * fsz;
+      blob(mb, { c: [toe[0], toe[1] + fr * 0.4, toe[2] + fr * 0.15], r: [fr * 1.05, fr * 0.55, fr * 1.15], seg: 8, st: 5, col: shadeC(c3, 0.9), cls: 3, fl: 0.3, wt: wt });
+      if (q < 2) for (var ni = -1; ni <= 1; ni++) blob(mb, { c: [toe[0] + ni * fr * 0.5, toe[1] + fr * 0.25, toe[2] + fr * 1.1], r: [fr * 0.22, fr * 0.2, fr * 0.2], seg: 5, st: 3, col: [0.72, 0.68, 0.6], cls: 1, fl: 0, wt: wt });
+    } else if (k === "splay") {
+      var sp = th * 0.55 * fsz;
+      blob(mb, { c: [toe[0], toe[1] + sp * 0.35, toe[2] + sp * 0.5], r: [sp * 1.2, sp * 0.5, sp * 1.5], seg: 8, st: 5, col: shadeC(c3, 0.8), cls: 3, fl: 0.2, wt: wt });
+    } else if (k === "hand") {
+      var hr2 = th * 0.55 * fsz;
+      blob(mb, { c: [toe[0], toe[1] + hr2 * 0.4, toe[2] + hr2 * 0.4], r: [hr2 * 0.9, hr2 * 0.5, hr2 * 1.3], seg: 7, st: 4, col: shadeC(c3, 0.7), cls: 3, fl: 0, wt: wt });
+      if (q < 2) for (var fi = -1.5; fi <= 1.5; fi += 1) blob(mb, { c: [toe[0] + fi * hr2 * 0.4, toe[1] + hr2 * 0.2, toe[2] + hr2 * 1.5], r: [hr2 * 0.22, hr2 * 0.2, hr2 * 0.5], seg: 5, st: 3, col: shadeC(c3, 0.7), cls: 3, fl: 0, wt: wt });
+    }
+  }
+
+  function buildTail(mb, B, S, q, tPath, tIds, hips, c1, c2, ctip, cmane, seg) {
+    var Tl = B.tail, k = Tl.k, th = Tl.th * S, n = tPath.length - 1;
+    var NN = (q === 0 ? 3 : 2) * n + 1;
+    var ids = [hips].concat(tIds);
+    var pts = [], samp = E.catmull(tPath, NN);
+    var tipC = ctip;
+    var fl = (k === "brush" || k === "plume") ? 1.9 : (k === "rat" || k === "whip" || k === "tuft" || k === "whiptuft") ? 0.5 : 1;
+    for (var i = 0; i < NN; i++) {
+      var t = i / (NN - 1), rr;
+      if (k === "brush") rr = th * (0.55 + 1.0 * sin(PI * Math.pow(t, 0.7)) * 0.9 + (1 - t) * 0.2) * (1 - 0.25 * Math.pow(t, 4));
+      else if (k === "plume") rr = th * (0.5 + 1.1 * sin(PI * Math.pow(t, 0.8)) + 0.2);
+      else if (k === "tuft" || k === "whiptuft") rr = th * (1.0 - 0.55 * t);
+      else if (k === "rat") rr = th * (1 - 0.8 * t);
+      else if (k === "thick") rr = th * (1.6 - 1.35 * t);
+      else if (k === "curl") rr = th * (1.0 - 0.45 * t);
+      else if (k === "stub" || k === "rabbit") rr = th * (1 - 0.4 * t);
+      else rr = th * (1 - 0.65 * t);
+      var cc = tipC && t > 0.72 ? mixc(c1, tipC, sstep(0.7, 0.9, t)) : (k === "rat" ? mixc(c1, [0.75, 0.55, 0.5], 0.7) : (k === "rabbit" ? c2 : mixc(c1, c2, 0.0)));
+      var pa = samp[i];
+      pts.push({ p: pa, rx: rr, ry: rr * (k === "plume" ? 1.0 : 1), wt: chainW(ids, t * n, 0.3), col: cc, fl: fl });
+    }
+    tube(mb, pts, { seg: max(6, seg - 3), cls: 2, cap0: "round", cap1: "round", e: 2 });
+    if ((k === "tuft" || k === "whiptuft") && q < 3) {
+      var tb = samp[NN - 1], tuftN = q === 0 ? 14 : q === 1 ? 8 : 4, len = (Tl.tuft || 0.22) * S;
+      var cT = Tl.tuftCol != null ? lin(Tl.tuftCol) : (cmane || c1);
+      for (var j = 0; j < tuftN; j++) {
+        var a = (j / tuftN) * PI * 2, rr2 = 0.012 * S;
+        tuftTri(mb, { b: [tb[0] + cos(a) * rr2, tb[1] + sin(a) * rr2, tb[2] + 0.0], d: [cos(a) * 0.3, -0.8 - 0.25 * (j % 3), -0.3 + 0.1 * sin(a * 2)], len: len * (0.7 + 0.5 * ((j * 37) % 10) / 10), w: 0.018 * S, g: 0.35, col: cT, col2: shadeC(cT, 0.8), grad: 1, n: [cos(a), 0.2, sin(a)], wt: [tIds[tIds.length - 1], 1], cls: 2, seg: 2 });
+      }
+    }
+    if (k === "brush" && q === 0) {
+      // uç tüyleri
+      var tb2 = samp[NN - 1], cT2 = ctip || c1;
+      for (var j2 = 0; j2 < 6; j2++) { var a2 = (j2 / 6) * PI * 2; tuftTri(mb, { b: tb2, d: [cos(a2) * 0.35, sin(a2) * 0.35, -1], len: 0.1 * S, w: 0.03 * S, g: 0.1, col: cT2, n: [cos(a2), sin(a2), -0.2], wt: [tIds[tIds.length - 1], 1], cls: 2 }); }
+    }
+  }
+
+  function buildMane(mb, B, S, q, nBase, nDir, nLen, nIds, chest, head, headP, drop, hl, hh, hw, cmane, c1, chU, zAt, backAt, hips, mid) {
+    var M = B.mane, k = M.k, len = (M.len || 0.12) * S, cnt = q === 0 ? 1 : 0.55;
+    var ids = [chest].concat(nIds, [head]);
+    var nN = nIds.length;
+    function wtAt(t) { return chainW(ids, 1 + t * nN, 0.3); }
+    if (k === "crest" || k === "horse") {
+      // boyun üstünde yüzer şeritler
+      var N = Math.round((M.n || 14) * cnt);
+      for (var i = 0; i < N; i++) {
+        var t = i / (N - 1), p = vadd(nBase, vmul(nDir, nLen * t * 0.98));
+        var r = lerp3(B.neck.thick, B.neck.thin, t) * S * 0.5;
+        var side = (i % 2) ? 1 : -1;
+        tuftTri(mb, { b: [p[0], p[1] + r * 0.9, p[2]], d: [side * 0.55, 0.45, -0.65], len: len * (0.8 + 0.4 * ((i * 53) % 7) / 7), w: len * 0.4, g: 0.55, col: cmane, col2: shadeC(cmane, 0.82), grad: 1, n: [0, 1, -0.3], wt: wtAt(t), cls: 1, seg: 2 });
+      }
+      // kakül
+      for (var f = 0; f < 3; f++) tuftTri(mb, { b: HFm(headP, drop, [0, hh * 0.45, hl * 0.12]), d: rot3([ (f - 1) * 0.25, 0.35, 0.8 ], [drop, 0, 0]), len: len * 0.9, w: len * 0.35, g: 0.7, col: cmane, n: [0, 1, 0.3], wt: [head, 1], cls: 1, seg: 2 });
+    } else if (k === "lion") {
+      var N2 = Math.round(48 * cnt);
+      var hc = HFm(headP, drop, [0, hh * 0.0, hl * 0.12]);
+      for (var j = 0; j < N2; j++) {
+        var a = (j / N2) * PI * 2 + (j % 2) * 0.1, ring = 0.7 + (j % 3) * 0.12;
+        var dirv = rot3([cos(a) * 0.9, sin(a) * 0.9, -0.55 - (j % 4) * 0.12], [drop, 0, 0]);
+        var base = vadd(hc, rot3([cos(a) * hw * 0.5 * ring, sin(a) * hh * 0.55 * ring, -hl * 0.05], [drop, 0, 0]));
+        tuftTri(mb, { b: base, d: dirv, len: len * (0.8 + 0.5 * ((j * 31) % 8) / 8), w: len * 0.34, g: 0.35, col: cmane, col2: shadeC(cmane, 0.7), grad: 1, n: vnorm3([cos(a), sin(a), -0.3]), wt: [head, 1], cls: 1, seg: 2 });
+      }
+      // omuz/göğüs uzantısı
+      for (var j3 = 0; j3 < Math.round(18 * cnt); j3++) {
+        var t3 = j3 / 18, a3 = ((j3 * 7) % 18) / 18 * PI * 2;
+        var bp = [cos(a3) * 0.1 * S, nBase[1] - 0.06 * S + sin(a3) * 0.1 * S, nBase[2] - 0.05 * S - 0.05 * S * (j3 % 3)];
+        tuftTri(mb, { b: bp, d: [cos(a3) * 0.5, sin(a3) * 0.3 - 0.4, -0.8], len: len * 1.1, w: len * 0.36, g: 0.5, col: cmane, col2: shadeC(cmane, 0.7), grad: 1, n: [cos(a3), sin(a3), 0], wt: [chest, 1], cls: 1, seg: 2 });
+      }
+    } else if (k === "ruff" || k === "chest" || k === "beard") {
+      var N3 = Math.round((M.n || 18) * cnt);
+      for (var j4 = 0; j4 < N3; j4++) {
+        var a4 = (j4 / N3) * PI * 2, hc2 = k === "beard" ? HFm(headP, drop, [0, -hh * 0.3, hl * 0.6]) : vadd(nBase, vmul(nDir, nLen * 0.55));
+        var rr = (k === "beard" ? hw * 0.15 : B.neck.thin * S * 0.5);
+        var dd = k === "beard" ? [cos(a4) * 0.2, -1, -0.15] : [cos(a4) * 0.7, sin(a4) * 0.7 - 0.2, -0.45];
+        tuftTri(mb, { b: [hc2[0] + cos(a4) * rr, hc2[1] + sin(a4) * rr, hc2[2]], d: dd, len: len * (0.7 + 0.5 * ((j4 * 29) % 8) / 8), w: len * 0.4, g: 0.4, col: cmane, col2: shadeC(cmane, 0.8), grad: 1, n: [cos(a4), sin(a4), 0], wt: k === "beard" ? [head, 1] : wtAt(0.55), cls: 1, seg: 2 });
+      }
+    } else if (k === "hump" ) {
+    } else if (k === "spine" ) {
+      var N5 = Math.round((M.n || 16) * cnt);
+      for (var j5 = 0; j5 < N5; j5++) {
+        var u5 = j5 / (N5 - 1), z5 = zAt(0.05 + u5 * 0.9);
+        tuftTri(mb, { b: [0, backAt(0.05 + u5 * 0.9) + 0.0, z5], d: [0, 1, -0.3], len: len * (1 - 0.3 * Math.abs(u5 - 0.5)), w: len * 0.3, g: 0.2, col: cmane, n: [0, 1, 0], wt: chainW([hips, mid, chest], (u5 * 2.2)), cls: 1, seg: 1 });
+      }
+    }
+  }
+  function HFm(headP, drop, p) { var r = rot3(p, [drop, 0, 0]); return [headP[0] + r[0], headP[1] + r[1], headP[2] + r[2]]; }
+
+  return { build: build, DEF: DEF, merge: merge };
+})();
+
+
+// ---- sg4_rig.js ----
+// ---- SG:SPECIES RİG: prototip önbelleği, örnek (SkinnedMesh) üretimi, LOD, kürk katmanları ----
+var SgRigs = (function () {
+  "use strict";
+  var E = SgEng, U = E.util;
+  var PI = Math.PI, sin = Math.sin, cos = Math.cos, abs = Math.abs, min = Math.min, max = Math.max, sqrt = Math.sqrt, exp = Math.exp;
+  var protos = {};
+  var planReg = {};
+  function reg(name, p) { planReg[name] = p; }
+
+  // tür prototipi: LOD geometrileri + iskelet tanımı (tür başına bir kez)
+  function getProto(id, S) {
+    var pr = protos[id];
+    if (pr) return pr;
+    E.init();
+    var plan = planReg[S.body.plan || "quad"];
+    if (!plan) throw new Error("plan yok: " + S.body.plan);
+    var B = plan.merge(plan.DEF, S.body);
+    pr = { id: id, S: S, B: B, plan: plan, geos: [null, null, null], info: null, inv: null, mats: null };
+    protos[id] = pr;
+    buildLod(pr, 0);
+    return pr;
+  }
+  function buildLod(pr, q) {
+    if (pr.geos[q]) return pr.geos[q];
+    var info = pr.plan.build(pr.S.size, q, null, pr.B);
+    var g = info.mb.geometry();
+    pr.geos[q] = g;
+    if (!pr.info) {
+      pr.info = info; pr.info.mb = null;
+      var T = E.T, inv = [];
+      for (var i = 0; i < info.rig.b.length; i++) { var w = info.rig.b[i].w; inv.push(new T.M4().makeTranslation(-w[0], -w[1], -w[2])); }
+      pr.inv = inv;
+      // sınır küresi
+      var bs = g.boundingSphere;
+      pr.bs = { c: [bs.center.x, bs.center.y, bs.center.z], r: bs.radius };
+    }
+    info.mb = null;
+    return g;
+  }
+
+  function matParams(pr) {
+    var B = pr.B, C = B.col, o = B.skin || {};
+    return {
+      belly: o.belly != null ? o.belly : C.c2, rough: o.rough != null ? o.rough : 0.88, tex: o.tex || (B.fur && B.fur.k === "none" ? "smooth" : "fur"), texS: o.texS,
+      pat: B.pat, cs: B.cs, side: 0,
+    };
+  }
+
+  // Örnek oluştur: { root(Group), mesh, bones[], skel, shells[], lod }
+  function instantiate(pr, opt) {
+    opt = opt || {};
+    var T = E.T, info = pr.info, bdefs = info.rig.b, bones = [], i;
+    for (i = 0; i < bdefs.length; i++) {
+      var b = new T.Bone(); b.name = bdefs[i].n;
+      var par = bdefs[i].p, pw = par >= 0 ? bdefs[par].w : [0, 0, 0];
+      b.position.set(bdefs[i].w[0] - pw[0], bdefs[i].w[1] - pw[1], bdefs[i].w[2] - pw[2]);
+      if (par >= 0) bones[par].add(b);
+      bones.push(b);
+    }
+    var skel = new T.Skel(bones, pr.inv);
+    var mp = matParams(pr);
+    var inst = { pr: pr, bones: bones, skel: skel, shells: [], lod: -1, tint: opt.tint || [1, 1, 1], seed: opt.seed || 0 };
+    var mat = SgMat.make(mp, null, inst);
+    var geo = buildLod(pr, 0);
+    var mesh = new T.SMesh(geo, mat);
+    mesh.add(bones[0]);
+    mesh.bind(skel, new T.M4());
+    mesh.frustumCulled = true;
+    mesh.boundingSphere = new T.Sph(new T.V3(pr.bs.c[0], pr.bs.c[1], pr.bs.c[2]), pr.bs.r * 1.35);
+    mesh.castShadow = true; mesh.receiveShadow = true;
+    var root = new T.Grp(), body = new T.Grp();
+    root.add(body); body.add(mesh);
+    inst.root = root; inst.body = body; inst.mesh = mesh; inst.mat = mat; inst.mp = mp;
+    // kürk katmanları
+    var fur = pr.B.fur;
+    if (fur && fur.k !== "none" && fur.layers > 0 && !opt.noFur) {
+      var n = fur.layers;
+      for (i = 1; i <= n; i++) {
+        var sm = SgMat.make(mp, { T: i / n, len: fur.len * pr.S.size, dens: 1 / (pr.S.size * (fur.cell || 0.022)), thick: fur.thick, sparse: fur.sparse, tip: fur.tip, tipc: fur.tipc }, inst);
+        var sh = new T.SMesh(geo, sm);
+        sh.bind(skel, new T.M4());
+        sh.frustumCulled = true; sh.boundingSphere = mesh.boundingSphere;
+        sh.castShadow = false; sh.receiveShadow = false;
+        body.add(sh); inst.shells.push(sh);
+      }
+    }
+    inst.setLod = function (l) {
+      if (l === inst.lod) return;
+      inst.lod = l;
+      var g = buildLod(pr, l);
+      mesh.geometry = g;
+      for (var k = 0; k < inst.shells.length; k++) inst.shells[k].geometry = g;
+    };
+    inst.setFurLevel = function (n) { for (var k = 0; k < inst.shells.length; k++) inst.shells[k].visible = k < n; };
+    inst.setLod(0);
+    return inst;
+  }
+  return { reg: reg, getProto: getProto, instantiate: instantiate, buildLod: buildLod, protos: protos };
+})();
+
+
+// ---- sg5_anim_quad.js ----
+// ---- SG:SPECIES ANİMASYON: dört ayaklı yürüyüş/koşu/ot yeme/uyku/saldırı/ölüm (iskelet + IK) ----
+var SgAnimBase = (function () {
+  "use strict";
+  var PI = Math.PI, sin = Math.sin, cos = Math.cos, abs = Math.abs, min = Math.min, max = Math.max, sqrt = Math.sqrt, exp = Math.exp, atan2 = Math.atan2;
+  function clamp(x, a, b) { return x < a ? a : x > b ? b : x; }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function sm(x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); }
+  function fract(x) { return x - Math.floor(x); }
+  function approach(c, t, k, dt) { return c + (t - c) * (1 - exp(-k * dt)); }
+  function qx(q, a) { var h = a * 0.5; q.set(sin(h), 0, 0, cos(h)); }
+  function qy(q, a) { var h = a * 0.5; q.set(0, sin(h), 0, cos(h)); }
+  function qz(q, a) { var h = a * 0.5; q.set(0, 0, sin(h), cos(h)); }
+  // euler (x,y,z) hızlı: XYZ sırası
+  function qe(q, x, y, z) {
+    var c1 = cos(x / 2), c2 = cos(y / 2), c3 = cos(z / 2), s1 = sin(x / 2), s2 = sin(y / 2), s3 = sin(z / 2);
+    q.set(s1 * c2 * c3 + c1 * s2 * s3, c1 * s2 * c3 - s1 * c2 * s3, c1 * c2 * s3 + s1 * s2 * c3, c1 * c2 * c3 - s1 * s2 * s3);
+  }
+  // iki bağlantılı düzlemsel IK. a,b uzunluklar; (dy,dz) hedef; bend=+1 diz öne. Dikeyden öne açı döndürür [tu, tl]
+  function ik2(a, b, dy, dz, bend) {
+    var dist = sqrt(dy * dy + dz * dz);
+    var mx = (a + b) * 0.998, mn = abs(a - b) + 1e-3;
+    var dd = dist > mx ? mx : dist < mn ? mn : dist;
+    var cA = clamp((a * a + dd * dd - b * b) / (2 * a * dd), -1, 1), A = Math.acos(cA);
+    var tt = atan2(dz, -dy);
+    var tu = tt + bend * A;
+    var kz = a * sin(tu), ky = -a * cos(tu);
+    var tl = atan2(dz - kz, -(dy - ky));
+    return [tu, tl];
+  }
+  return { clamp: clamp, lerp: lerp, sm: sm, fract: fract, approach: approach, qx: qx, qy: qy, qz: qz, qe: qe, ik2: ik2 };
+})();
+
+var SgQuadAnim = (function () {
+  "use strict";
+  var A = SgAnimBase, clamp = A.clamp, lerp = A.lerp, sm = A.sm, fract = A.fract, approach = A.approach, qx = A.qx, qy = A.qy, qz = A.qz, qe = A.qe, ik2 = A.ik2;
+  var PI = Math.PI, sin = Math.sin, cos = Math.cos, abs = Math.abs, min = Math.min, max = Math.max, sqrt = Math.sqrt, exp = Math.exp;
+
+  var OFF_W = [0.25, 0.75, 0.0, 0.5];   // FL FR BL BR yürüyüş
+  var OFF_T = [0.0, 0.5, 0.5, 0.0];     // tırıs
+  var OFF_G = [0.5, 0.58, 0.0, 0.08];   // dörtnala
+  var OFF_B = [0.0, 0.04, 0.5, 0.54];   // sıçrama (bound)
+  var OFF_P = [0.0, 0.5, 0.0, 0.5];     // pace (deve, zürafa)
+  var KEY = { FL: 0, FR: 1, BL: 2, BR: 3 };
+
+  function Anim(inst) {
+    var T = SgEng.T;
+    this.T = T;
+    this.inst = inst; this.pr = inst.pr; this.info = inst.pr.info; this.B = inst.pr.B; this.S = inst.pr.S.size;
+    var bn = inst.bones, info = this.info;
+    this.bn = bn;
+    this.ph = Math.random(); this.time = Math.random() * 50; this.id = 0;
+    this.ch = { gait: 0, down: 0, alert: 0, lie: 0, sit: 0, rear: 0, die: 0, atk: 0, hit: 0, yaw: 0, look: 0, jaw: 0, flick: 0, sleepT: 0 };
+    this.q = new T.Q4();
+    this.mR = new T.M4(); this.mH = new T.M4(); this.mM = new T.M4(); this.mC = new T.M4(); this.inv = new T.M4(); this.v = new T.V3();
+    this.legs = info.legs.map(function (l) {
+      return { l: l, u: bn[l.ids[0]], lo: bn[l.ids[1]], f: bn[l.ids[2]], par: l.par, idx: KEY[l.key], toe: new T.V3(), a: l.L[0], b: l.L[1], c: l.L[2], th0: l.th0, x: l.P[3][0], z0: l.P[3][2], y0: 0, J: l.J };
+    });
+    this.legLen = info.legs[0].legLen;
+    this.rear = info.legs[2].legLen;
+    this.nextLook = 2 + Math.random() * 4; this.lookT = 0; this.lookTarget = 0;
+    this.nextFlick = 1 + Math.random() * 3; this.flickT = 0; this.flickSide = 0;
+    this.tailPh = Math.random() * 6;
+    this.earPh = [Math.random() * 6, Math.random() * 6];
+    this.deathRoll = 0; this.deathDir = 1;
+    this.graze = this.solveGraze();
+    this.cy = info.baseY; // gövde merkez yüksekliği
+    this.prevYaw = null; this.turn = 0;
+    this.anim = this.B.anim || {};
+    this.pose = null; // dışarıdan zorlanan poz: 'lie' | 'sit' | 'graze' | 'attack' | 'die' | 'run' ...
+  }
+  Anim.prototype.solveGraze = function () {
+    var info = this.info, S = this.S, nN = info.neck.length, B = this.B;
+    var nb = info.nBase, up = Math.atan2(info.nDir[1], info.nDir[2]);
+    var nLen = B.neck.len * S / nN;
+    var hd = B.head, hl = hd.len * S, hh = hd.ht * S, drop = hd.drop * PI / 180;
+    var tipL = Math.hypot(hl * 0.98, hh * 0.2), tipA = Math.atan2(-hh * 0.2, hl * 0.98);
+    function tipY(th, ratioH) {
+      var y = nb[1], ang = up - 0; // yukarı açısı (yataydan)
+      var per = th / nN;
+      var p = [nb[1], nb[2]];
+      var a = up;
+      for (var i = 0; i < nN; i++) { a -= per; p = [p[0] + sin(a) * nLen, p[1] + cos(a) * nLen]; }
+      var ah = a - th * ratioH - drop; // kafa ekseni açısı
+      return p[0] + sin(ah + tipA) * tipL;
+    }
+    var target = this.S * 0.03, r = 0.5, best = 0, by = 1e9, first = -1;
+    for (var th = 0; th <= 2.8; th += 0.04) { var y = tipY(th, r); if (y < by) { by = y; best = th; } if (y <= target) { first = th; break; } }
+    if (first < 0) return { n: best, h: best * r };
+    var lo = max(0, first - 0.04), hi = first;
+    for (var k = 0; k < 14; k++) { var m = (lo + hi) / 2; if (tipY(m, r) > target) lo = m; else hi = m; }
+    var n = (lo + hi) / 2;
+    return { n: n, h: n * r };
+  };
+
+  // g: {speed, scale, state, lunging, lunge, hitFlash, dead, deathT, id, t, sp:{walk,run}, playerDist, lookYaw}
+  Anim.prototype.update = function (g, dt) {
+    var info = this.info, bn = this.bn, B = this.B, S = this.S, ch = this.ch, q = this.q, an = this.anim, T = this.T;
+    this.time += dt;
+    var sc = g.scale || 1, v = (g.speed || 0) / sc;
+    var sp = g.sp || { walk: 1.2, run: 6 };
+    var dead = !!g.dead, st = g.state || "idle";
+    var pose = this.pose;
+    if (pose === "die") dead = true;
+    var legLen = this.legLen;
+    // ---- duyum kanalları ----
+    var lieT = 0, downT = 0, alertT = 0, sitT = 0, rearT = 0, atkT = 0;
+    if (pose === "lie" || st === "sleep" || g.asleep) lieT = 1;
+    if (pose === "sit" || st === "sit") sitT = 1;
+    if (pose === "graze" || (st === "graze" && v < 0.15) || st === "drink") downT = 1;
+    if (pose === "alert" || st === "alert" || st === "stalk") alertT = 1;
+    if (pose === "rear" || g.rear > 0.5) rearT = 1;
+    var atkA = g.lunging ? g.lunge : (pose === "attack" ? ((this.time * 0.9) % 1) : 0);
+    if (v > 0.15 || dead) { lieT = 0; downT = 0; sitT = 0; rearT = 0; }
+    if (lieT && !(an.canLie !== false)) lieT = 0;
+    var kc = 5;
+    ch.lie = approach(ch.lie, lieT, lieT ? 2.2 : 3.5, dt);
+    ch.sit = approach(ch.sit, sitT, 3, dt);
+    ch.down = approach(ch.down, downT, 3, dt);
+    ch.alert = approach(ch.alert, alertT, 5, dt);
+    ch.rear = approach(ch.rear, rearT, 4, dt);
+    ch.hit = approach(ch.hit, g.hitFlash || 0, 14, dt);
+    ch.die = dead ? approach(ch.die, 1, 3.4, dt) : approach(ch.die, 0, 8, dt);
+    // ---- yürüyüş değişkenleri ----
+    var vw = sp.walk || 1.2, vr = sp.run || vw * 5;
+    var gt;
+    var vA = vw * 1.25, vB = vw * 2.0, vC = max(vB * 1.1, vr * 0.5), vD = max(vC * 1.1, vr * 0.78);
+    if (v <= vA) gt = 0; else if (v <= vB) gt = (v - vA) / (vB - vA); else if (v <= vC) gt = 1; else if (v <= vD) gt = 1 + (v - vC) / (vD - vC); else gt = 2;
+    if (an.noTrot) gt = gt < 1 ? gt : 1 + (gt - 1) * 1;
+    ch.gait = approach(ch.gait, gt, 7, dt);
+    var gi = ch.gait;
+    var runKind = an.run || "gallop";
+    var offR = runKind === "bound" ? OFF_B : runKind === "pace" ? OFF_P : runKind === "trot" ? OFF_T : OFF_G;
+    var offW = an.walk === "pace" ? OFF_P : OFF_W;
+    var offT = an.trot === "pace" ? OFF_P : OFF_T;
+    var w1 = clamp(gi, 0, 1), w2 = clamp(gi - 1, 0, 1);
+    var duty = gi < 1 ? lerp(an.dutyW || 0.66, an.dutyT || 0.52, gi) : lerp(an.dutyT || 0.52, an.dutyR || 0.34, w2);
+    var kStr = gi < 1 ? lerp(an.kW || 1.5, an.kT || 2.6, gi) : lerp(an.kT || 2.6, an.kR || 4.2, w2);
+    var strideNom = kStr * legLen;
+    var f = v > 0.03 ? clamp(v / strideNom, 0.55, 5) : 0;
+    var stride = f > 0 ? v / f : 0;
+    this.ph = fract(this.ph + f * dt);
+    var ph = this.ph;
+    var liftH = legLen * (0.12 + 0.1 * w1 + 0.1 * w2) * (an.lift || 1);
+    var moving = v > 0.03;
+    // gövde hareketi
+    var bobA = legLen * 0.022 * (1 - w2) * min(1, v * 2) + legLen * 0.075 * w2;
+    var bob = (1 - w2) * cos(4 * PI * ph + 0.3) * bobA * 0.5 + w2 * cos(2 * PI * ph + 1.2) * bobA * 0.5;
+    var sway = sin(2 * PI * ph) * 0.05 * (1 - w2) * min(1, v * 1.5) * (an.sway != null ? an.sway : 1);
+    var pitchG = w2 * sin(2 * PI * ph + 0.4) * 0.09 * (an.pitch != null ? an.pitch : 1) + sin(4 * PI * ph + 1) * 0.015 * (1 - w2) * min(1, v);
+    var flexA = (an.flex != null ? an.flex : 0.05) * (0.3 + 0.7 * min(1, v * 0.6)) * (0.35 + w2 * 1.3);
+    var flex = moving ? sin(2 * PI * ph + (runKind === "bound" ? 1.0 : 0.2)) * flexA : 0;
+    var yawFlex = moving ? sin(2 * PI * ph) * (an.snake || 0.0) * min(1, v) : 0;
+    // ---- duruş: yatma / oturma / ön ayakları kaldırma ----
+    var D = B.deep * S;
+    var lieDrop = (info.baseY - D * 0.42) * ch.lie;
+    var sitUp = ch.sit * (an.sitAng != null ? an.sitAng : 0.95);
+    var rearUp = ch.rear * 0.85;
+    // ---- ölüm ----
+    var dieK = ch.die;
+    var rootY = bob * (1 - dieK) - lieDrop, rootRot = 0;
+    // ---- gövde kemikleri ----
+    var hips = bn[info.hips], mid = bn[info.mid], chest = bn[info.chest], root = bn[info.root];
+    var atkS = 0, atkW = 0;
+    if (atkA > 0) { atkW = sm(atkA / 0.32) * (1 - sm((atkA - 0.34) / 0.1)); atkS = sm((atkA - 0.32) / 0.12) * (1 - sm((atkA - 0.58) / 0.35)); }
+    var atk = an.atk || "bite";
+    var hipPitch = pitchG * 0.5 - sitUp * 0.85 - rearUp * 0.9 + (atk === "kick" ? -atkS * 0.35 : 0) + (atk === "rear" ? -atkS * 0.1 : 0);
+    var frontPitch = flex - pitchG * 0.5 - sitUp * 0.15 + (atk === "butt" ? atkW * 0.25 - atkS * 0.3 : 0) + (atk === "bite" ? -atkW * 0.08 : 0) - (atk === "rear" ? atkW * 0.7 : 0) + ch.hit * 0.1;
+    if (atk === "rear" || atk === "swipe") { hipPitch -= (atk === "rear" ? 0.35 * atkW : 0.0); }
+    var hipsLen = info.chest;
+    var rollW = sway * 0.6;
+    var curYaw = g.turn || 0;
+    qe(q, hipPitch, yawFlex * 0.5 + curYaw * 0.25, rollW); hips.quaternion.copy(q);
+    qe(q, frontPitch * 0.5, -yawFlex * 0.7 - curYaw * 0.2, -rollW * 0.5); mid.quaternion.copy(q);
+    qe(q, frontPitch * 0.5, -yawFlex * 0.8 - curYaw * 0.2, -rollW * 0.5); chest.quaternion.copy(q);
+    // kök (ölüm dönüşü ve yükseklik)
+    var Wd = B.wid * S;
+    var rest = 0;
+    var roll = dieK * (PI / 2) * 0.97 * (this.deathDir);
+    var cyc = info.baseY * 0.9;
+    // kök = kök-merkez etrafında döndür
+    root.position.set(0, rootY, 0);
+    qz(q, roll); root.quaternion.copy(q);
+    if (roll !== 0) {
+      var ca = cos(roll), sa = sin(roll);
+      rest = (cyc - Wd * 0.475) * abs(sa);
+      root.position.x = sa * cyc;
+      root.position.y = rootY + cyc - ca * cyc - rest;
+    }
+    root.updateMatrix(); hips.updateMatrix(); mid.updateMatrix(); chest.updateMatrix();
+    this.mR.copy(root.matrix);
+    this.mH.multiplyMatrices(this.mR, hips.matrix);
+    this.mM.multiplyMatrices(this.mH, mid.matrix);
+    this.mC.multiplyMatrices(this.mM, chest.matrix);
+    // ---- bacaklar ----
+    var legs = this.legs;
+    var tw = this.time;
+    var atkLeg = atk === "swipe" ? 0 : atk === "kick" ? 2 : -1;
+    for (var i = 0; i < 4; i++) {
+      var L = legs[i], l = L.l;
+      var u, dz = 0, dy = 0, off = lerp(lerp(offW[L.idx], offT[L.idx], w1), offR[L.idx], w2);
+      if (moving) {
+        u = fract(ph + off);
+        if (u < duty) { var s = u / duty; dz = stride * duty * (0.5 - s); dy = 0; this.legPh = 0; }
+        else { var s2 = (u - duty) / (1 - duty); var e = s2 * s2 * (3 - 2 * s2); dz = stride * duty * (-0.5 + e); dy = liftH * sin(PI * s2) * (1 - 0.15 * s2); }
+        L.s = u < duty ? 0 : (u - duty) / (1 - duty); L.st = u < duty ? u / duty : -1;
+      } else { L.s = 0; L.st = 0.5; }
+      var foot = l.th0[2];
+      if (moving) {
+        if (L.st < 0) foot = l.th0[2] - 0.8 * sin(PI * L.s) * (L.l.front ? 1.0 : 0.7) * (0.7 + 0.5 * w1);
+        else foot = l.th0[2] - 0.35 * sm((L.st - 0.7) / 0.3);
+      }
+      // oturma/yatma/ayağa kalkma ofsetleri
+      var tz = L.z0 + dz, ty = dy, tx = L.x;
+      var front = l.front;
+      if (ch.lie > 0.001) {
+        var k = ch.lie;
+        if (front) { tz += legLen * 0.55 * k; ty += 0; }
+        else { tz += legLen * 0.32 * k; tx *= (1 - 0.35 * k * 0); ty += 0; }
+      }
+      if (ch.sit > 0.001) {
+        var k2 = ch.sit;
+        if (front) { tz += legLen * 0.12 * k2; ty += legLen * 0.45 * k2; }
+        else { tz += legLen * 0.55 * k2; ty += 0.0; }
+      }
+      if (ch.rear > 0.001) {
+        var k3 = ch.rear;
+        if (front) { tz += legLen * (0.55 + 0.25 * sin(tw * 5 + i)) * k3; ty += legLen * (0.9 + 0.1 * sin(tw * 7 + i * 2)) * k3; }
+        else tz -= legLen * 0.05 * k3;
+      }
+      // saldırı ayak ofsetleri
+      if (atkA > 0 && i === atkLeg) {
+        if (atk === "swipe") { tz += legLen * (0.5 * atkW + 0.4 * atkS); ty += legLen * (0.9 * atkW - 0.25 * atkS); }
+        else if (atk === "kick") { tz -= legLen * (0.2 * atkW + 0.9 * atkS); ty += legLen * (0.2 * atkW + 0.55 * atkS); }
+      }
+      if (atkA > 0 && atk === "kick" && i === 3) { tz -= legLen * (0.2 * atkW + 0.9 * atkS) * 0.85; ty += legLen * (0.2 * atkW + 0.5 * atkS); }
+      if (atkA > 0 && atk === "rear") { if (front) { tz += legLen * 0.9 * atkS; ty += legLen * (0.5 * atkW - 0.45 * atkS); } }
+      if (atkA > 0 && atk === "swipe" && i === 1) { tz += legLen * (0.3 * atkW) * 0.5; ty += legLen * 0.3 * atkW; }
+      // hedef: dünya (kök uzayı) -> ebeveyn uzayı
+      var pm = L.par === info.chest ? this.mC : this.mH;
+      this.inv.copy(pm).invert();
+      this.v.set(tx, ty, tz).applyMatrix4(this.inv);
+      var ux = L.u.position, jx = this.v.x - ux.x, jy = this.v.y - ux.y, jz = this.v.z - ux.z;
+      // ayak vektörünü çıkar -> bilek hedefi
+      var cd = L.c, dyF = -cos(foot) * cd, dzF = sin(foot) * cd;
+      var ay = jy - dyF, az = jz - dzF;
+      var r = ik2(L.a, L.b, ay, az, l.bend);
+      var th = L.th0;
+      qx(q, -(r[0] - th[0])); L.u.quaternion.copy(q);
+      qx(q, -((r[1] - r[0]) - (th[1] - th[0]))); L.lo.quaternion.copy(q);
+      qx(q, -((foot - r[1]) - (th[2] - th[1]))); L.f.quaternion.copy(q);
+      // ölümde bacaklar gerilsin / dışa
+      if (dieK > 0.01) {
+        var kk = dieK, sw = sin(this.time * 14 + i * 1.7) * 0.5 * exp(-(g.deathT || 0) * 1.3);
+        qx(q, (front ? -0.35 : 0.35) * kk + sw * 0.5); L.u.quaternion.slerp(q, kk * 0.6);
+        qx(q, 0.5 * kk + sw * 0.4); L.lo.quaternion.slerp(q, kk * 0.5);
+      }
+    }
+    // ---- boyun / baş ----
+    var nN = info.neck.length;
+    var grz = this.graze;
+    var downK = ch.down * (an.grazeK != null ? an.grazeK : 1);
+    var nodW = sin(4 * PI * ph + 1.0) * 0.05 * (1 - w2) * min(1, v) * (an.nod != null ? an.nod : 1);
+    var runExt = w2 * (an.runNeck != null ? an.runNeck : 0.22);
+    var headUp = ch.alert * 0.22 + ch.lie * (an.lieHead != null ? an.lieHead : 0.5) - ch.sit * 0.3;
+    // bakış
+    this.nextLook -= dt;
+    if (this.nextLook <= 0) { this.nextLook = 2.5 + Math.random() * 5; this.lookTarget = (Math.random() - 0.5) * 1.6; if (Math.random() < 0.35) this.lookTarget *= 0.2; }
+    var lookY = this.lookTarget;
+    if (g.lookYaw != null && (ch.alert > 0.5 || atkA > 0 || st === "chase")) lookY = clamp(g.lookYaw, -1.1, 1.1);
+    if (moving) lookY *= 0.2;
+    ch.look = approach(ch.look, lookY, 4.5, dt);
+    var atkNeck = 0, atkHead = 0, atkJaw = 0;
+    if (atkA > 0) {
+      if (atk === "bite") { atkNeck = -0.18 * atkW + 0.35 * atkS; atkHead = -0.1 * atkW + 0.15 * atkS; atkJaw = 0.7 * atkW * (1 - atkS) - 0.0; if (atkS > 0.5) atkJaw = 0.1; }
+      else if (atk === "butt" || atk === "gore") { atkNeck = 0.55 * atkW - (atk === "butt" ? 0.85 * atkS : 0.2 * atkS); atkHead = 0.3 * atkW - 0.1 * atkS; }
+      else if (atk === "swipe") { atkNeck = -0.1 * atkW; atkJaw = 0.9 * atkW * (1 - atkS); }
+      else if (atk === "kick") { atkNeck = 0.3 * atkW; atkHead = 0.2 * atkW; }
+      else if (atk === "rear") { atkNeck = 0.2 * atkW; atkJaw = 0.5 * atkW; }
+      else if (atk === "slam") { atkNeck = -0.3 * atkW + 0.5 * atkS; }
+    }
+    var tot = downK * grz.n + runExt - headUp + atkNeck + nodW * 0.5 - ch.hit * 0.35 + ch.die * 0.3 + (an.baseNeck || 0);
+    var curlHead = ch.lie * (an.lieCurl || 0);
+    for (var n = 0; n < nN; n++) {
+      var per = tot / nN, yawN = ch.look * (n === nN - 1 ? 0.45 : 0.25) * (1 - ch.die) - curlHead * 0.9;
+      qe(q, per, yawN, ch.look * 0.04); bn[info.neck[n]].quaternion.copy(q);
+    }
+    var hp = downK * grz.h + atkHead - ch.alert * 0.05 + nodW * 0.5 - runExt * 0.5 + ch.hit * 0.1 + curlHead * 0.6;
+    qe(q, hp, ch.look * 0.28 * (1 - ch.die) - curlHead * 0.7, ch.look * 0.08 + curlHead * 0.4); bn[info.head].quaternion.copy(q);
+    // çene
+    var jawT = atkJaw, chew = 0;
+    if (downK > 0.5 && st === "graze") chew = (0.5 + 0.5 * sin(this.time * 7)) * 0.1;
+    if (ch.die > 0.3) jawT += 0.12 * ch.die;
+    if (g.speaking) jawT += 0.3;
+    ch.jaw = approach(ch.jaw, jawT + chew, 22, dt);
+    qx(q, ch.jaw * (an.jawK || 1)); bn[info.jaw].quaternion.copy(q);
+    // kulaklar
+    this.nextFlick -= dt;
+    if (this.nextFlick <= 0) { this.nextFlick = 1.5 + Math.random() * 5; this.flickT = 0.22; this.flickSide = Math.random() < 0.5 ? 0 : 1; }
+    this.flickT = max(0, this.flickT - dt);
+    var fl = this.flickT > 0 ? sin((1 - this.flickT / 0.22) * PI) : 0;
+    var atkB = atkA > 0 ? 1 : 0;
+    for (var e2 = 0; e2 < info.ears.length; e2++) {
+      var side = e2 ? -1 : 1;
+      var back = (atkB * 0.8 + (st === "flee" ? 0.5 : 0) + (st === "chase" ? 0.4 : 0)) * (an.earBack != null ? an.earBack : 1);
+      var fwd = ch.alert * 0.35 * (1 - back);
+      var rx = fwd - back + (this.flickSide === e2 ? fl * 0.5 : 0) + sin(this.time * 0.9 + this.earPh[e2]) * 0.03;
+      var rz = side * (-back * 0.3 + (this.flickSide === e2 ? fl * 0.25 : 0)) + side * ch.lie * 0.2;
+      qe(q, rx, 0, rz); bn[info.ears[e2]].quaternion.copy(q);
+    }
+    // kuyruk
+    var tl = info.tail.length;
+    if (tl) {
+      var tk = B.tail, kind = tk.k;
+      var wagF = (st === "flee" ? 9 : 1.6) * (an.wag || 1), wagA = (an.wagA != null ? an.wagA : 0.25) * (moving ? 0.8 : 1) * (1 - ch.die);
+      this.tailPh += dt * wagF;
+      var base = (an.tailMood === "tuck" && (st === "flee" || st === "alert")) ? 0.6 : (an.tailMood === "flag" && st === "flee" ? -1.1 : 0);
+      base += ch.lie * 0.2 - ch.alert * 0.1 + w2 * (an.tailRun != null ? an.tailRun : -0.25) + ch.hit * -0.4;
+      base += ch.die * 0.4;
+      for (var t = 0; t < tl; t++) {
+        var yw = sin(this.tailPh - t * 0.7) * wagA * (0.6 + 0.4 * t) + (moving ? sin(2 * PI * ph - t * 0.6) * 0.1 * min(1, v * 0.5) : 0);
+        qe(q, base / tl + sin(this.time * 1.3 + t) * 0.02, yw, 0); bn[info.tail[t]].quaternion.copy(q);
+      }
+    }
+    // ek: özel kemikler (kule, hortum vb.) plan genişletmeleri
+    if (this.extra) this.extra(g, dt, ph, v, moving);
+    // ölüm: gövde dönüş yönü
+    if (dead && !this._dd) { this._dd = true; this.deathDir = (g.id || 0) % 2 ? 1 : -1; }
+    if (!dead) this._dd = false;
+  };
+  return { Anim: Anim };
+})();
+
+
+// ---- sg_test_game.js ----
+window.TS = {
+ wolf: {size:0.9, body:{plan:'quad', h:0.88, len:1.15, deep:0.4, wid:0.26, tuck:0.7, neck:{len:0.4,thick:0.2,thin:0.14,up:30}, head:{len:0.34,wid:0.17,ht:0.17,muz:0.55,muzW:0.5,muzH:0.5,drop:25,fwd:0.7,fang:1,slit:0}, ear:{k:'cone',len:0.11,wid:0.08,spread:0.4,tilt:0.1}, legs:{th:0.07,zigB:0.8,up:0.34,low:0.38,foot:'paw'}, tail:{k:'brush',len:0.5,th:0.04,up:-0.4}, col:{c1:0x8f8678,c2:0xcfc7b8,c3:0x6a6256,c4:0xb0a898,nose:0x1a1a1a,eye:0xd8a020}, fur:{k:'long',len:0.05,cell:0.02,layers:3}}},
+ deer: {size:1.2, body:{plan:'quad', h:0.85, len:0.95, deep:0.38, wid:0.24, tuck:0.62, neck:{len:0.45,thick:0.17,thin:0.1,up:50}, head:{len:0.28,wid:0.12,ht:0.14,muz:0.6,muzW:0.5,muzH:0.45,drop:40,fwd:0.2}, ear:{k:'leaf',len:0.13,wid:0.08,spread:0.7,tilt:0.15}, horn:{k:'antler',len:0.28,th:0.014,tines:3}, legs:{th:0.045,zigB:0.6,up:0.3,low:0.42,foot:'cloven'}, tail:{k:'stub',len:0.08,th:0.035}, col:{c1:0x9a6a3c,c2:0xe8d8b8,c3:0x7a5030,c4:0xb08a60,nose:0x222222,eye:0x1a0e08,hoof:0x2a2220}, fur:{k:'short',len:0.015,cell:0.02,layers:2}}},
+};
+
+SgRigs.reg("quad", { build: SgQuad.build, merge: SgQuad.merge, DEF: SgQuad.DEF, Anim: SgQuadAnim.Anim });
+window.__sg = { SgEng: SgEng, SgRigs: SgRigs, SgMat: SgMat, SgQuadAnim: SgQuadAnim };
+
+// ===== SG:SPECIES BİTTİ =====
   function sgDeathNpc(n) {
     let role = n.def?.role || "x",
       av = n.av,
