@@ -50770,6 +50770,7 @@ uniform float uWet; uniform float uNight;`,
       const B = av.bones, hand = B["hand_" + side];
       handQuat(side, f, n, hQ);
       wr.copy(SOCK[side]).applyQuaternion(hQ).multiplyScalar(-1).add(P);
+      (av.sgDbg ||= {})[side] = { P: P.clone(), wr: wr.clone(), w };
       Gl(B["upperarm_" + side], B["lowerarm_" + side], hand, wr, pole, w);
       hand.parent.getWorldQuaternion(hQp).invert();
       hQl.copy(hQp).multiply(hQ);
@@ -50822,20 +50823,20 @@ uniform float uWet; uniform float uNight;`,
       const V = (x, y, z) => new R(x, y, z);
       switch (kind) {
         case "small": {
-          S.p = fp ? [0.2, -0.3, 0.5] : [0.17, 1.13, 0.37];
+          S.p = fp ? [0.2, -0.3, 0.5] : [0.2, 1.2, 0.32];
           S.y = [0, 1, 0]; S.z = fp ? [0, 0.15, 1] : [0, 0, 1];
           const gy = -Math.max(0, r - 0.045);
           S.hands.r = { g: V(0, gy, 0), n: V(0, 1, 0), f: V(0.3, 0, 1) };
           break;
         }
         case "long": {
-          S.p = fp ? [0.2, -0.26, 0.52] : [0.19, 1.07, 0.36];
+          S.p = fp ? [0.2, -0.26, 0.52] : [0.2, 1.17, 0.34];
           S.y = fp ? [0.1, 0.75, 0.65] : [0.15, 0.8, 0.55]; S.z = [0, -0.6, 1];
           S.hands.r = { g: V(0, -Math.min(dy * 0.28, 0.11), 0), n: V(1, 0, 0), f: V(0, 0, 1) };
           break;
         }
         case "bottle": {
-          S.p = fp ? [0.2, -0.3, 0.5] : [0.22, 0.98, 0.3];
+          S.p = fp ? [0.2, -0.3, 0.5] : [0.2, 1.12, 0.26];
           S.y = [0.0, 1, 0.12]; S.z = [0, -0.1, 1];
           S.hands.r = { g: V(0, 0, 0), n: V(1, 0, 0), f: V(0, 0, 1) };
           break;
@@ -50843,7 +50844,7 @@ uniform float uWet; uniform float uNight;`,
         case "big":
         case "rock": {
           const hx = Math.max(0.07, dx * 0.5);
-          S.p = fp ? [0, -0.34, 0.5] : [0, 1.1, kind === "rock" ? 0.3 : 0.34];
+          S.p = fp ? [0, -0.34, 0.5] : [0, 1.2, kind === "rock" ? 0.28 : 0.3];
           S.y = [0, 1, 0]; S.z = [0, 0, 1];
           S.hands.r = { g: V(-hx * 0.92, -dy * 0.12, 0), n: V(0.85, 0.5, 0), f: V(0.2, -0.15, 1) };
           S.hands.l = { g: V(hx * 0.92, -dy * 0.12, 0), n: V(-0.85, 0.5, 0), f: V(-0.2, -0.15, 1) };
@@ -50851,7 +50852,7 @@ uniform float uWet; uniform float uNight;`,
         }
         case "flat": {
           const hx = Math.max(0.07, dx * 0.5);
-          S.p = fp ? [0, -0.34, 0.5] : [0, 1.02, 0.36];
+          S.p = fp ? [0, -0.34, 0.5] : [0, 1.15, 0.32];
           S.y = [0, 1, 0]; S.z = [0, 0, 1];
           S.hands.r = { g: V(-hx * 0.78, -Math.max(0, dy / 2 - 0.035), -0.02), n: V(0, 1, 0), f: V(0.55, 0, 1) };
           S.hands.l = { g: V(hx * 0.78, -Math.max(0, dy / 2 - 0.035), -0.02), n: V(0, 1, 0), f: V(-0.55, 0, 1) };
@@ -50859,7 +50860,7 @@ uniform float uWet; uniform float uNight;`,
         }
         case "bundle": {
           const hx = Math.max(0.1, dx * 0.5);
-          S.p = fp ? [0, -0.3, 0.55] : [0, 1.12, 0.3];
+          S.p = fp ? [0, -0.3, 0.55] : [0, 1.2, 0.28];
           S.y = [0, 1, -0.2]; S.z = [0, 0.2, 1];
           S.hands.r = { g: V(-hx * 0.8, -dy * 0.25, 0.02), n: V(0.8, 0.5, 0), f: V(0.4, 0, 1) };
           S.hands.l = { g: V(hx * 0.8, -dy * 0.25, 0.02), n: V(-0.8, 0.5, 0), f: V(-0.4, 0, 1) };
@@ -50867,7 +50868,7 @@ uniform float uWet; uniform float uNight;`,
         }
         case "bowl": {
           const hx = Math.max(0.06, dx * 0.5);
-          S.p = fp ? [0, -0.3, 0.46] : [0, 1.1, 0.33];
+          S.p = fp ? [0, -0.3, 0.46] : [0, 1.18, 0.3];
           S.y = [0, 1, 0]; S.z = [0, 0, 1];
           S.hands.r = { g: V(-hx * 0.85, -dy * 0.15, 0), n: V(0.9, 0.35, 0), f: V(0.1, 0.1, 1) };
           S.hands.l = { g: V(hx * 0.85, -dy * 0.15, 0), n: V(-0.9, 0.35, 0), f: V(-0.1, 0.1, 1) };
@@ -50875,7 +50876,7 @@ uniform float uWet; uniform float uNight;`,
         }
         case "log": {
           const hy = dy * 0.5;
-          S.p = fp ? [0, -0.36, 0.5] : [0, 1.0, 0.31];
+          S.p = fp ? [0, -0.36, 0.5] : [0, 1.1, 0.3];
           S.y = [-1, 0, 0]; S.z = [0, 0, 1];
           S.hands.r = { g: V(0, -hy * 0.5, 0), n: V(-1, 0, 0), f: V(0, 0, 1) };
           S.hands.l = { g: V(0, hy * 0.5, 0), n: V(-1, 0, 0), f: V(0, 0, 1) };
@@ -50889,8 +50890,8 @@ uniform float uWet; uniform float uNight;`,
           break;
         }
         case "bag": {
-          S.p = fp ? [0.2, -0.45, 0.5] : [0.15, 1.02, 0.1];
-          S.y = [0.1, 0.9, -0.3]; S.z = [0, 0.3, 1];
+          S.p = fp ? [0.2, -0.3, 0.5] : [0.2, 1.5, 0.0];
+          S.y = [0.1, 0.8, -0.6]; S.z = [0, 0.3, 1];
           S.hands.r = { g: V(0, dy * 0.4, 0), n: V(1, 0, 0), f: V(0, 0, 1) };
           break;
         }
@@ -50925,46 +50926,42 @@ uniform float uWet; uniform float uNight;`,
     // ======================================================================
     const Tq = new ce(), Mq = new ce(), TP = new R(), MP = new R(), pl = new R();
     const gp1 = new R(), gf = new R(), gn = new R();
-    // sonuç: {P, Q}: modelin dünya dönüşümü
-    function placeItem(av, e, fr, S, I, w, dyn, outMesh) {
+    // hedefleri hesapla (el uygulamadan): {T,TQ,P,Q,hands:[{h,P,f,n}]}
+    function holdTargets(av, e, fr, S, I, dyn) {
       const A = canon(I, S.mode);
       const fp = fr.fp;
-      // yönelim
-      fvec(fr, S.y[0], S.y[1], S.y[2], v1.set(0, 0, 0));
-      const yc = v1.clone();
-      fvec(fr, S.z[0], S.z[1], S.z[2], v2.set(0, 0, 0));
-      const zc = v2.clone();
-      if (S.pend && !fp) {
-        // sarkaç: gövde yan eksenine göre
-        q3.setFromAxisAngle(fr.f, S.pend);
-        yc.applyQuaternion(q3);
-      }
-      canonQ(yc, zc, Tq);
-      fpt(fr, S.p[0] + dyn.sway, S.p[1] + dyn.bob, S.p[2], TP);
-      if (S.liftY) TP.y += S.liftY;
-      // sağ el kavrama noktasından çapa
-      if (S.anchor === "grip" && S.hands.r) {
-        gp1.copy(S.hands.r.g).multiplyScalar(dyn.s).applyQuaternion(Tq);
-        TP.sub(gp1);
-      }
-      if (S.hang) {
-        // asılı: el kavrama noktası sabit, öğe aşağı sarkar
-        gp1.copy(S.hands.r.g).multiplyScalar(dyn.s);
-      }
-      const poleR = polesFor(fr, "r", pl.clone());
-      const poleL = polesFor(fr, "l", pl.clone());
+      const yc = fvec(fr, S.y[0], S.y[1], S.y[2], new R());
+      const zc = fvec(fr, S.z[0], S.z[1], S.z[2], new R());
+      if (S.pend && !fp) yc.applyQuaternion(q3.setFromAxisAngle(fr.f, S.pend));
+      const TQ = new ce();
+      canonQ(yc, zc, TQ);
+      const T = fpt(fr, S.p[0] + dyn.sway, S.p[1] + dyn.bob, S.p[2], new R());
+      if (S.liftY) T.y += S.liftY;
+      if (S.anchor === "grip" && S.hands.r) T.sub(new R().copy(S.hands.r.g).multiplyScalar(dyn.s).applyQuaternion(TQ));
+      const hands = [];
       for (const h of ["r", "l"]) {
         const H = S.hands[h];
         if (!H) continue;
-        gp1.copy(H.g).multiplyScalar(dyn.s).applyQuaternion(Tq).add(TP);
-        gf.copy(H.f).applyQuaternion(Tq);
-        gn.copy(H.n).applyQuaternion(Tq);
-        grip(av, h, gp1.clone(), gf.clone(), gn.clone(), w, h === "r" ? poleR : poleL);
+        hands.push({
+          h,
+          P: new R().copy(H.g).multiplyScalar(dyn.s).applyQuaternion(TQ).add(T),
+          f: new R().copy(H.f).applyQuaternion(TQ),
+          n: new R().copy(H.n).applyQuaternion(TQ),
+        });
       }
-      // model dönüşümü
-      Mq.copy(Tq).multiply(A.Binv);
-      MP.copy(I.c).multiplyScalar(dyn.s).applyQuaternion(Mq).multiplyScalar(-1).add(TP);
-      return { P: MP, Q: Mq, T: TP, TQ: Tq };
+      const Q = new ce().copy(TQ).multiply(A.Binv);
+      const P = new R().copy(I.c).multiplyScalar(dyn.s).applyQuaternion(Q).multiplyScalar(-1).add(T);
+      return { T, TQ, P, Q, hands };
+    }
+    function applyHands(av, fr, hands, w) {
+      const poleR = polesFor(fr, "r", new R());
+      const poleL = polesFor(fr, "l", new R());
+      for (const H of hands) grip(av, H.h, H.P, H.f, H.n, H.w ?? w, H.h === "r" ? poleR : poleL);
+    }
+    function placeItem(av, e, fr, S, I, w, dyn) {
+      const R0 = holdTargets(av, e, fr, S, I, dyn);
+      applyHands(av, fr, R0.hands, w);
+      return R0;
     }
 
 
@@ -51029,7 +51026,7 @@ uniform float uWet; uniform float uNight;`,
       if (spec.kind === "hang") {
         spec.anchor = "grip";
         spec.pend = dyn.pend;
-        spec.p = fp ? [0.26, -0.3, 0.46] : [0.27, 0.9, 0.12];
+        spec.p = fp ? [0.26, -0.3, 0.46] : [0.27, 0.93, 0.12];
       } else if (kind === "bag" || kind === "bottle") spec.anchor = "grip";
       const w = S.hk;
       const res = placeItem(av, e, fr, spec, I, w, dyn);
@@ -51064,7 +51061,7 @@ uniform float uWet; uniform float uNight;`,
       if (spec.kind === "hang") {
         spec.anchor = "grip";
         spec.pend = dyn.pend;
-        spec.p = fp ? [0.26, -0.3, 0.46] : [0.27, 0.9, 0.12];
+        spec.p = fp ? [0.26, -0.3, 0.46] : [0.27, 0.93, 0.12];
       } else if (kind === "bag" || kind === "bottle") spec.anchor = "grip";
       const w = S.ck;
       const res = placeItem(av, e, fr, spec, I, yt(w * 1.1, 0, 1), dyn);
@@ -51082,10 +51079,286 @@ uniform float uWet; uniform float uNight;`,
       return true;
     }
 
+    // ======================================================================
+    // 8) YEME / İÇME
+    // ======================================================================
+    const tri = (q, a, b) => (q <= a || q >= b ? 0 : q < (a + b) / 2 ? (q - a) / ((b - a) / 2) : (b - q) / ((b - a) / 2));
+    const env = (q, a, b) => sm(0, a, q) * (1 - sm(1 - b, 1, q));
+    const BITES = { bite: [3, 0.2, 0.2, 0.2], chew_meat: [3, 0.2, 0.2, 0.2], nibble: [5, 0.12, 0.14, 0.15], munch: [6, 0.12, 0.12, 0.13], peel: [2, 0.52, 0.2, 0.2] };
+    // Zaman çizelgesi: b (elin ağıza yaklaşması), gap (ağızla öğe arası, m), tilt (içme eğimi), chew, sw (yutkunma), frac (kalan parça), tear
+    function eatTL(ek, q) {
+      const T = { b: 0, gap: 0.075, bite: 0, chew: 0, sw: 0, tilt: 0, frac: 1, tear: 0, hide: false, wig: 0 };
+      const cf = BITES[ek];
+      if (cf) {
+        const [n, s0, st, wd] = cf;
+        T.b = env(q, ek === "peel" ? 0.1 : 0.14, 0.14);
+        if (ek === "peel") {
+          const to = sm(0.34, 0.5, q);
+          T.b = env(q, 0.1, 0.14) * (0.45 + 0.55 * to);
+          T.wig = (1 - to) * sm(0.1, 0.18, q);
+        }
+        let done = 0;
+        for (let i = 0; i < n; i++) {
+          const u = (q - (s0 + i * st)) / wd;
+          if (u >= 0 && u <= 1) {
+            T.gap = u < 0.3 ? Dt(0.075, 0.006, sm(0, 0.3, u)) : u < 0.42 ? 0.006 : Dt(0.006, 0.075, sm(0.42, 0.62, u));
+            T.bite = tri(u, 0.22, 0.46);
+            T.tear = ek === "chew_meat" ? tri(u, 0.3, 0.62) : 0;
+          }
+          done += u > 0.4 ? 1 : u > 0 ? sm(0.3, 0.42, u) : 0;
+        }
+        T.frac = Math.max(0, 1 - done / n);
+        const last = s0 + (n - 1) * st + wd * 0.42;
+        T.hide = q > last;
+        if (T.hide) T.b *= 1 - sm(last, last + 0.12, q);
+        T.chew = sm(s0 + 0.08, s0 + 0.14, q) * (1 - sm(0.8, 0.9, q)) * (T.gap < 0.03 ? 0.6 : 1);
+        T.sw = tri(q, 0.82, 0.92) + (n > 3 ? tri(q, 0.5, 0.58) * 0.6 : 0);
+      } else if (ek === "sip") {
+        T.b = env(q, 0.2, 0.16);
+        T.tilt = sm(0.22, 0.4, q) * (1 - sm(0.45, 0.58, q)) + sm(0.58, 0.7, q) * (1 - sm(0.78, 0.86, q)) * 0.8;
+        T.sw = tri(q, 0.42, 0.52) + tri(q, 0.76, 0.86) * 0.8;
+        T.gap = 0.0;
+      } else {
+        // gulp: kase / geniş kap
+        T.b = env(q, 0.22, 0.18);
+        T.tilt = sm(0.24, 0.42, q) * (1 - sm(0.76, 0.86, q));
+        T.sw = tri(q, 0.44, 0.52) + tri(q, 0.58, 0.66) + tri(q, 0.72, 0.8);
+        T.gap = 0.0;
+      }
+      return T;
+    }
+    const hF = { p: new R(), q: new ce(), N: new R(), U: new R(), L: new R(), M: new R() };
+    function headFrame(av) {
+      const H = av.bones.Head;
+      H.updateWorldMatrix(true, false);
+      H.getWorldPosition(hF.p);
+      H.getWorldQuaternion(hF.q);
+      hF.N.set(0, 0, 1).applyQuaternion(hF.q);
+      hF.U.set(0, 1, 0).applyQuaternion(hF.q);
+      hF.L.crossVectors(hF.U, hF.N);
+      hF.M.set(0, 0.03, 0.125).applyQuaternion(hF.q).add(hF.p);
+      return hF;
+    }
+    // baş elipsoidi içinde mi? Değer: nüfuz derinliği (m), 0 = dışarıda
+    function headPen(av, P, margin = 0.012) {
+      const H = av.bones.Head;
+      v6.copy(P);
+      H.worldToLocal(v6);
+      // Head kemiğinin ölçeği (gizliyken 0.001) dikkate alındığı için dünya ölçeğinden geri çevir
+      H.getWorldScale(v5);
+      v6.multiply(v5);
+      const x = v6.x / (0.098 + margin), y = (v6.y - 0.085) / (0.128 + margin), z = (v6.z - 0.012) / (0.125 + margin);
+      const d = Math.sqrt(x * x + y * y + z * z);
+      return d < 1 ? (1 - d) * 0.12 : 0;
+    }
+    const projPerp = (a, nrm, out) => out.copy(a).addScaledVector(nrm, -a.dot(nrm)).normalize();
+    const vv = (x, y, z) => new R(x, y, z);
+    const comb = (N, U, Rs, a, b, c) => vv(0, 0, 0).addScaledVector(N, a).addScaledVector(U, b).addScaledVector(Rs, c);
+    // yeme hedefi: öğe merkezi/yönelim + el hedefleri
+    function eatTarget(av, fr, fp, hk, ek, I, dyn, T, mass) {
+      const mode = hk === "long" || hk === "log" ? "long" : "y";
+      const A = canon(I, mode), s = dyn.s;
+      const dy = A.dy * s, dx = A.dx * s, dz = A.dz * s;
+      const mxd = Math.max(dx, dy, dz);
+      let N, U, Rs, Mc, gapD;
+      if (fp) {
+        N = fr.f; U = fr.u; Rs = fr.r;
+        Mc = fr.o.clone().addScaledVector(U, -0.075);
+        gapD = 0.2 + 2.2 * T.gap + (ek === "gulp" || ek === "sip" || hk === "bowl" || hk === "bottle" ? 0.12 : 0); // kameradan uzaklık (m)
+      } else {
+        const hf = headFrame(av);
+        N = hf.N.clone(); U = hf.U.clone(); Rs = hf.L.clone().negate();
+        Mc = hf.M.clone();
+        gapD = T.gap;
+      }
+      const rr = Math.max(0.02, Math.min(dx, dz) * 0.5);
+      const out = { hands: [] };
+      const bowlLike = ek === "gulp" || hk === "bowl";
+      const axisLike = !bowlLike && (ek === "sip" || hk === "bottle" || hk === "long" || ek === "munch" || ek === "chew_meat");
+      let C = new R(), Yd = new R(), Zd = new R();
+      if (bowlLike) {
+        const th = T.tilt * 0.8;
+        Yd = comb(N, U, Rs, -Math.sin(th), Math.cos(th), 0).normalize();
+        const Tt = projPerp(N.clone().negate(), Yd, new R());
+        const Rb = Math.max(0.05, Math.max(dx, dz) * 0.5);
+        if (fp) C.copy(Mc).addScaledVector(N, gapD + 0.06).addScaledVector(U, 0.02);
+        else C.copy(Mc).addScaledVector(Tt, -Rb * 0.85).addScaledVector(Yd, -dy * 0.5).addScaledVector(N, gapD * 0 + 0.004).addScaledVector(U, -0.01);
+        Zd = N.clone();
+        out.bowl = { Rb, Tt };
+        const pL = C.clone().addScaledVector(Rs, -Rb * 0.95).addScaledVector(Yd, -dy * 0.15);
+        const pR = C.clone().addScaledVector(Rs, Rb * 0.95).addScaledVector(Yd, -dy * 0.15);
+        const nR = projPerp(comb(N, U, Rs, 0, 0.35, -0.9), vv(0, 0, 0), new R());
+        const nL = comb(N, U, Rs, 0, 0.35, 0.9).normalize();
+        const fF = projPerp(comb(N, U, Rs, -0.3, -0.3, 0.0).addScaledVector(Tt, 0.7), nR, new R());
+        out.hands.push({ h: "r", P: pR, f: projPerp(fF, nR, new R()), n: nR }, { h: "l", P: pL, f: projPerp(fF, nL, new R()), n: nL });
+      } else if (axisLike) {
+        const drink = ek === "sip" || hk === "bottle";
+        // içerken şişe ters döner: ağız dudakta, gövde yukarı-ileri
+        Yd = drink
+          ? comb(N, U, Rs, -(0.25 + 0.3 * T.tilt), 0.95 - 1.95 * T.tilt, 0.1).normalize()
+          : comb(N, U, Rs, -0.62, 0.6, 0.1).normalize();
+        C.copy(Mc).addScaledVector(N, gapD).addScaledVector(Yd, -dy * 0.5);
+        if (fp) C.addScaledVector(U, 0.0);
+        Zd = N.clone().addScaledVector(Rs, 0.0);
+        const gc = C.clone().addScaledVector(Yd, drink ? -dy * 0.02 : -dy * 0.32);
+        const dirP = projPerp(comb(N, U, Rs, 0.55, -0.1, 0.85), Yd, new R());
+        const P = gc.clone().addScaledVector(dirP, rr * 0.9);
+        const n = dirP.clone().negate();
+        const f = projPerp(comb(N, U, Rs, -0.6, 0.35, -0.45), n, new R());
+        out.hands.push({ h: "r", P, f, n });
+      } else {
+        // küre benzeri: elma, ekmek, meyve...
+        const half = Math.max(0.02, mxd * 0.5 * 0.85);
+        Yd = comb(N, U, Rs, -0.35, 0.8, 0).normalize();
+        C.copy(Mc).addScaledVector(N, gapD + half);
+        if (fp) C.copy(Mc).addScaledVector(N, gapD + half);
+        Zd = N.clone();
+        const dirP = comb(N, U, Rs, 0.12, -0.8, 0.45).normalize();
+        const P = C.clone().addScaledVector(dirP, half * 0.9);
+        const n = dirP.clone().negate();
+        const f = projPerp(comb(N, U, Rs, 0.45, 0.78, -0.2), n, new R());
+        out.hands.push({ h: "r", P, f, n });
+      }
+      out.mode = mode;
+      out.C = C;
+      out.N = N; out.U = U; out.Rs = Rs; out.Mc = Mc;
+      canonQ(Yd, Zd, (out.Q = new ce()));
+      return out;
+    }
+
+    function updateEat(ad, t, e, act) {
+      const S = state(ad), av = ad.av;
+      const m = av.held.r || av.held.l;
+      const want = !!(act && act.type === "eat" && m && !e.dead);
+      S.ek = Bt(S.ek || 0, want ? 1 : 0, 10, t);
+      if (S.ek < 0.01 || !m) {
+        if (S.eatM) {
+          S.eatM.visible = true;
+          S.eatM.userData.sgEatS = 0;
+        }
+        S.eatM = null;
+        S.gripL = 0;
+        return false;
+      }
+      const q = want ? yt(act.t / Math.max(0.2, act.dur), 0, 1) : 1;
+      const itemId = act?.item || e.heldId;
+      const hk = ((x) => (x === "tool" || x === "hang" || x === "carcass" || x === "bag" ? "small" : x))(holdKindOf(itemId));
+      const ek = eatKindOf(itemId);
+      const fp = e.fp || null;
+      const TL = eatTL(ek, q);
+      const w = S.ek;
+      S.eatM = m;
+      // FP'de büyük eşyayı küçült; ısırdıkça küçült
+      const base = m.scale.x;
+      const I = modelInfo(m);
+      const fpMax = 0.14;
+      const md = Math.max(I.d.x, I.d.y, I.d.z) * base;
+      const fpS = fp ? yt(fpMax / Math.max(0.04, md), 0.3, 1.2) : 1;
+      const sh = Math.max(0.0, TL.frac);
+      const keep = (ek === "sip" || ek === "gulp" || BITES[ek] === undefined) ? 1 : Dt(1, 0.45 + 0.55 * sh, 1);
+      m.scale.setScalar(base * Dt(1, fpS, TL.b) * keep);
+      m.visible = !(TL.hide && BITES[ek]);
+      m.updateMatrixWorld(true);
+      m.getWorldScale(ws1);
+      const mass = massOf(itemId);
+      const dyn = dynOf(av, e, mass, hk, ws1.x || 1);
+      const fr = frame(av, fp, FR);
+      // baş / gövde hareketi (TP)
+      const ctA = (S.ct = (S.ct || 0) + t * 21);
+      if (!fp) {
+        const B = av.bones;
+        const Lax = v1.set(0, 0, 0).addScaledVector(fr.r, -1).clone();
+        const b = TL.b * w;
+        const nod = 0.08 * b + 0.1 * TL.bite - 0.42 * TL.tilt + 0.028 * Math.sin(ctA) * TL.chew - 0.07 * TL.sw;
+        const yaw = (0.035 * Math.sin(ctA * 0.37) * TL.chew + 0.22 * Math.sin(ctA * 0.9) * TL.tear) * w;
+        Yn(B.neck_01, Lax, nod * 0.45 * w);
+        Yn(B.Head, Lax, nod * 0.55 * w);
+        Yn(B.Head, UP, yaw);
+        leanBody(av, fr, (0.05 * b + 0.05 * TL.bite) * w);
+        av.root.updateMatrixWorld(true);
+      }
+      // hedefler
+      const spec0 = holdSpec(hk, I, !!fp, dyn);
+      if (hk === "bottle") spec0.anchor = "grip";
+      const H0 = holdTargets(av, e, fr, spec0, I, dyn);
+      const ET = eatTarget(av, fr, !!fp, hk, ek, I, dyn, TL, mass);
+      const b = TL.b;
+      const Pm = new R().lerpVectors(H0.T, ET.C, b);
+      const Qm = new ce().slerpQuaternions(H0.TQ, ET.Q, b);
+      if (TL.wig) Pm.addScaledVector(ET.U, Math.sin(ctA * 0.5) * 0.012 * TL.wig).addScaledVector(ET.Rs, Math.sin(ctA * 0.37) * 0.015 * TL.wig);
+      if (TL.chew && !fp) Pm.addScaledVector(ET.U, Math.sin(ctA * 1.0) * 0.002 * TL.chew);
+      if (TL.tear) Pm.addScaledVector(ET.N, 0.05 * TL.tear).addScaledVector(ET.Rs, 0.025 * TL.tear);
+      // eller: tutma -> yeme
+      const hands = [];
+      const sideOf = (L, h) => L.find((x) => x.h === h);
+      for (const h of ["r", "l"]) {
+        const a = sideOf(H0.hands, h), c = sideOf(ET.hands, h);
+        if (!a && !c) continue;
+        let P, f, n, wh = w;
+        if (a && c) {
+          // eşyaya göreli ofset ile karıştır (öğe yer değiştirince el onunla gitsin)
+          const ra = a.P.clone().sub(H0.T).applyQuaternion(H0.TQ.clone().invert());
+          const rc = c.P.clone().sub(ET.C).applyQuaternion(ET.Q.clone().invert());
+          P = new R().lerpVectors(ra, rc, b).applyQuaternion(Qm).add(Pm);
+          f = new R().lerpVectors(a.f, c.f, b).normalize();
+          n = new R().lerpVectors(a.n, c.n, b).normalize();
+        } else if (c) {
+          const rc = c.P.clone().sub(ET.C).applyQuaternion(ET.Q.clone().invert());
+          P = rc.applyQuaternion(Qm).add(Pm);
+          f = c.f; n = c.n; wh = w * b;
+        } else {
+          const ra = a.P.clone().sub(H0.T).applyQuaternion(H0.TQ.clone().invert());
+          P = ra.applyQuaternion(Qm).add(Pm);
+          f = a.f; n = a.n; wh = w * (1 - b);
+        }
+        hands.push({ h, P, f, n, w: wh });
+      }
+      // baş içine girme güvenliği (TP): el/bilek/parmak ucu
+      if (!fp) {
+        const dir = ET.N.clone().multiplyScalar(0.6).addScaledVector(ET.Rs, 0.4).addScaledVector(ET.U, -0.2).normalize();
+        for (const H of hands) {
+          for (let it = 0; it < 5; it++) {
+            const wrist = v2.copy(H.P).addScaledVector(H.f, -0.105);
+            const tip = v3.copy(H.P).addScaledVector(H.f, 0.09);
+            const pen = Math.max(headPen(av, H.P), headPen(av, wrist), headPen(av, tip), headPen(av, v4.copy(H.P).addScaledVector(H.f, -0.05)));
+            if (pen <= 0) break;
+            H.P.addScaledVector(dir, pen + 0.006);
+          }
+        }
+      }
+      applyHands(av, fr, hands, w);
+      const Mq2 = new ce().copy(Qm).multiply(canon(I, ET.mode).Binv);
+      const Mp2 = new R().copy(I.c).multiplyScalar(dyn.s).applyQuaternion(Mq2).multiplyScalar(-1).add(Pm);
+      seatModel(m, Mp2, Mq2, w);
+      S.gripR = w;
+      S.gripL = hands.some((H) => H.h === "l") ? w : 0;
+      S.eatTL = TL;
+      return true;
+    }
+
+    function edible(id) {
+      const k = kt[id];
+      if (!k) return false;
+      return k.cat === "food" || id === "waterskin" || (k.cat === "med" && !!(k.water || k.curePoison) && !k.stopBleed);
+    }
+    function mouthPoint(ad, out) {
+      const S = state(ad);
+      if (S.fp) {
+        const f = v1.set(0, 0, -1).applyQuaternion(S.fp.q), u = v2.set(0, 1, 0).applyQuaternion(S.fp.q);
+        return out.copy(S.fp.p).addScaledVector(f, 0.3).addScaledVector(u, -0.1);
+      }
+      return out.copy(headFrame(ad.av).M);
+    }
     function update(ad, t, e, act) {
       const S = state(ad);
+      S.fp = e.fp || null;
       const free = !e.dead && !e.sleep && !e.swim && !e.pose && !e.scr && !e.aim;
       const it = e.carryItem;
+      if (act && act.type === "eat" && free && e.heldId) {
+        S.hk = 1;
+        updateCarry(ad, t, e, null);
+        if (updateEat(ad, t, e, act)) return true;
+      } else updateEat(ad, t, e, null);
       if (it && free && !act) {
         updateHold(ad, t, e, false);
         return updateCarry(ad, t, e, it);
@@ -51095,7 +51368,7 @@ uniform float uWet; uniform float uNight;`,
       return updateHold(ad, t, e, on);
     }
 
-    return { holdKindOf, eatKindOf, modelInfo, canon, frame, mkF, holdSpec, dynOf, placeItem, grip, gripObj, massOf, HEAVY, polesFor, canonQ, fvec, fpt, sm, update, state, seatModel, restoreSeat, leanBody };
+    return { edible, mouthPoint, updateEat, eatTL, headFrame, headPen, eatTarget, holdTargets, holdKindOf, eatKindOf, modelInfo, canon, frame, mkF, holdSpec, dynOf, placeItem, grip, gripObj, massOf, HEAVY, polesFor, canonQ, fvec, fpt, sm, update, state, seatModel, restoreSeat, leanBody };
   }
   var sgAnim = null,
     sgA = () => (sgAnim ||= sgAnimMake({ R, ce, Gt, Gl, Yn, Bt, Dt, yt, xe, kt }));
@@ -51326,10 +51599,7 @@ uniform float uWet; uniform float uNight;`,
           n.root.updateMatrixWorld(!0));
       }
       mouthWorld(t) {
-        let e = this.bones.Head,
-          n = this.av.root.getWorldQuaternion(sgQ1),
-          i = sgV1.set(0, 0, 1).applyQuaternion(n);
-        return (e.getWorldPosition(t), t.addScaledVector(i, 0.1), (t.y += 0.07), t);
+        return sgA().mouthPoint(this, t);
       }
       poseEat(t, e, n) {
         let i = this.bones,
@@ -51446,8 +51716,6 @@ uniform float uWet; uniform float uNight;`,
             .addScaledVector(new R(0, 1, 0).applyQuaternion(e.fp.q), -0.2));
         this.poseSlope(t, e);
         let s = !!(n && n.type === "eat" && e.food && !e.dead);
-        this.eatK = Bt(this.eatK || 0, s ? 1 : 0, 9, t);
-        this.eatK > 0.01 && this.poseEat(this.eatK, s ? n.t / Math.max(0.2, n.dur) : 1, e);
         let o = !!(i && n && /^(punch|swing|chop|mine|thrust)$/.test(n.type) && !e.dead);
         (o && (this.atkSide = n.type === "punch" ? (this.atkN || 0) % 2 : 0),
           (this.atkP = o ? n.t / Math.max(0.1, n.dur) : 1),
@@ -54935,7 +55203,7 @@ uniform float uWet; uniform float uNight;`,
             action: c
               ? { type: c.type, t: c.t, dur: c.dur, item: c.itemId }
               : null,
-            food: !!(c && c.type === "eat" && c.itemId && kt[c.itemId]?.cat === "food"),
+            food: !!(c && c.type === "eat" && c.itemId && sgA().edible(c.itemId)),
             holdPose: a,
             carry: !!this.G.physics.held,
             carryItem: this.G.physics.held || null,
