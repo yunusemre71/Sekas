@@ -19,12 +19,15 @@ python3 -m http.server 8000
 
 ## Kontroller (özet)
 
-- `W A S D` yürü, `Shift` koş, `Boşluk` zıpla / tırman, `C` çömel (suda: dal)
+- `W A S D` yürü, `Shift` koş, `Boşluk` zıpla / tırman
+- `Sol Ctrl` basılı tut: çömel (suda: dal) · hızlı iki kez bas: çömelmeyi kilitle, tek basış kalkar. `C` yedek (aç/kapa)
+- Su: göl/deniz/nehirden içilmez. Köy ortasındaki kuyuya bakıp `E` ile matarayı doldur; matara elindeyken sol tık = yudum (her zaman içilebilir)
 - `E` etkileşim, `Tab` envanter, `V` kamera modu, `J` rehberi gizle
 - `Q` eşyayı at (`Shift+Q` hepsini), `R` yapı parçasını döndür
 - Envanterde kıyafete **sağ tık**: giy · giyim yuvasına **tık**: çıkar
 - Oyun odaktayken tarayıcı kısayolları (Ctrl+D, Alt…) engellenir; Ctrl+Shift gibi
-  Windows dil değiştirme tuşları oyunda kullanılmaz.
+  Windows dil değiştirme tuşları oyunda kullanılmaz. Sol Ctrl yalnız başına basıldığında eğilme sayılır;
+  Ctrl+başka tuş (Ctrl+Q gibi) eğilmeyi tetiklemez.
 
 ## Yapı sistemi
 

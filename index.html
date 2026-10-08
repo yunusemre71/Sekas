@@ -199,6 +199,9 @@ kbd { font-family: var(--font-display); font-weight: 400; font-size: 15px; lette
 #stamina { position: relative; }
 #stamina.boost::after { content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 35%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.75), transparent); transform: skewX(-20deg); animation: stamShine 3.2s ease-in-out infinite; pointer-events: none; }
 @keyframes stamShine { 0% { left: -40%; } 30% { left: 110%; } 100% { left: 110%; } }
+#crouchLock { margin-bottom: 8px; padding: 3px 12px 2px; background: var(--paper-2); border: var(--line); box-shadow: 3px 3px 0 var(--ink); font-family: var(--font-hand); font-weight: 400; font-size: 17px; white-space: nowrap; text-align: center; }
+#crouchLock b { font-family: var(--font-display); font-weight: 400; color: var(--hp); letter-spacing: .03em; }
+#crouchLock span { color: var(--ink-2); font-size: 14px; margin-left: 4px; }
 #hotbar { display: flex; gap: 7px; padding: 7px; background: var(--paper-2); border: var(--line); box-shadow: var(--shadow); }
 .slot { position: relative; width: 58px; height: 58px; background: var(--paper-3); border: 2.5px solid var(--ink); flex: none; box-sizing: border-box; }
 .slot img { position: absolute; inset: 4px; width: calc(100% - 8px); height: calc(100% - 8px); pointer-events: none; filter: drop-shadow(1.5px 0 0 var(--ink)) drop-shadow(-1.5px 0 0 var(--ink)) drop-shadow(0 1.5px 0 var(--ink)) drop-shadow(0 -1.5px 0 var(--ink)); }
@@ -241,7 +244,6 @@ kbd { font-family: var(--font-display); font-weight: 400; font-size: 15px; lette
 @keyframes stampIn { 0% { opacity: 0; transform: translate(-50%, -50%) scale(2.2) rotate(8deg); } 12% { opacity: 1; transform: translate(-50%, -50%) scale(.94) rotate(-4deg); } 20% { transform: translate(-50%, -50%) scale(1) rotate(-4deg); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1) rotate(-4deg); } }
 
 .fx { position: fixed; inset: 0; pointer-events: none; z-index: 9; opacity: 0; transition: opacity .25s; }
-#fxHurt { background: radial-gradient(ellipse at center, transparent 45%, rgba(200, 20, 20, .55) 100%); }
 #fxCold { background: radial-gradient(ellipse at center, transparent 50%, rgba(170, 220, 255, .5) 100%); transition: opacity 2s; }
 #fxWater { background: linear-gradient(180deg, rgba(30,110,140,.45), rgba(10,60,90,.65)); }
 #fxSleep { background: #0b0816; transition: opacity 1.2s; z-index: 11; }
@@ -484,6 +486,7 @@ kbd { font-family: var(--font-display); font-weight: 400; font-size: 15px; lette
   </div>
 
   <div id="bottom">
+    <div id="crouchLock" hidden><b>Sol Ctrl</b> eğilme kilitli <span>tek basış: kalk</span></div>
     <div id="stamina"><i id="stamFill"></i></div>
     <div id="hotbar"></div>
     <div id="selName"></div>
@@ -498,7 +501,6 @@ kbd { font-family: var(--font-display); font-weight: 400; font-size: 15px; lette
   </div>
 </div>
 
-<div id="fxHurt" class="fx"></div>
 <div id="fxCold" class="fx"></div>
 <div id="fxWater" class="fx"></div>
 <div id="fxSleep" class="fx"></div>
@@ -593,12 +595,12 @@ kbd { font-family: var(--font-display); font-weight: 400; font-size: 15px; lette
     <div class="keys">
       <div><kbd>W A S D</kbd><span>Yürü</span></div>
       <div><kbd>Shift</kbd><span>Basılı tut: koş (kovalanırken hayvandan biraz hızlısın; canın %30'un altındaysa ancak onun kadar)</span></div>
-      <div><kbd>C</kbd><span>Çömel / sessiz yürü (suda: dal)</span></div>
+      <div><kbd>Sol Ctrl</kbd><span>Basılı tut: çömel / sessiz yürü · hızlı iki kez bas: çömelmeyi kilitle, tek basış: kalk (suda: dal) · <kbd>C</kbd> yedek: aç/kapa</span></div>
       <div><kbd>Boşluk</kbd><span>Zıpla / yüz</span></div>
       <div><kbd>Fare</kbd><span>Etrafa bak · Shift+tekerlek: kamera mesafesi</span></div>
-      <div><kbd>Sol Tık</kbd><span>Kullan · vur · ye · yerleştir</span></div>
+      <div><kbd>Sol Tık</kbd><span>Kullan · vur · ye · yerleştir · matarayla yudum al</span></div>
       <div><kbd>Sağ Tık</kbd><span>Nişan al (mızrak, yay, taş)</span></div>
-      <div><kbd>E</kbd><span>Topla / etkileşim / konuş · basılı tut: yapıyı topla</span></div>
+      <div><kbd>E</kbd><span>Topla / etkileşim / konuş · köy kuyusunda matarayı doldur · basılı tut: yapıyı topla</span></div>
       <div><kbd>1–9</kbd><span>Konuşurken cevap seç</span></div>
       <div><kbd>L</kbd><span>Görev defteri (yan görevler)</span></div>
       <div><kbd>F</kbd><span>Nesneyi tut / bırak (fizik)</span></div>
@@ -613,6 +615,7 @@ kbd { font-family: var(--font-display); font-weight: 400; font-size: 15px; lette
       <div><kbd>Esc</kbd><span>Duraklat</span></div>
     </div>
     <div class="tips">
+      <p><b>İpucu:</b> Göl ve denizden su içilmez. Matarayı köylerin ortasındaki kuyudan doldur; matara elindeyken sol tıkla istediğin zaman yudum alabilirsin.</p>
       <p><b>İpucu:</b> Çömelerek yaklaşırsan hayvanlar seni geç fark eder. Seni çoktan görmüşlerse çömelmek işe yaramaz.</p>
       <p><b>İpucu:</b> Kurtlar ateşten korkar; elinde yanan meşale varken sana yaklaşamazlar. Ayılar korkmaz!</p>
       <p><b>İpucu:</b> Bir taş fırlat — düştüğü yerdeki ses yırtıcıların dikkatini dağıtır.</p>

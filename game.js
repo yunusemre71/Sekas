@@ -31381,7 +31381,7 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
     },
     SgFx = class {
       constructor(G) {
-        ((this.G = G), (this.map = new Map()), (this.v = new R()));
+        ((this.G = G), (this.map = new Map()), (this.v = new R()), (this.hv = new R()));
         let d = document.createElement("div");
         ((d.id = "sgbars"),
           (d.style.cssText = "position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:6;overflow:hidden"),
@@ -31389,26 +31389,96 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
           (this.host = d));
       }
       info(o) {
-        if (o.sp && o.type && o.m) return { root: o.m.root, hp: o.hp, max: o.sp.hp, y: o.pos.y + o.sp.size * 1.15 * (o.scale || 1) + 0.3, dead: o.dead, gone: o.removed };
-        if (o.char) return { root: o.char.root, hp: o.stats.hp, max: 100, y: 0, dead: o.dead, gone: !1, noBar: !0 };
-        let s = o.scale || o.def?.spec?.scale || 1;
-        return { root: o.root, hp: o.hp, max: o.maxHp || 70, y: o.pos.y + 2.05 * s, dead: o.dead || o.hp <= 0, gone: o.gone };
+        if (o.sp && o.type && o.m) return { kind: "animal", root: o.m.root, hp: o.hp, max: o.sp.hp, y: o.pos.y + o.sp.size * 1.15 * (o.scale || 1) + 0.3, dead: o.dead, gone: o.removed };
+        if (o.char) return { kind: "player", root: o.char.root, hp: o.stats.hp, max: 100, y: 0, dead: o.dead, gone: !1, noBar: !0 };
+        let s = o.scale || o.def?.spec?.scale || 1,
+          y = o.pos.y + 2.05 * s;
+        if (o.av?.bones?.Head && o.headPos) y = o.headPos(this.hv).y + 0.3 * s;
+        return { kind: "npc", root: o.root, hp: o.hp, max: o.maxHp || 70, y, dead: o.dead || o.hp <= 0, gone: o.gone };
+      }
+      // NPC kafa üstü can barı: dünya içinde, kameraya dönük düz bir levha (kırmızı yok)
+      makeBar() {
+        let c = document.createElement("canvas");
+        ((c.width = 192), (c.height = 32));
+        let tex = new Qi(c);
+        tex.colorSpace = Le;
+        let m = new si({ map: tex, transparent: !0, depthWrite: !1, depthTest: !0, fog: !1, toneMapped: !1 });
+        this.pg ||= new us(1, 1);
+        let mesh = new Ct(this.pg, m);
+        mesh.onBeforeRender = (r, sc, cam) => {
+          (mesh.quaternion.copy(cam.quaternion), mesh.matrixWorld.compose(mesh.position, mesh.quaternion, mesh.scale));
+        };
+        return ((mesh.frustumCulled = !1), (mesh.renderOrder = 12), (mesh.visible = !1), (mesh.userData.cv = c), (mesh.userData.last = ""), this.G.scene.add(mesh), mesh);
+      }
+      paintBar(bb, gh, r) {
+        let key = gh.toFixed(3) + "/" + r.toFixed(3);
+        if (bb.userData.last === key) return;
+        bb.userData.last = key;
+        let c = bb.userData.cv,
+          g = c.getContext("2d"),
+          W = c.width,
+          H = c.height,
+          rr = (x, y, w, h, q) => {
+            g.beginPath();
+            g.moveTo(x + q, y);
+            g.arcTo(x + w, y, x + w, y + h, q);
+            g.arcTo(x + w, y + h, x, y + h, q);
+            g.arcTo(x, y + h, x, y, q);
+            g.arcTo(x, y, x + w, y, q);
+            g.closePath();
+          };
+        g.clearRect(0, 0, W, H);
+        g.fillStyle = "rgba(14,12,10,0.86)";
+        rr(1, 1, W - 2, H - 2, 12);
+        g.fill();
+        g.lineWidth = 3;
+        g.strokeStyle = "#f4ecd8";
+        g.stroke();
+        let x0 = 7,
+          y0 = 7,
+          bw = W - 14,
+          bh = H - 14;
+        g.save();
+        rr(x0, y0, bw, bh, 8);
+        g.clip();
+        g.fillStyle = "#3a332b";
+        g.fillRect(x0, y0, bw, bh);
+        g.fillStyle = "#f1d98a";
+        g.fillRect(x0, y0, bw * gh, bh);
+        g.fillStyle = r > 0.5 ? "#7cc956" : r > 0.25 ? "#e3b53a" : "#e08a2e";
+        g.fillRect(x0, y0, bw * r, bh);
+        g.fillStyle = "rgba(255,255,255,.22)";
+        g.fillRect(x0, y0, bw * r, bh * 0.38);
+        g.restore();
+        bb.material.map.needsUpdate = !0;
+      }
+      drop(e) {
+        (e.hurt.dispose(), e.el?.remove());
+        if (e.bb) {
+          (e.bb.removeFromParent(), e.bb.material.map.dispose(), e.bb.material.dispose());
+          e.bb = null;
+        }
       }
       hit(o) {
-        let i = this.info(o),
-          e = this.map.get(o);
+        let i = this.info(o);
+        if (i.kind === "player") return;
+        let e = this.map.get(o);
         if (!e) {
-          let el = document.createElement("div");
-          ((el.style.cssText =
-            "position:absolute;width:78px;height:10px;margin:-5px 0 0 -39px;background:rgba(20,10,10,.72);border:1px solid rgba(0,0,0,.85);border-radius:5px;overflow:hidden;opacity:0;transition:opacity .25s"),
-            (el.innerHTML =
-              '<div style="position:absolute;left:0;top:0;height:100%;width:100%;background:#f1c76a"></div><div style="position:absolute;left:0;top:0;height:100%;width:100%;background:linear-gradient(#ff6a5c,#c92a22)"></div>'));
-          (i.noBar || this.host.appendChild(el),
-            (e = { o, el, gh: i.hp / i.max, show: 0, hurt: new SgHurt(), delay: 0, ratio: 1 }),
-            this.map.set(o, e));
+          e = { o, el: null, bb: null, gh: i.hp / i.max, show: 0, hurt: new SgHurt(), delay: 0, ratio: 1 };
+          if (i.kind === "npc") e.bb = this.makeBar();
+          else {
+            let el = document.createElement("div");
+            ((el.style.cssText =
+              "position:absolute;width:78px;height:10px;margin:-5px 0 0 -39px;background:rgba(20,10,10,.72);border:1px solid rgba(0,0,0,.85);border-radius:5px;overflow:hidden;opacity:0;transition:opacity .25s"),
+              (el.innerHTML =
+                '<div style="position:absolute;left:0;top:0;height:100%;width:100%;background:#f1c76a"></div><div style="position:absolute;left:0;top:0;height:100%;width:100%;background:linear-gradient(#ff6a5c,#c92a22)"></div>'));
+            (this.host.appendChild(el), (e.el = el));
+          }
+          this.map.set(o, e);
         }
         ((e.show = 7), (e.delay = 0.45));
-        i.root && e.hurt.hit(i.root);
+        // Kırmızı vuruş boyası yalnız hayvanlarda; köylüler ve oyuncu kırmızıya boyanmaz.
+        i.kind === "animal" && i.root && e.hurt.hit(i.root);
       }
       update(dt) {
         if (!this.map.size) return;
@@ -31417,22 +31487,39 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
         for (let [o, e] of this.map) {
           let i = this.info(o);
           if (i.gone || !i.root) {
-            (e.hurt.dispose(), e.el.remove(), this.map.delete(o));
+            (this.drop(e), this.map.delete(o));
             continue;
           }
           e.hurt.update(dt, i.root);
-          let r = Math.max(0, Math.min(1, i.hp / i.max));
+          let r = Math.max(0, Math.min(1, i.hp / i.max)),
+            dist = Math.hypot(o.pos.x - cam.position.x, o.pos.z - cam.position.z);
           ((e.ratio = r), (e.show -= dt));
+          // yakındaki yaralı köylünün barı görünür kalsın
+          e.bb && !i.dead && r < 1 && dist < 6 && (e.show = Math.max(e.show, 1.6));
           i.dead && (e.show = Math.min(e.show, 1.4));
           if (e.show <= 0 && !e.hurt.ov.some((x) => x.visible)) {
-            (e.hurt.dispose(), e.el.remove(), this.map.delete(o));
+            (this.drop(e), this.map.delete(o));
             continue;
           }
           (e.delay > 0 ? (e.delay -= dt) : e.gh > r && (e.gh = Math.max(r, e.gh - dt * 0.2)), r > e.gh && (e.gh = r));
-          if (i.noBar) continue;
+          if (e.bb) {
+            let bb = e.bb,
+              vis = e.show > 0 && dist < 45 && !i.dead;
+            if (!vis) {
+              bb.visible = !1;
+              continue;
+            }
+            let w = Math.max(0.55, Math.min(2.6, 0.7 * Math.pow(Math.max(dist, 1) / 6, 0.6)));
+            (bb.position.set(o.pos.x, i.y, o.pos.z),
+              bb.quaternion.copy(cam.quaternion),
+              bb.scale.set(w, w * 0.16, 1),
+              (bb.material.opacity = Math.min(1, e.show)),
+              (bb.visible = !0),
+              this.paintBar(bb, e.gh, r));
+            continue;
+          }
           v.set(o.pos.x, i.y, o.pos.z).project(cam);
-          let dist = Math.hypot(o.pos.x - cam.position.x, o.pos.z - cam.position.z),
-            vis = v.z < 1 && Math.abs(v.x) < 1.1 && Math.abs(v.y) < 1.1 && dist < 40 && e.show > 0;
+          let vis = v.z < 1 && Math.abs(v.x) < 1.1 && Math.abs(v.y) < 1.1 && dist < 40 && e.show > 0;
           if (!vis) {
             e.el.style.opacity = "0";
             continue;
@@ -31447,7 +31534,7 @@ if (vBindY > 0.7 && vBindY < 1.12) diffuseColor.rgb = vec3(0.17, 0.2, 0.33);`,
         }
       }
       clear() {
-        for (let [, e] of this.map) (e.hurt.dispose(), e.el.remove());
+        for (let [, e] of this.map) this.drop(e);
         this.map.clear();
       }
     };
@@ -32686,6 +32773,7 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
               (this.leader = s),
               (this.hitFlash = 0),
               (this.knockV = new R()),
+              (this.hopT = 0),
               (this.stepDist = 0),
               (this.headDown = 0),
               (this.alertLook = 0),
@@ -32714,7 +32802,8 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
               (this.followT = 0),
               (this.hurtAgo = 0),
               s.sgFx?.hit(this),
-              this.knockV.set(e.x * n, 0, e.z * n),
+              this.knockV.set(e.x * n * 1.7, 0, e.z * n * 1.7),
+              (this.hopT = 1),
               (this.awareness = 1),
               (this.provoked = !0),
               i === "player" &&
@@ -33152,7 +33241,7 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
           update(t) {
             let e = this.G;
             if (
-              ((this.t += t), (this.hitFlash = Math.max(0, this.hitFlash - t * 4)), this.dead && this.rig)
+              ((this.t += t), (this.hitFlash = Math.max(0, this.hitFlash - t * 4)), (this.hopT = Math.max(0, this.hopT - t * 3.2)), this.dead && this.rig)
             ) {
               ((this.deathT += t),
                 (this.decay -= t),
@@ -33310,6 +33399,7 @@ float fh3(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 437
               i = this.sp;
             if (
               (n.root.position.copy(this.pos),
+              this.hopT > 0 && (n.root.position.y += Math.sin((1 - this.hopT) * Math.PI) * Math.min(0.4, 0.1 + i.size * 0.12)),
               (n.root.rotation.y = this.yaw),
               (n.root.rotation.x = this.pitch),
               this.rig)
@@ -49546,6 +49636,7 @@ uniform float uWet; uniform float uNight;`,
         (this.locked = !1),
         (this.enabled = !0),
         (this.lockFailed = !1),
+        (this.cr = { down: !1, t0: 0, solo: !1, cancel: !1, used: !1, lastTap: -1e9, lock: !1 }),
         (this.sens = 1),
         (this.invertY = !1),
         (this.lastMove = { x: null, y: null }),
@@ -49557,7 +49648,7 @@ uniform float uWet; uniform float uNight;`,
             if (this.captureKey(e)) {
               e.preventDefault();
             }
-            e.repeat || (this.keys.add(e.code), this.pressedKeys.add(e.code));
+            e.repeat || (this.crKey(e.code, !0), this.keys.add(e.code), this.pressedKeys.add(e.code));
           },
           { capture: !0 },
         ),
@@ -49568,7 +49659,7 @@ uniform float uWet; uniform float uNight;`,
             n && (n.tagName === "INPUT" || n.tagName === "TEXTAREA" || n.isContentEditable)
               ? 0
               : this.captureKey(e) && e.preventDefault();
-            (this.keys.delete(e.code), this.releasedKeys.add(e.code));
+            (this.crKey(e.code, !1), this.keys.delete(e.code), this.releasedKeys.add(e.code));
           },
           { capture: !0 },
         ),
@@ -49577,7 +49668,7 @@ uniform float uWet; uniform float uNight;`,
         window.addEventListener("dragstart", (e) => this.active() && e.preventDefault()),
         window.addEventListener("selectstart", (e) => this.active() && e.preventDefault()),
         window.addEventListener("blur", () => {
-          (this.keys.clear(), (this.mouse.b = [!1, !1, !1]));
+          (this.keys.clear(), (this.mouse.b = [!1, !1, !1]), this.crReset());
         }),
         t.addEventListener("mousedown", (e) => {
           (e.button > 0 && e.preventDefault(), (this.mouse.b[e.button] = !0), (this.mouse.pressed[e.button] = !0));
@@ -49602,10 +49693,51 @@ uniform float uWet; uniform float uNight;`,
         ),
         document.addEventListener("pointerlockchange", () => {
           ((this.locked = document.pointerLockElement === t),
-            this.locked ? this.keyLock() : this.keyUnlock(),
+            this.locked ? this.keyLock() : (this.keyUnlock(), this.crReset()),
             this.onLockChange && this.onLockChange(this.locked));
         }),
         document.addEventListener("pointerlockerror", () => this.lockError()));
+    }
+    // ----- Sol Ctrl: basılı tut = eğil; hızlı çift basış = eğilmeyi kilitle; kilitliyken tek basış = kalk -----
+    crKey(t, down) {
+      let c = this.cr,
+        now = performance.now();
+      if (t !== "ControlLeft") {
+        // Ctrl ile başka tuş: yalnız Ctrl sayılmasın (Ctrl+Q gibi). Yürüyüş/zıplama/koşu tuşları eğilmeyi bozmaz.
+        if (down && c.down) {
+          c.solo = !1;
+          now - c.t0 < 100 && !/^(Key[WASD]|Space|ShiftLeft|ShiftRight)$/.test(t) && (c.cancel = !0);
+        }
+        return;
+      }
+      if (down) {
+        if (c.down) return;
+        ((c.down = !0), (c.t0 = now), (c.solo = !this.otherKeyHeld()), (c.cancel = !1), (c.used = !1));
+        // çift basış: ilk kısa basışın üzerinden ~350 ms geçmeden ikinci basış
+        if (!c.lock && now - c.lastTap < 350) ((c.lock = !0), (c.lastTap = -1e9), (c.used = !0));
+      } else {
+        if (!c.down) return;
+        c.down = !1;
+        if (c.solo && !c.used && !c.cancel && now - c.t0 < 400) {
+          if (c.lock) ((c.lock = !1), (c.lastTap = -1e9));
+          else c.lastTap = c.t0;
+        }
+        ((c.solo = !1), (c.used = !1));
+      }
+    }
+    otherKeyHeld() {
+      for (let k of this.keys) if (!/^(Control(Left|Right)|Key[WASD]|Space|Shift(Left|Right))$/.test(k)) return !0;
+      return !1;
+    }
+    crouchHeld() {
+      let c = this.cr;
+      return !!(this.enabled && c.down && !c.cancel && performance.now() - c.t0 >= 100);
+    }
+    crouchLocked() {
+      return !!this.cr.lock;
+    }
+    crReset() {
+      this.cr = { down: !1, t0: 0, solo: !1, cancel: !1, used: !1, lastTap: -1e9, lock: !1 };
     }
     active() {
       return this.locked || this.freeLook || (this.enabled && document.activeElement === document.body);
@@ -53251,7 +53383,7 @@ uniform float uWet; uniform float uNight;`,
         charges: !0,
         phys: { t: "sphere", r: 0.1, m: 0.4 },
         grip: Ln,
-        desc: "Suya bakarken kullanarak doldur. Her yudum +20 su.",
+        desc: "Köy kuyusuna bakıp [E] ile doldur. Sol tık: yudum al (+20 su). Her zaman içilebilir.",
       },
       bread: {
         name: "Köy Ekmeği",
@@ -54627,7 +54759,9 @@ uniform float uWet; uniform float uNight;`,
           n = e.input,
           i = e.cam;
         if (((this.hurtT = Math.max(0, this.hurtT - t * 2.5)), this.dead)) {
-          ((this.deathT += t),
+          (n.crReset(),
+            (this.crouch = this.crouching = !1),
+            (this.deathT += t),
             (this.vel.x *= 0.9),
             (this.vel.z *= 0.9),
             (this.vel.y += -24 * t),
@@ -54637,6 +54771,7 @@ uniform float uWet; uniform float uNight;`,
           return;
         }
         if (((this.hitCool = Math.max(0, (this.hitCool || 0) - t)), this.rest)) {
+          (n.crReset(), (this.crouch = this.crouching = !1));
           if (this.sleeping) {
             ((this.sleepT += t),
               (e.env.timeScale = 60),
@@ -54684,7 +54819,11 @@ uniform float uWet; uniform float uNight;`,
           n.down("KeyD") && ((c += a), (h += l)),
           n.down("KeyA") && ((c -= a), (h -= l)));
         let u = Math.hypot(c, h);
-        (u > 0 && ((c /= u), (h /= u)), !d && !this.swim && n.pressed("KeyC") && (this.crouch = !this.crouch));
+        (u > 0 && ((c /= u), (h /= u)),
+          (d || e.ui?.mapOpen) && n.crReset(),
+          !d && !this.swim && n.pressed("KeyC") && (n.cr.lock = !n.cr.lock),
+          this.swim && (n.cr.lock = !1),
+          (this.crouch = !d && !this.swim && (n.crouchHeld() || n.cr.lock)));
         let f = !1,
           p = this.crouch && !this.swim,
           y = !d && n.down("ShiftLeft") && u > 0 && !p && !this.aiming && !e.physics.held;
@@ -54704,6 +54843,7 @@ uniform float uWet; uniform float uNight;`,
               ? ((this.climb = X),
                 (this.pushT = 0),
                 (this.crouch = !1),
+                (n.cr.lock = !1),
                 this.startAction("climb", X.dur),
                 e.audio?.jump())
               : Y || (this.pushT = 0.1);
@@ -54728,7 +54868,7 @@ uniform float uWet; uniform float uNight;`,
           this.swim &&
             !x &&
             !this.swimTip &&
-            ((this.swimTip = !0), e.ui?.notify("Dalmak için [C], yükselmek için [Boşluk].", null)),
+            ((this.swimTip = !0), e.ui?.notify("Dalmak için [Sol Ctrl], yükselmek için [Boşluk].", null)),
           this.swim &&
             !x &&
             (e.audio?.splash(this.pos.clone().setY(0), Math.min(1, Math.abs(this.vel.y) / 8 + 0.3)),
@@ -54768,7 +54908,7 @@ uniform float uWet; uniform float uNight;`,
         }
         if (this.swim) {
           let D = 0 - 1.22,
-            G = !d && n.down("KeyC"),
+            G = !d && (n.down("KeyC") || n.crouchHeld()),
             Y = !d && n.down("Space"),
             X = this.pos.y < D - 0.25;
           if (G) ((this.vel.y = Bt(this.vel.y, -2.4, 5, t)), (this.diving = !0));
@@ -54791,8 +54931,8 @@ uniform float uWet; uniform float uNight;`,
             this.grounded &&
             !this.climb &&
             !this.steep &&
-            (p && this.crouch
-              ? (this.crouch = !1)
+            (p && n.cr.lock
+              ? ((n.cr.lock = !1), (this.crouch = !1))
               : ((this.vel.y = 7),
                 (this.grounded = !1),
                 e.audio?.jump())),
@@ -55106,14 +55246,16 @@ uniform float uWet; uniform float uNight;`,
           return;
         }
         if (n?.id === "waterskin") {
-          i?.kind === "water"
+          // Matara yalnız köy kuyusundan dolar; doluysa (ya da kuyuya bakmıyorsan) yudum alınır. Susuzluk şartı yok.
+          i?.kind === "well" && e.d <= 0
             ? this.interact()
             : e.d > 0
-              ? ((e.d -= 1),
+              ? this.action ||
+                ((e.d -= 1),
                 this.startAction("eat", 1, { itemId: "waterskin", onDone: () => this.drinkAmount(20) }),
                 t.audio?.drink(),
                 t.ui?.refreshHotbar())
-              : t.ui?.notify("Matara boş. Suya bakıp E ile doldur.", null);
+              : t.ui?.notify("Matara boş. Köy kuyusundan doldurabilirsin.", null);
           return;
         }
         let s = "punch",
@@ -55206,6 +55348,9 @@ uniform float uWet; uniform float uNight;`,
               },
             }));
         }
+      }
+      sgFindWaterskin() {
+        return this.G.inventory.slots.find((t) => t && t.id === "waterskin") || null;
       }
       drinkAmount(t) {
         ((this.stats.water = Math.min(100, this.stats.water + t)), (this.boostT = 30), this.G.quests?.event("drink"));
@@ -55306,29 +55451,30 @@ uniform float uWet; uniform float uNight;`,
           }
           case "struct":
             break;
-          case "water": {
-            let s = this.selectedItem();
-            if (e.point && t.gen.isSalt(e.point.x, e.point.z)) {
-              t.ui?.notify("Deniz suyu tuzlu, içilmez.", null);
+          case "well": {
+            // Göl, deniz ve nehirden su içilmez; su yalnız köy kuyusundan mataraya doldurulur.
+            let s = this.selectedItem(),
+              w = e.well,
+              ws = this.sgFindWaterskin();
+            if (this.action) break;
+            if (s?.id !== "waterskin") {
+              t.ui?.notify(ws ? "Kuyudan su almak için matarayı eline al." : "Su doldurmak için bir matara lazım. Deriden yapılır.", null);
               break;
             }
-            if (s?.id === "waterskin" && s.d < kt.waterskin.dur)
-              ((s.d = kt.waterskin.dur),
-                this.startAction("drink", 1.2),
-                t.audio?.splash(e.point || this.pos, 0.3),
-                t.ui?.notify("Matara doldu.", "waterskin"),
-                t.ui?.refreshHotbar());
-            else {
-              if (this.stats.water >= 99.5) {
-                t.ui?.notify("Susamadım.", null);
-                break;
-              }
-              (this.startAction("drink", 1.3, { onDone: () => this.drinkAmount(18) }),
-                t.audio?.drink(),
-                e.point && t.particles.splash(new R(e.point.x, 0, e.point.z), 0.3));
+            if (s.d >= kt.waterskin.dur) {
+              t.ui?.notify("Matara tam dolu. İçmek için sol tık.", "waterskin");
+              break;
             }
+            ((s.d = kt.waterskin.dur),
+              this.startAction("gather", 1.2),
+              t.audio?.splash(new R(w.x, w.y + 0.9, w.z), 0.3),
+              t.particles.splash(new R(w.x, w.y + 0.9, w.z), 0.35),
+              t.ui?.notify("Matarayı kuyudan doldurdun.", "waterskin"),
+              t.ui?.refreshHotbar());
             break;
           }
+          case "water":
+            break;
           case "carcass":
             t.ui?.notify("Leşi parçalamak için bıçak/balta ile vur.", null);
             break;
@@ -62219,6 +62365,21 @@ uniform float uWet; uniform float uNight;`,
         prox &&
           (!s || c.has(s.kind) || ((s.kind === "pickup" || s.kind === "plant") && (s.dist ?? 9) > prox.dist + 0.6)) &&
           (s = prox);
+        // köy kuyusu: kuyunun yanında ve ona bakarken matara doldurma hedefi
+        if (t.villages && (!s || c.has(s.kind) || s.kind === "pickup" || s.kind === "plant")) {
+          let wl = null,
+            wd2 = 3.1;
+          for (let u of t.villages.list.values())
+            if (u.built && u.well && Math.abs(u.well.x - e.x) < 6 && Math.abs(u.well.z - e.z) < 6) {
+              let dx = u.well.x - e.x,
+                dz = u.well.z - e.z,
+                dd = Math.hypot(dx, dz),
+                hl = Math.hypot(i.x, i.z) || 1,
+                dot = dd < 1.6 ? 1 : (dx * i.x + dz * i.z) / (dd * hl);
+              dd < wd2 && dot > 0.5 && Math.abs(e.y - u.well.y) < 1.6 && ((wd2 = dd), (wl = u.well));
+            }
+          wl && ((s = { kind: "well", well: wl, name: "Köy Kuyusu", reach: 4, point: new R(wl.x, wl.y + 0.9, wl.z), dist: wd2 }), (o = Math.min(o, wd2 * 0.5)));
+        }
       }
       if (i.y < -0.05) {
         let c = (0 - n.y) / i.y;
@@ -62342,16 +62503,17 @@ uniform float uWet; uniform float uNight;`,
               ? (s = "[Sol Tık] Yüz / Parçala")
               : (o = "Yüzmek için Bıçak ya da Balta gerekli");
             break;
-          case "water": {
-            let salt = e.point && t.gen.isSalt(e.point.x, e.point.z);
-            (salt
-              ? ((s = null), (o = "Deniz suyu tuzlu, içilmez"))
-              : n?.id === "waterskin"
-                ? (s = n.d < kt.waterskin.dur ? "[E] Matarayı Doldur" : "[E] İç")
-                : (s = "[E] Su İç"),
-              i?.fishing && (s = "[Sol Tık] Olta At" + (s ? "   " + s : "")));
+          case "well":
+            n?.id === "waterskin"
+              ? n.d < kt.waterskin.dur
+                ? ((s = "[E] Matarayı Doldur"), n.d > 0 && (s += "   [Sol Tık] Yudum al"))
+                : ((s = "[Sol Tık] Yudum al"), (o = "Matara dolu"))
+              : (o = t.player.sgFindWaterskin() ? "Matarayı eline alıp [E] ile doldur" : "Su doldurmak için matara lazım"),
+              (a = null);
             break;
-          }
+          case "water":
+            i?.fishing && (s = "[Sol Tık] Olta At");
+            break;
         }
       ((this.prompt = s), (this.sub = o), (this.hp = a));
     }
@@ -64277,7 +64439,7 @@ uniform float uWet; uniform float uNight;`,
       {
         id: "food",
         title: "Bir hayvan avla ya da balık tut",
-        hint: "Çömelerek ([C]) sessizce yaklaş. Ya da Olta yapıp suya at.",
+        hint: "Çömelerek ([Sol Ctrl]) sessizce yaklaş. Ya da Olta yapıp suya at.",
         any: ["hunt", "fish"],
         n: 1,
       },
@@ -64643,7 +64805,7 @@ uniform float uWet; uniform float uNight;`,
         "Bir uyku tulumun varsa, ormanda başına bir şey gelse de oraya dönersin.",
         "Yağmurda ıslanırsan çabuk üşürsün. Bir çatı ya da ateş bul.",
         "Çömelerek yürürsen hayvanlar seni zor fark eder. Ama bir kez gördülerse iş işten geçmiştir.",
-        "Matarayı derede doldur, susuz yola çıkma.",
+        "Matarayı köyün ortasındaki kuyudan doldur; susuz yola çıkma.",
         "Yay tezgâhta yapılır. Ok için çakmaktaşı lazım, dere kenarlarında bolca bulunur.",
         "Geceleri gökyüzüne bak; bazen kayan yıldız görürsün. Dilek tutmayı unutma.",
       ],
@@ -68229,7 +68391,8 @@ uniform float uWet; uniform float uNight;`,
         (e >= 0 && this.notes.splice(e, 1), t.el.classList.add("out"), setTimeout(() => t.el.remove(), 400));
       }
       flashHurt(t) {
-        this.hurtFlash = Math.min(1, (this.hurtFlash || 0) + 0.3 + t * 0.03);
+        // Kırmızı ekran/vinyet yok: hasar, kamera sarsıntısı + ses + can çubuğu ile hissettirilir (bkz. Player.damage).
+        this.hurtFlash = 0;
       }
       hitMarker() {
         let t = Nt("hitmark");
@@ -68370,13 +68533,15 @@ uniform float uWet; uniform float uNight;`,
           i = n.stats;
         this.frameT = (this.frameT || 0) + t;
         for (let v of [...this.notes]) ((v.t += t), v.t > 4 && this.removeNote(v));
-        this.hurtFlash = Math.max(0, (this.hurtFlash || 0) - t * 1.6);
-        let s = i.hp < 30 ? (1 - i.hp / 30) * (0.5 + 0.5 * Math.sin(this.frameT * 5)) * 0.55 : 0;
-        ((Nt("fxHurt").style.opacity = String(Math.max(this.hurtFlash, s, n.bleed > 0 ? 0.2 : 0))),
-          (Nt("fxCold").style.opacity = String(yt((n.cold || 0) * 1.2, 0, 0.9))),
+        {
+          let cl = Nt("crouchLock"),
+            on = !!(n.crouching && e.input.crouchLocked() && !n.swim && !n.dead);
+          cl.hidden === on && (cl.hidden = !on);
+        }
+        ((Nt("fxCold").style.opacity = String(yt((n.cold || 0) * 1.2, 0, 0.9))),
           (Nt("fxWater").style.opacity = e.cam.underwater ? "1" : "0"),
           e.rend.setEffects({
-            hurt: Math.max(this.hurtFlash * 0.4, s * 0.6),
+            hurt: 0,
             cold: n.cold || 0,
             under: e.cam.underwater ? 1 : 0,
             low: i.hp < 25 ? (1 - i.hp / 25) * 0.6 : 0,
@@ -69841,6 +70006,7 @@ uniform float uWet; uniform float uNight;`,
         (A.animals.spawnPoint = { x: i.x, z: i.z }),
         (A.player.yaw = Math.random() * Math.PI * 2),
         (A.quests.startDay = 1));
+      A.inventory.add("waterskin", 1, 0);
       for (let s = 0; s < 4; s++) {
         let o = Math.random() * Math.PI * 2,
           a = 2.5 + Math.random() * 3,
