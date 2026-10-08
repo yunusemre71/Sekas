@@ -51026,7 +51026,7 @@ uniform float uWet; uniform float uNight;`,
       if (spec.kind === "hang") {
         spec.anchor = "grip";
         spec.pend = dyn.pend;
-        spec.p = fp ? [0.26, -0.3, 0.46] : [0.27, 0.93, 0.12];
+        spec.p = fp ? [0.24, -0.1, 0.5] : [0.27, 0.93, 0.12];
       } else if (kind === "bag" || kind === "bottle") spec.anchor = "grip";
       const w = S.hk;
       const res = placeItem(av, e, fr, spec, I, w, dyn);
@@ -51061,7 +51061,7 @@ uniform float uWet; uniform float uNight;`,
       if (spec.kind === "hang") {
         spec.anchor = "grip";
         spec.pend = dyn.pend;
-        spec.p = fp ? [0.26, -0.3, 0.46] : [0.27, 0.93, 0.12];
+        spec.p = fp ? [0.24, -0.1, 0.5] : [0.27, 0.93, 0.12];
       } else if (kind === "bag" || kind === "bottle") spec.anchor = "grip";
       const w = S.ck;
       const res = placeItem(av, e, fr, spec, I, yt(w * 1.1, 0, 1), dyn);
@@ -51240,7 +51240,7 @@ uniform float uWet; uniform float uNight;`,
         S.gripL = 0;
         return false;
       }
-      const q = want ? yt(act.t / Math.max(0.2, act.dur), 0, 1) : 1;
+      const q = want ? yt(act.t, 0, 1) : 1;
       const itemId = act?.item || e.heldId;
       const hk = ((x) => (x === "tool" || x === "hang" || x === "carcass" || x === "bag" ? "small" : x))(holdKindOf(itemId));
       const ek = eatKindOf(itemId);
@@ -51336,6 +51336,362 @@ uniform float uWet; uniform float uNight;`,
       return true;
     }
 
+    // ======================================================================
+    // 9) ALETLER: hazır poz + saldırı hareketleri (vuruş anı = action.hitAt)
+    // ======================================================================
+    // Anahtar: K(u, P[sağ,yukarı,ileri], a[alet ekseni: sap -> uç], lean, tw, dip, ez, ekstra)
+    const K = (u, P, a, lean = 0, tw = 0, dip = 0, ez = "io", x = null) => ({ u, P, a, lean, tw, dip, ez, ...(x || {}) });
+    const MOVES = {
+      chop: {
+        cU: 0.5, two: 0.2, mass: 1,
+        tp: [
+          K(0, [0.2, 1.15, 0.24], [0.15, 0.9, 0.4]),
+          K(0.2, [0.26, 1.55, 0.02], [0.3, 0.6, -0.74], -0.1, 0.35, -0.01, "out", { w: 1 }),
+          K(0.38, [0.24, 1.66, 0.06], [0.2, 0.85, -0.48], -0.18, 0.42, -0.01, "io"),
+          K(0.5, [0.12, 1.3, 0.32], [-0.1, -0.25, 0.96], 0.28, -0.12, 0.04, "in", { hit: 1 }),
+          K(0.64, [0.06, 1.16, 0.28], [-0.35, -0.75, 0.55], 0.34, -0.28, 0.05, "out"),
+          K(1, [0.2, 1.15, 0.24], [0.15, 0.9, 0.4]),
+        ],
+        fp: [
+          K(0, [0.27, -0.2, 0.4], [-0.15, 0.85, 0.5]),
+          K(0.2, [0.22, -0.06, 0.36], [0.2, 0.8, 0.5], 0, 0, 0, "out", { w: 1 }),
+          K(0.38, [0.2, -0.02, 0.36], [0.15, 0.85, 0.45], 0, 0, 0, "io"),
+          K(0.5, [0.1, -0.15, 0.46], [-0.2, -0.2, 0.95], 0, 0, 0, "in", { hit: 1 }),
+          K(0.64, [0.04, -0.3, 0.4], [-0.45, -0.65, 0.6], 0, 0, 0, "out"),
+          K(1, [0.27, -0.2, 0.4], [-0.15, 0.85, 0.5]),
+        ],
+      },
+      sword: {
+        cU: 0.5, two: 0, mass: 0.6,
+        tp: [
+          K(0, [0.2, 1.14, 0.26], [0.12, 0.92, 0.38]),
+          K(0.22, [0.34, 1.46, 0.1], [0.45, 0.8, -0.15], -0.05, 0.3, 0, "out", { w: 1, L: [-0.2, 1.3, 0.2] }),
+          K(0.34, [0.36, 1.5, 0.14], [0.5, 0.75, 0.0], -0.08, 0.34, 0, "io", { L: [-0.2, 1.3, 0.2] }),
+          K(0.5, [0.1, 1.26, 0.4], [-0.2, -0.1, 0.97], 0.14, -0.25, 0.02, "in", { hit: 1, L: [-0.25, 1.35, 0.15] }),
+          K(0.66, [-0.12, 1.18, 0.34], [-0.85, -0.2, 0.45], 0.18, -0.5, 0.03, "out", { L: [-0.28, 1.3, 0.1] }),
+          K(1, [0.2, 1.14, 0.26], [0.12, 0.92, 0.38], 0, 0, 0, "io", { L: [-0.2, 1.3, 0.2] }),
+        ],
+        fp: [
+          K(0, [0.27, -0.2, 0.4], [-0.1, 0.85, 0.5]),
+          K(0.22, [0.3, -0.1, 0.34], [0.55, 0.7, 0.4], 0, 0, 0, "out", { w: 1 }),
+          K(0.34, [0.32, -0.08, 0.36], [0.6, 0.65, 0.4], 0, 0, 0, "io"),
+          K(0.5, [0.1, -0.2, 0.48], [-0.2, -0.1, 0.97], 0, 0, 0, "in", { hit: 1 }),
+          K(0.66, [-0.14, -0.26, 0.42], [-0.85, -0.2, 0.45], 0, 0, 0, "out"),
+          K(1, [0.27, -0.2, 0.4], [-0.1, 0.85, 0.5]),
+        ],
+      },
+      thrust: {
+        cU: 0.5, two: 0.55, mass: 0.8, fixedW: [0, 1, 0],
+        tp: [
+          K(0, [0.18, 1.12, 0.22], [0.05, 0.6, 0.8]),
+          K(0.25, [0.2, 1.22, 0.0], [0.05, 0.12, 1.0], -0.08, 0.35, -0.01, "out", { w: 1 }),
+          K(0.5, [0.12, 1.3, 0.5], [0.0, 0.02, 1.0], 0.25, -0.3, 0.05, "in", { hit: 1 }),
+          K(0.66, [0.1, 1.26, 0.56], [0.0, 0.04, 1.0], 0.28, -0.32, 0.05, "out"),
+          K(1, [0.18, 1.12, 0.22], [0.05, 0.6, 0.8]),
+        ],
+        fp: [
+          K(0, [0.27, -0.22, 0.38], [-0.1, 0.35, 0.93]),
+          K(0.25, [0.29, -0.2, 0.24], [-0.05, 0.2, 0.97], 0, 0, 0, "out", { w: 1 }),
+          K(0.5, [0.14, -0.18, 0.56], [-0.02, 0.1, 1.0], 0, 0, 0, "in", { hit: 1 }),
+          K(0.66, [0.12, -0.18, 0.6], [-0.02, 0.1, 1.0], 0, 0, 0, "out"),
+          K(1, [0.27, -0.22, 0.38], [-0.1, 0.35, 0.93]),
+        ],
+      },
+      stab: {
+        cU: 0.5, two: 0, mass: 0.3, fixedW: [0, 1, 0],
+        tp: [
+          K(0, [0.2, 1.12, 0.3], [0.1, 0.8, 0.58], 0, 0, 0, "io", { L: [-0.2, 1.3, 0.2] }),
+          K(0.22, [0.24, 1.22, 0.14], [0.1, 0.35, 0.93], -0.05, 0.3, 0, "out", { w: 1, L: [-0.15, 1.3, 0.25] }),
+          K(0.5, [0.12, 1.28, 0.5], [0.0, 0.05, 1.0], 0.22, -0.28, 0.03, "in", { hit: 1, L: [-0.2, 1.3, 0.2] }),
+          K(0.68, [0.16, 1.2, 0.4], [0.05, 0.3, 0.95], 0.15, -0.15, 0.02, "out", { L: [-0.2, 1.3, 0.2] }),
+          K(1, [0.2, 1.12, 0.3], [0.1, 0.8, 0.58], 0, 0, 0, "io", { L: [-0.2, 1.3, 0.2] }),
+        ],
+        fp: [
+          K(0, [0.24, -0.16, 0.4], [-0.25, 0.9, 0.4]),
+          K(0.22, [0.26, -0.12, 0.3], [-0.2, 0.6, 0.75], 0, 0, 0, "out", { w: 1 }),
+          K(0.5, [0.1, -0.12, 0.5], [-0.2, 0.3, 0.93], 0, 0, 0, "in", { hit: 1 }),
+          K(0.68, [0.16, -0.16, 0.44], [-0.22, 0.45, 0.86], 0, 0, 0, "out"),
+          K(1, [0.24, -0.16, 0.4], [-0.25, 0.9, 0.4]),
+        ],
+      },
+    };
+    MOVES.mine = {
+      ...MOVES.chop, mass: 1.2, two: 0.22,
+      tp: [
+        K(0, [0.2, 1.15, 0.24], [0.15, 0.9, 0.4]),
+        K(0.22, [0.25, 1.6, 0.0], [0.25, 0.65, -0.7], -0.12, 0.38, -0.01, "out", { w: 1 }),
+        K(0.4, [0.22, 1.7, 0.04], [0.15, 0.9, -0.4], -0.2, 0.44, -0.015, "io"),
+        K(0.5, [0.1, 1.24, 0.34], [-0.08, -0.5, 0.85], 0.34, -0.12, 0.05, "in", { hit: 1 }),
+        K(0.66, [0.05, 1.12, 0.3], [-0.2, -0.8, 0.55], 0.38, -0.2, 0.06, "out"),
+        K(1, [0.2, 1.15, 0.24], [0.15, 0.9, 0.4]),
+      ],
+      fp: [
+        K(0, [0.27, -0.2, 0.4], [-0.15, 0.85, 0.5]),
+        K(0.22, [0.22, -0.04, 0.36], [0.15, 0.8, 0.5], 0, 0, 0, "out", { w: 1 }),
+        K(0.4, [0.2, 0.0, 0.36], [0.1, 0.85, 0.45], 0, 0, 0, "io"),
+        K(0.5, [0.1, -0.14, 0.44], [-0.12, -0.35, 0.92], 0, 0, 0, "in", { hit: 1 }),
+        K(0.66, [0.05, -0.3, 0.4], [-0.3, -0.8, 0.5], 0, 0, 0, "out"),
+        K(1, [0.27, -0.2, 0.4], [-0.15, 0.85, 0.5]),
+      ],
+    };
+    MOVES.club = {
+      ...MOVES.sword, mass: 1.2, two: -0.2,
+      tp: [
+        K(0, [0.2, 1.14, 0.26], [0.1, 0.9, 0.42]),
+        K(0.24, [0.28, 1.6, 0.0], [0.2, 0.75, -0.6], -0.12, 0.36, -0.01, "out", { w: 1 }),
+        K(0.38, [0.26, 1.64, 0.04], [0.15, 0.85, -0.5], -0.16, 0.4, -0.015, "io"),
+        K(0.5, [0.1, 1.24, 0.36], [-0.12, -0.3, 0.95], 0.28, -0.2, 0.05, "in", { hit: 1 }),
+        K(0.68, [-0.02, 1.14, 0.3], [-0.55, -0.7, 0.45], 0.34, -0.4, 0.06, "out"),
+        K(1, [0.2, 1.14, 0.26], [0.1, 0.9, 0.42]),
+      ],
+    };
+    MOVES.club.fp = MOVES.chop.fp;
+    MOVES.torch = { ...MOVES.sword, mass: 0.5 };
+    const TOOL_OF = {
+      axe: "chop", iron_axe: "chop", pickaxe: "mine", knife: "stab", iron_knife: "stab", club: "club", sword: "sword", sword_stone: "sword",
+      spear: "thrust", spear_stone: "thrust", torch: "torch",
+    };
+    const MOVE_ACT = { chop: "chop", mine: "mine", swing: "sword", thrust: "thrust", punch: "sword" };
+    function moveOf(id, act) {
+      if (TOOL_OF[id]) return MOVES[TOOL_OF[id]];
+      const k = kt[id];
+      if (k && k.moveKind && MOVES[k.moveKind]) return MOVES[k.moveKind];
+      if (k && k.act && MOVE_ACT[k.act]) return MOVES[MOVE_ACT[k.act]];
+      if (act && MOVE_ACT[act.type]) return MOVES[MOVE_ACT[act.type]];
+      return MOVES.sword;
+    }
+    const easeF = { io: (k) => k * k * (3 - 2 * k), in: (k) => k * k, out: (k) => 1 - (1 - k) * (1 - k) };
+    const lerpA = (a, b, k, out) => {
+      out[0] = a[0] + (b[0] - a[0]) * k;
+      out[1] = a[1] + (b[1] - a[1]) * k;
+      out[2] = a[2] + (b[2] - a[2]) * k;
+      return out;
+    };
+    function sampleKeys(keys, uu, o) {
+      let i = 0;
+      while (i < keys.length - 2 && uu >= keys[i + 1].u) i++;
+      const A = keys[i], B = keys[i + 1];
+      const k = yt((uu - A.u) / Math.max(1e-4, B.u - A.u), 0, 1);
+      const s = (easeF[B.ez] || easeF.io)(k);
+      lerpA(A.P, B.P, s, o.P);
+      lerpA(A.a, B.a, s, o.a);
+      o.lean = A.lean + (B.lean - A.lean) * s;
+      o.tw = A.tw + (B.tw - A.tw) * s;
+      o.dip = A.dip + (B.dip - A.dip) * s;
+      if (A.L && B.L) {
+        lerpA(A.L, B.L, s, (o.L ||= [0, 0, 0]));
+        o.hasL = 1;
+      } else o.hasL = 0;
+      return o;
+    }
+    function armLen(av, side) {
+      const B = av.bones;
+      const up = B["upperarm_" + side], lo = B["lowerarm_" + side], ha = B["hand_" + side];
+      up.getWorldPosition(v4);
+      lo.getWorldPosition(v5);
+      ha.getWorldPosition(v6);
+      return v4.distanceTo(v5) + v5.distanceTo(v6);
+    }
+    // hedef bilek noktasını omuzdan erişilebilir küreye sıkıştır
+    function clampReach(av, side, wrist) {
+      const sh = av.bones["upperarm_" + side];
+      sh.getWorldPosition(v1);
+      const L = armLen(av, side) * 0.985;
+      v2.copy(wrist).sub(v1);
+      const d = v2.length();
+      if (d > L) wrist.copy(v1).addScaledVector(v2, L / d);
+      return wrist;
+    }
+    const tkS = { P: [0, 0, 0], a: [0, 0, 1], lean: 0, tw: 0, dip: 0, L: null, hasL: 0 };
+    const eVec = new R(), aVec = new R(), pVec = new R(), wVec = new R();
+    const tqQ = new ce();
+    function prepMove(mv, key) {
+      mv._w = mv._w || {};
+      if (mv._w[key]) return mv._w[key];
+      const ks = mv[key] || mv.tp;
+      let om;
+      if (mv.fixedW) om = new R(...mv.fixedW);
+      else {
+        const w0 = ks.find((x) => x.w) || ks[1], h0 = ks.find((x) => x.hit);
+        om = new R(...w0.a).normalize().cross(new R(...h0.a).normalize());
+        if (om.length() < 0.2) om.set(1, 0, 0);
+        om.normalize();
+      }
+      return (mv._w[key] = om);
+    }
+    // gripObj + erişim sınırı
+    function gripObjReach(av, side, obj, P, Q, w, pole) {
+      const B = av.bones, hand = B["hand_" + side];
+      hand.updateWorldMatrix(true, false);
+      obj.updateWorldMatrix(true, false);
+      hand.getWorldPosition(rg1);
+      hand.getWorldQuaternion(rg3);
+      obj.getWorldPosition(rg2);
+      obj.getWorldQuaternion(rg4);
+      const inv = rg5.copy(rg3).invert();
+      const d = rg2.sub(rg1).applyQuaternion(inv);
+      const rel = inv.multiply(rg4);
+      const Qh = rg6.copy(Q).multiply(rg4.copy(rel).invert());
+      const wrp = new R().copy(d).applyQuaternion(Qh).multiplyScalar(-1).add(P);
+      clampReach(av, side, wrp);
+      Gl(B["upperarm_" + side], B["lowerarm_" + side], hand, wrp, pole, w);
+      hand.parent.getWorldQuaternion(hQp).invert();
+      hQl.copy(hQp).multiply(Qh);
+      hand.quaternion.slerp(hQl, w);
+      hand.updateMatrixWorld(true);
+    }
+    // alet: hazır poz (act tipi none) veya hareket
+    function updateTool(ad, t, e, act, id) {
+      const S = state(ad), av = ad.av;
+      const m = av.held.r;
+      const free = !e.dead && !e.sleep && !e.swim && !e.pose && !e.scr;
+      const meleeAct = !!(act && /^(chop|mine|swing|thrust|punch)$/.test(act.type) && free);
+      const want = !!(m && id && free && !e.aim && (meleeAct || (!act || act.type === "none")));
+      S.tk = Bt(S.tk || 0, want ? 1 : 0, meleeAct ? 22 : 9, t);
+      if (!m || S.tk < 0.01) {
+        if (m && S.toolOn) restoreSeat(m);
+        S.toolOn = false;
+        return false;
+      }
+      S.toolOn = true;
+      const fp = e.fp || null;
+      const fr = frame(av, fp, FR);
+      const mv = moveOf(id, act);
+      const key = fp && mv.fp ? "fp" : "tp";
+      const ks = mv[key];
+      const om = prepMove(mv, key);
+      let uu = 0, recoil = 0;
+      if (meleeAct) {
+        const q = yt(act.t, 0, 1);
+        const hA = yt(act.hitAt ?? mv.cU, 0.12, 0.9);
+        uu = q < hA ? (mv.cU * q) / hA : mv.cU + ((1 - mv.cU) * (q - hA)) / (1 - hA);
+        if (q > hA) recoil = Math.exp(-(q - hA) * 14) * Math.cos((q - hA) * 30) * 0.5 + Math.exp(-(q - hA) * 14) * 0.5;
+      }
+      const o = sampleKeys(ks, uu, tkS);
+      const mass = mv.mass || 0.6;
+      const walk = !meleeAct ? Math.min(1, (e.speed || 0) / 3) : 0;
+      const ph = (av.phase || 0) * PI * 2;
+      const swayX = Math.sin(ph) * 0.012 * walk, swayY = Math.cos(ph * 2) * 0.012 * walk;
+      const w = S.tk;
+      const lean = o.lean * w + (meleeAct ? -recoil * 0.04 * mass * w : 0);
+      if (!fp) {
+        const B = av.bones;
+        av.root.updateMatrixWorld(true);
+        leanBody(av, fr, lean);
+        const tw = o.tw * w;
+        Yn(B.spine_01, UP, tw * 0.3);
+        Yn(B.spine_02, UP, tw * 0.35);
+        Yn(B.spine_03, UP, tw * 0.35);
+        Yn(B.Head, UP, -tw * 0.45);
+        av.model.position.y -= o.dip * w * mass;
+        av.root.updateMatrixWorld(true);
+      }
+      pVec.set(0, 0, 0).addScaledVector(fr.r, o.P[0] + swayX).addScaledVector(fr.u, o.P[1] + swayY).addScaledVector(fr.f, o.P[2]);
+      pVec.add(fr.o);
+      aVec.set(0, 0, 0).addScaledVector(fr.r, o.a[0]).addScaledVector(fr.u, o.a[1]).addScaledVector(fr.f, o.a[2]).normalize();
+      if (recoil && meleeAct) pVec.addScaledVector(aVec, -0.03 * recoil * mass);
+      wVec.set(0, 0, 0).addScaledVector(fr.r, om.x).addScaledVector(fr.u, om.y).addScaledVector(fr.f, om.z).normalize();
+      eVec.crossVectors(wVec, aVec);
+      if (eVec.lengthSq() < 1e-4) eVec.copy(fr.r);
+      eVec.normalize();
+      const zz = v3.crossVectors(eVec, aVec);
+      tqQ.setFromRotationMatrix(m4.makeBasis(eVec, aVec, zz));
+      m.updateWorldMatrix(true, true);
+      restoreSeat(m);
+      m.updateMatrixWorld(true);
+      gripObjReach(av, "r", m, pVec, tqQ, w, polesFor(fr, "r", new R()));
+      S.gripR = w;
+      let usedL = 0;
+      const two = mv.two || 0;
+      if (two) {
+        const Pl = new R().copy(pVec).addScaledVector(aVec, two);
+        const side = projPerp(new R().copy(fr.r).multiplyScalar(-0.85).addScaledVector(fr.u, -0.25), aVec, new R());
+        const Pc = Pl.addScaledVector(side, 0.03);
+        const nL = side.clone().negate();
+        const fL = new R().crossVectors(aVec, nL).normalize();
+        if (fL.dot(fr.f) < 0) fL.negate();
+        const w2 = w * 0.85;
+        grip(av, "l", clampReachPalm(av, "l", Pc, fL), fL, nL, w2, polesFor(fr, "l", new R()));
+        usedL = w2;
+      } else if (o.hasL && !fp) {
+        const Pf = fpt(fr, o.L[0], o.L[1], o.L[2], new R());
+        const nL = fvec(fr, 0.8, 0.2, 0.2, new R()).normalize();
+        const fL = projPerp(fvec(fr, 0.1, 0.5, 0.85, new R()), nL, new R());
+        grip(av, "l", clampReachPalm(av, "l", Pf, fL), fL, nL, w * 0.8, polesFor(fr, "l", new R()));
+        usedL = w * 0.8;
+      }
+      S.gripL = usedL;
+      return true;
+    }
+    function clampReachPalm(av, side, P, f) {
+      const wr = new R().copy(P).addScaledVector(f, -0.105);
+      clampReach(av, side, wr);
+      return P.copy(wr).addScaledVector(f, 0.105);
+    }
+
+    // yumruk: sol/sağ sırayla
+    function updatePunch(ad, t, e, act) {
+      const S = state(ad), av = ad.av;
+      const free = !e.dead && !e.sleep && !e.swim && !e.pose && !e.scr;
+      const on = !!(act && act.type === "punch" && free);
+      S.pk = Bt(S.pk || 0, on ? 1 : 0, on ? 22 : 10, t);
+      if (S.pk < 0.01) {
+        S.punchPrev = null;
+        return false;
+      }
+      if (on) {
+        if (S.punchPrev == null || act.t < S.punchPrev - 1e-4) S.punchSide = ((S.punchSide ?? 1) + 1) % 2;
+        S.punchPrev = act.t;
+      }
+      const side = S.punchSide ? "l" : "r", gs = side === "r" ? 1 : -1;
+      const fp = e.fp || null;
+      const fr = frame(av, fp, FR);
+      const q = on ? yt(act.t, 0, 1) : 1;
+      const hA = yt(act?.hitAt ?? 0.42, 0.12, 0.9);
+      const uu = q < hA ? 0.5 * (q / hA) : 0.5 + (0.5 * (q - hA)) / (1 - hA);
+      const seg = (u) => (u < 0.22 ? [0, 1, easeF.out(u / 0.22)] : u < 0.5 ? [1, 2, easeF.in((u - 0.22) / 0.28)] : u < 0.68 ? [2, 3, easeF.out((u - 0.5) / 0.18)] : [3, 0, easeF.io((u - 0.68) / 0.32)]);
+      const [a, b, k] = seg(uu);
+      const T = fp
+        ? [
+            [0.2, -0.2, 0.36, 0.1, 0.0],
+            [0.22, -0.3, 0.26, 0.0, 0.2],
+            [0.06, -0.2, 0.62, 0.0, -0.05],
+            [0.1, -0.24, 0.55, 0.0, -0.1],
+          ]
+        : [
+            [0.17, 1.42, 0.3, 0.1, 0.0],
+            [0.22, 1.36, 0.18, 0.0, 0.25],
+            [0.04, 1.44, 0.6, 0.0, -0.3],
+            [0.07, 1.4, 0.54, 0.0, -0.36],
+          ];
+      const lp = (i) => T[a][i] + (T[b][i] - T[a][i]) * k;
+      const rx = lp(0), ry = lp(1), rz = lp(2), lean = lp(3), tw = lp(4);
+      const w = S.pk;
+      if (!fp) {
+        const B = av.bones;
+        leanBody(av, fr, lean * w);
+        Yn(B.spine_01, UP, tw * gs * w * 0.3);
+        Yn(B.spine_02, UP, tw * gs * w * 0.35);
+        Yn(B.spine_03, UP, tw * gs * w * 0.35);
+        Yn(B.Head, UP, -tw * gs * w * 0.4);
+        av.root.updateMatrixWorld(true);
+      }
+      const Pm = fpt(fr, rx * gs, ry, rz, new R());
+      const nH = fvec(fr, -gs * 0.2, -0.9, 0.0, new R()).normalize();
+      const fH = fvec(fr, 0, 0.15, 1, new R()).normalize();
+      grip(av, side, clampReachPalm(av, side, Pm, fH), fH, nH, w, polesFor(fr, side, new R()));
+      const os = side === "r" ? "l" : "r", gso = -gs;
+      const Pg = fpt(fr, gso * (fp ? 0.2 : 0.17), fp ? -0.24 : 1.4, fp ? 0.34 : 0.3, new R());
+      const nG = fvec(fr, -gso * 0.3, -0.9, 0.0, new R()).normalize();
+      const fG = fvec(fr, 0, 0.5, 1, new R()).normalize();
+      grip(av, os, clampReachPalm(av, os, Pg, fG), fG, nG, w * 0.9, polesFor(fr, os, new R()));
+      S.gripR = S.gripL = w;
+      return true;
+    }
+    function handles(act, e) {
+      return !!(act && /^(chop|mine|swing|thrust|punch)$/.test(act.type) && !e.swim && !e.dead);
+    }
+
     function edible(id) {
       const k = kt[id];
       if (!k) return false;
@@ -51359,6 +51715,18 @@ uniform float uWet; uniform float uNight;`,
         updateCarry(ad, t, e, null);
         if (updateEat(ad, t, e, act)) return true;
       } else updateEat(ad, t, e, null);
+      if (updatePunch(ad, t, e, act)) {
+        updateCarry(ad, t, e, null);
+        return true;
+      }
+      const hk = e.heldId ? holdKindOf(e.heldId) : null;
+      const isTool = hk === "tool" && e.heldId !== "bow" && e.heldId !== "rod" && !e.carryItem;
+      const dispatch = isTool && (!act || handles(act, e));
+      if (updateTool(ad, t, e, dispatch ? act : { type: "none" }, dispatch ? e.heldId : null) && dispatch) {
+        updateHold(ad, t, e, false);
+        updateCarry(ad, t, e, null);
+        return true;
+      }
       if (it && free && !act) {
         updateHold(ad, t, e, false);
         return updateCarry(ad, t, e, it);
@@ -51368,7 +51736,7 @@ uniform float uWet; uniform float uNight;`,
       return updateHold(ad, t, e, on);
     }
 
-    return { edible, mouthPoint, updateEat, eatTL, headFrame, headPen, eatTarget, holdTargets, holdKindOf, eatKindOf, modelInfo, canon, frame, mkF, holdSpec, dynOf, placeItem, grip, gripObj, massOf, HEAVY, polesFor, canonQ, fvec, fpt, sm, update, state, seatModel, restoreSeat, leanBody };
+    return { handles, updateTool, updatePunch, MOVES, moveOf, edible, mouthPoint, updateEat, eatTL, headFrame, headPen, eatTarget, holdTargets, holdKindOf, eatKindOf, modelInfo, canon, frame, mkF, holdSpec, dynOf, placeItem, grip, gripObj, massOf, HEAVY, polesFor, canonQ, fvec, fpt, sm, update, state, seatModel, restoreSeat, leanBody };
   }
   var sgAnim = null,
     sgA = () => (sgAnim ||= sgAnimMake({ R, ce, Gt, Gl, Yn, Bt, Dt, yt, xe, kt }));
@@ -51502,6 +51870,7 @@ uniform float uWet; uniform float uNight;`,
             (!this.lastAction || this.lastAction !== o.type || o.t < this.lastActT - 1e-4) &&
             h1[o.type] &&
             !(o.type === "eat" && e.food) &&
+            !sgA().handles(o, e) &&
             !(s && /^(punch|swing|chop|mine|thrust)$/.test(o.type))
           ) {
             let p = h1[o.type];
@@ -51651,7 +52020,7 @@ uniform float uWet; uniform float uNight;`,
           i = this.bones,
           s = !!e.fp;
         this.fpK = Bt(this.fpK || 0, s ? 1 : 0, 12, t);
-        let o = 1 + 0.3 * this.fpK;
+        let o = 1 + 0.4 * this.fpK;
         for (let h of ["l", "r"]) {
           let d = i["upperarm_" + h];
           Math.abs(d.scale.x - o) > 1e-4 && d.scale.setScalar(o);
@@ -55167,7 +55536,7 @@ uniform float uWet; uniform float uNight;`,
       animate(t, e) {
         let n = this.char;
         if ((n.root.position.copy(this.pos), (n.root.rotation.y = this.yaw), this.action && this.action.type === "eat" && this.action.itemId && kt[this.action.itemId]?.cat === "food")) {
-          let q = this.action.t / Math.max(0.2, this.action.dur),
+          let q = this.action.t,
             w = this._eatP ?? 0;
           for (let m of [0.4, 0.55, 0.7, 0.83])
             if (w < m && q >= m && n.mouthWorld) {
@@ -55201,7 +55570,7 @@ uniform float uWet; uniform float uNight;`,
                 : null,
             swim: this.swim,
             action: c
-              ? { type: c.type, t: c.t, dur: c.dur, item: c.itemId }
+              ? { type: c.type, t: c.t, dur: c.dur, item: c.itemId, hitAt: c.hitAt }
               : null,
             food: !!(c && c.type === "eat" && c.itemId && sgA().edible(c.itemId)),
             holdPose: a,
